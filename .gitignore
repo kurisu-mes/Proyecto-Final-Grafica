@@ -1,0 +1,36 @@
+## Visual Studio temporales ##
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Compilación ##
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.obj
+
+## Paquetes ##
+*.nupkg
+packages/
+*.snupkg
+
+## Archivos generados por VS ##
+*.dbmdl
+*.bak
+*.log
+*.ldf
+
+## Otros ##
+*.swp
+*.tmp
+*.vsidx
