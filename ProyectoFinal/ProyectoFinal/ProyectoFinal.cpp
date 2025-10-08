@@ -369,6 +369,7 @@ int main()
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 
 	glm::mat4 model(1.0);
+	glm::mat4 modelPiso(1.0);
 	glm::mat4 modelaux(1.0);
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 	////Loop mientras no se cierra la ventana
@@ -410,10 +411,10 @@ int main()
 		//meshList[2]->RenderMesh();
 		
 		//Piso modelado con Blender
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+		modelPiso = glm::mat4(1.0);
+		modelPiso = glm::translate(modelPiso, glm::vec3(0.0f, -2.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiso));
 		Piso_M.RenderModel();
 
 
