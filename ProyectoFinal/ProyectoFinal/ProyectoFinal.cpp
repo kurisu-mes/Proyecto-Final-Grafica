@@ -1,5 +1,5 @@
 /*
-Práctica 5: Optimización y Carga de Modelos
+Práctica 6: Texturizado
 */
 //para cargar imagen
 #define STB_IMAGE_IMPLEMENTATION
@@ -23,30 +23,38 @@ Práctica 5: Optimización y Carga de Modelos
 #include "Mesh.h"
 #include "Shader_m.h"
 #include "Camera.h"
+#include "Texture.h"
 #include "Sphere.h"
 #include"Model.h"
 #include "Skybox.h"
 
 const float toRadians = 3.14159265f / 180.0f;
-//float angulocola = 0.0f;
+
 Window mainWindow;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
 
 Camera camera;
-Model Goddard_M;
-Model Mandibula_M;
-Model PataDDer_M;
-Model PataDIzq_M;
-Model PataTDer_M;
-Model PataTIzq_M;
 
-Model Carro_M;
-Model Cofre_M;
-Model LlantaDDer_M;
-Model LlantaDIzq_M;
-Model LlantaTDer_M;
-Model LlantaTIzq_M;
+Texture brickTexture;
+Texture dirtTexture;
+Texture plainTexture;
+Texture pisoTexture;
+Texture dadoTexture;
+Texture logofiTexture;
+
+Texture dadoTextureAnim;
+
+Model Kitt_M;
+Model Llanta_M;
+Model Dado_M;
+Model Dadodae_M;
+Model Dadoobj_M;
+Model Dadofbx_M;
+
+Model DadoAnim_M;
+
+Model Piso_M;
 
 Skybox skybox;
 
@@ -57,14 +65,42 @@ static double limitFPS = 1.0 / 60.0;
 
 
 // Vertex Shader
-static const char* vShader = "shaders/shader_m.vert";
+static const char* vShader = "shaders/shader_texture.vert";
 
 // Fragment Shader
-static const char* fShader = "shaders/shader_m.frag";
+static const char* fShader = "shaders/shader_texture.frag";
 
-//Variables para la posicion del carro
-glm::vec3 carPosition = glm::vec3(0.0f, 0.3f, 0.0f);
-float carSpeed = 0.1f;
+
+
+
+//cálculo del promedio de las normales para sombreado de Phong
+void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
+	unsigned int vLength, unsigned int normalOffset)
+{
+	for (size_t i = 0; i < indiceCount; i += 3)
+	{
+		unsigned int in0 = indices[i] * vLength;
+		unsigned int in1 = indices[i + 1] * vLength;
+		unsigned int in2 = indices[i + 2] * vLength;
+		glm::vec3 v1(vertices[in1] - vertices[in0], vertices[in1 + 1] - vertices[in0 + 1], vertices[in1 + 2] - vertices[in0 + 2]);
+		glm::vec3 v2(vertices[in2] - vertices[in0], vertices[in2 + 1] - vertices[in0 + 1], vertices[in2 + 2] - vertices[in0 + 2]);
+		glm::vec3 normal = glm::cross(v1, v2);
+		normal = glm::normalize(normal);
+
+		in0 += normalOffset; in1 += normalOffset; in2 += normalOffset;
+		vertices[in0] += normal.x; vertices[in0 + 1] += normal.y; vertices[in0 + 2] += normal.z;
+		vertices[in1] += normal.x; vertices[in1 + 1] += normal.y; vertices[in1 + 2] += normal.z;
+		vertices[in2] += normal.x; vertices[in2 + 1] += normal.y; vertices[in2 + 2] += normal.z;
+	}
+
+	for (size_t i = 0; i < verticeCount / vLength; i++)
+	{
+		unsigned int nOffset = i * vLength + normalOffset;
+		glm::vec3 vec(vertices[nOffset], vertices[nOffset + 1], vertices[nOffset + 2]);
+		vec = glm::normalize(vec);
+		vertices[nOffset] = vec.x; vertices[nOffset + 1] = vec.y; vertices[nOffset + 2] = vec.z;
+	}
+}
 
 
 
@@ -97,6 +133,27 @@ void CreateObjects()
 		10.0f, 0.0f, 10.0f,		10.0f, 10.0f,	0.0f, -1.0f, 0.0f
 	};
 
+	unsigned int vegetacionIndices[] = {
+		0, 1, 2,
+		0, 2, 3,
+		4,5,6,
+		4,6,7
+	};
+
+	GLfloat vegetacionVertices[] = {
+		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.0f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
+
+		0.0f, -0.5f, -0.5f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, 0.0f,
+	};
+	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
+
+
 
 	Mesh* obj1 = new Mesh();
 	obj1->CreateMesh(vertices, indices, 32, 12);
@@ -110,6 +167,9 @@ void CreateObjects()
 	obj3->CreateMesh(floorVertices, floorIndices, 32, 6);
 	meshList.push_back(obj3);
 
+	Mesh* obj4 = new Mesh();
+	obj4->CreateMesh(vegetacionVertices, vegetacionIndices, 64, 12);
+	meshList.push_back(obj4);
 
 }
 
@@ -121,6 +181,127 @@ void CreateShaders()
 	shaderList.push_back(*shader1);
 }
 
+void CrearDado()
+{
+	unsigned int cubo_indices[] = {
+		// front
+		0, 1, 2,
+		2, 3, 0,
+
+		// back
+		8, 9, 10,
+		10, 11, 8,
+
+		// left
+		12, 13, 14,
+		14, 15, 12,
+		// bottom
+		16, 17, 18,
+		18, 19, 16,
+		// top
+		20, 21, 22,
+		22, 23, 20,
+
+		// right
+		4, 5, 6,
+		6, 7, 4,
+
+	};
+	//Ejercicio 1: reemplazar con sus dados de 6 caras texturizados, agregar normales
+// average normals
+	GLfloat cubo_vertices[] = {
+		// front
+		//x		y		z		S		T			NX		NY		NZ
+		-0.5f, -0.5f,  0.5f,	0.26f,  0.34f,		0.0f,	0.0f,	-1.0f,	//0
+		0.5f, -0.5f,  0.5f,		0.49f,	0.34f,		0.0f,	0.0f,	-1.0f,	//1
+		0.5f,  0.5f,  0.5f,		0.49f,	0.66f,		0.0f,	0.0f,	-1.0f,	//2
+		-0.5f,  0.5f,  0.5f,	0.26f,	0.66f,		0.0f,	0.0f,	-1.0f,	//3
+		// right
+		//x		y		z		S		T
+		0.5f, -0.5f,  0.5f,	    0.51f,  0.33f,		-1.0f,	0.0f,	0.0f,
+		0.5f, -0.5f,  -0.5f,	0.74f,	0.33f,		-1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  -0.5f,	0.74f,	0.66f,		-1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  0.5f,	    0.51f,	0.66f,		-1.0f,	0.0f,	0.0f,
+		// back
+		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f,		0.0f,	0.0f,	1.0f,
+		0.5f, -0.5f, -0.5f,		1.0f,	0.0f,		0.0f,	0.0f,	1.0f,
+		0.5f,  0.5f, -0.5f,		1.0f,	1.0f,		0.0f,	0.0f,	1.0f,
+		-0.5f,  0.5f, -0.5f,	0.0f,	1.0f,		0.0f,	0.0f,	1.0f,
+
+		// left
+		//x		y		z		S		T
+		-0.5f, -0.5f,  -0.5f,	0.0f,  0.0f,		1.0f,	0.0f,	0.0f,
+		-0.5f, -0.5f,  0.5f,	1.0f,	0.0f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  0.5f,	1.0f,	1.0f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  -0.5f,	0.0f,	1.0f,		1.0f,	0.0f,	0.0f,
+
+		// bottom
+		//x		y		z		S		T
+		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f,		0.0f,	1.0f,	0.0f,
+		0.5f,  -0.5f,  0.5f,	1.0f,	0.0f,		0.0f,	1.0f,	0.0f,
+		 0.5f,  -0.5f,  -0.5f,	1.0f,	1.0f,		0.0f,	1.0f,	0.0f,
+		-0.5f, -0.5f,  -0.5f,	0.0f,	1.0f,		0.0f,	1.0f,	0.0f,
+
+		//UP
+		 //x		y		z		S		T
+		 -0.5f, 0.5f,  0.5f,	0.0f,  0.0f,		0.0f,	-1.0f,	0.0f,
+		 0.5f,  0.5f,  0.5f,	1.0f,	0.0f,		0.0f,	-1.0f,	0.0f,
+		  0.5f, 0.5f,  -0.5f,	1.0f,	1.0f,		0.0f,	-1.0f,	0.0f,
+		 -0.5f, 0.5f,  -0.5f,	0.0f,	1.0f,		0.0f,	-1.0f,	0.0f,
+
+	};
+
+	Mesh* dado = new Mesh();
+	dado->CreateMesh(cubo_vertices, cubo_indices, 192, 36);
+	meshList.push_back(dado);
+
+	GLfloat cubo_verticesAnim[] = {
+		// front
+		//x		y		z		S		T			NX		NY		NZ
+		-0.5f, -0.5f,  0.5f,	0.26f,  0.34f,		0.0f,	0.0f,	-1.0f,	//0
+		0.5f, -0.5f,  0.5f,		0.49f,	0.34f,		0.0f,	0.0f,	-1.0f,	//1
+		0.5f,  0.5f,  0.5f,		0.49f,	0.66f,		0.0f,	0.0f,	-1.0f,	//2
+		-0.5f,  0.5f,  0.5f,	0.26f,	0.66f,		0.0f,	0.0f,	-1.0f,	//3
+		// right
+		//x		y		z		S		T
+		0.5f, -0.5f,  0.5f,	    0.01f,  0.34f,		-1.0f,	0.0f,	0.0f,
+		0.5f, -0.5f,  -0.5f,	0.25f,	0.34f,		-1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  -0.5f,	0.25f,	0.66f,		-1.0f,	0.0f,	0.0f,
+		0.5f,  0.5f,  0.5f,	    0.01f,	0.66f,		-1.0f,	0.0f,	0.0f,
+		// back
+		-0.5f, -0.5f, -0.5f,	0.99f,  0.34f,		0.0f,	0.0f,	1.0f,
+		0.5f, -0.5f, -0.5f,		0.76f,	0.34f,		0.0f,	0.0f,	1.0f,
+		0.5f,  0.5f, -0.5f,		0.76f,	0.66f,		0.0f,	0.0f,	1.0f,
+		-0.5f,  0.5f, -0.5f,	0.99f,	0.66f,		0.0f,	0.0f,	1.0f,
+
+		// left
+		//x		y		z		S		T
+		-0.5f, -0.5f,  -0.5f,	0.51f,  0.34f,		1.0f,	0.0f,	0.0f,
+		-0.5f, -0.5f,  0.5f,	0.74f,	0.34f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  0.5f,	0.74f,	0.66f,		1.0f,	0.0f,	0.0f,
+		-0.5f,  0.5f,  -0.5f,	0.51f,	0.66f,		1.0f,	0.0f,	0.0f,
+
+		// bottom
+		//x		y		z		S		T
+		-0.5f, -0.5f,  0.5f,	0.74f,  0.99f,		0.0f, 1.0f, 0.0f,
+		0.5f,  -0.5f,  0.5f,	0.74f,	0.67f,		0.0f,	1.0f,	0.0f,
+		 0.5f,  -0.5f,  -0.5f,	0.51f,	0.67f,		0.0f,	1.0f,	0.0f,
+		-0.5f, -0.5f,  -0.5f,	0.51f,	0.99f,		0.0f,	1.0f,	0.0f,
+
+		//UP
+		 //x		y		z		S		T
+		 -0.5f, 0.5f,  0.5f,	0.74f,  0.01f,		0.0f,	-1.0f,	0.0f,
+		 0.5f,  0.5f,  0.5f,	0.74f,	0.333f,		0.0f,	-1.0f,	0.0f,
+		  0.5f, 0.5f,  -0.5f,	0.51f,	0.333f,		0.0f,	-1.0f,	0.0f,
+		 -0.5f, 0.5f,  -0.5f,	0.51f,	0.01f,		0.0f,	-1.0f,	0.0f,
+
+	};
+
+	Mesh* dadoAnim = new Mesh();
+	dadoAnim->CreateMesh(cubo_verticesAnim, cubo_indices, 192, 36);
+	meshList.push_back(dadoAnim);
+}
+
 
 
 int main()
@@ -129,36 +310,48 @@ int main()
 	mainWindow.Initialise();
 
 	CreateObjects();
+	CrearDado();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.5f, 7.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 1.0f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
-	Goddard_M = Model();
-	Goddard_M.LoadModel("Models/GodartCuerpo.fbx");
-	Mandibula_M = Model();
-	Mandibula_M.LoadModel("Models/Mandibula.fbx");
-	PataDDer_M = Model();
-	PataDDer_M.LoadModel("Models/PataD_Derecha.fbx");
-	PataDIzq_M = Model();
-	PataDIzq_M.LoadModel("Models/PataD_Izquierda.fbx");
-	PataTDer_M = Model();
-	PataTDer_M.LoadModel("Models/PataT_Derecha.fbx");
-	PataTIzq_M = Model();
-	PataTIzq_M.LoadModel("Models/PataT_Izquierda.fbx");
+	brickTexture = Texture("Textures/brick.png");
+	brickTexture.LoadTextureA();
+	dirtTexture = Texture("Textures/dirt.png");
+	dirtTexture.LoadTextureA();
+	plainTexture = Texture("Textures/plain.png");
+	plainTexture.LoadTextureA();
+	pisoTexture = Texture("Textures/piso.tga");
+	pisoTexture.LoadTextureA();
+	dadoTexture = Texture("Textures/dadonum.jpg");
+	dadoTexture.LoadTexture();
+	//Animales
+	dadoTextureAnim = Texture("Textures/dado_animales.jpg");
+	dadoTextureAnim.LoadTexture();
+	//----
+	logofiTexture = Texture("Textures/escudo_fi_color.tga");
+	logofiTexture.LoadTextureA();
 
-	Carro_M = Model();
-	Carro_M.LoadModel("Models/Carro.fbx");
-	Cofre_M = Model();
-	Cofre_M.LoadModel("Models/Cofre.fbx");
-	LlantaDDer_M = Model();
-	LlantaDDer_M.LoadModel("Models/LlantaDDer.fbx");
-	LlantaDIzq_M = Model();
-	LlantaDIzq_M.LoadModel("Models/LlantaDIzq.fbx");
-	LlantaTDer_M = Model();
-	LlantaTDer_M.LoadModel("Models/LlantaTDer.fbx");
-	LlantaTIzq_M = Model();
-	LlantaTIzq_M.LoadModel("Models/LlantaTIzq.fbx");
 
+	Kitt_M = Model();
+	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
+	Llanta_M = Model();
+	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
+
+	Dadodae_M = Model();
+	Dadodae_M.LoadModel("Models/dado.dae");
+
+	Dadoobj_M = Model();
+	Dadoobj_M.LoadModel("Models/dado.obj");
+
+	Dadofbx_M = Model();
+	Dadofbx_M.LoadModel("Models/dado.fbx");
+
+	DadoAnim_M = Model();
+	DadoAnim_M.LoadModel("Models/dadoAnim.obj");
+
+	Piso_M = Model();
+	Piso_M.LoadModel("Models/Piso.obj");
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
@@ -175,12 +368,9 @@ int main()
 	GLuint uniformColor = 0;
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 
-
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
-	glm::mat4 modelCarro(1.0);
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
@@ -194,169 +384,147 @@ int main()
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
-		//Movimiento del carro
-		if (mainWindow.getsKeys()[GLFW_KEY_H]) {
-			carPosition.x -= carSpeed;
-		}
-		if (mainWindow.getsKeys()[GLFW_KEY_J]) {
-			carPosition.x += carSpeed;
-		}
-
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//Se dibuja el Skybox
 		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
-
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
 		uniformView = shaderList[0].GetViewLocation();
 		uniformColor = shaderList[0].getColorLocation();
-
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-		// INICIA DIBUJO DEL PISO
-		color = glm::vec3(0.5f, 0.5f, 0.5f); //piso de color gris
+		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		//Piso de textura
+
+		color = glm::vec3(1.0f, 1.0f, 1.0f);//color blanco, multiplica a la información de color de la textura
+
+		//model = glm::mat4(1.0);
+		//model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
+		//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+
+		//pisoTexture.UseTexture();
+		//meshList[2]->RenderMesh();
+		
+		//Piso modelado con Blender
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(30.0f, 1.0f, 30.0f));
+		//model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		meshList[2]->RenderMesh();
+		Piso_M.RenderModel();
 
-		//------------*INICIA DIBUJO DE NUESTROS DEMÁS OBJETOS-------------------*
+
+		//Dado de Opengl
+		//Ejercicio 1: Texturizar su cubo con la imagen dado_animales ya optimizada por ustedes
 		/*
-		//Goddard
-		color = glm::vec3(1.0f, 0.0f, 0.0f); //modelo de goddard de color negro
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 0.65f, -30.0f));
-		modelaux = model;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		model = glm::translate(model, glm::vec3(-1.5f, 4.5f, -2.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Goddard_M.RenderModel();//modificar por el modelo sin las 4 patas y sin cola
-		//mandibula
-		color = glm::vec3(0.0f, 1.0f, 0.0f);
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(2.35f, 0.65f, 0.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion1()), glm::vec3(0.0f, 0.0f, -1.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion2()), glm::vec3(0.0f, 0.0f, 1.0f));
-		//modelaux = model;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Mandibula_M.RenderModel();
-
-		//pata delantera derecha
-		color = glm::vec3(0.0f, 0.0f, 1.0f);
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(0.6f, -0.5f, 0.6f));
-		modelaux = model;
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion3()), glm::vec3(0.0f, 0.0f, -1.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion4()), glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		PataDDer_M.RenderModel();
-
-		// pata delantera izquierda
-
-		color = glm::vec3(0.0f, 0.0f, 1.0f);
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.2f));
-		modelaux = model;
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion5()), glm::vec3(0.0f, 0.0f, -1.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion6()), glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		PataDIzq_M.RenderModel();
-		//pata trasera derecha
-
-		color = glm::vec3(0.0f, 0.0f, 1.0f);
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(-1.8f, -0.72f, 1.2f));
-		modelaux = model;
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion7()), glm::vec3(0.0f, 0.0f, -1.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion8()), glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		PataTDer_M.RenderModel();
-		//pata trasera izquierda
-		color = glm::vec3(0.0f, 0.0f, 1.0f);
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.2f));
-		//modelaux = model;
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion9()), glm::vec3(0.0f, 0.0f, -1.0f));
-		model = glm::rotate(model, glm::radians(mainWindow.getarticulacion()), glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		PataTIzq_M.RenderModel();
+		dadoTexture.UseTexture();
+		meshList[4]->RenderMesh();
 		*/
-		//-------------------------------------------------------------------*
-		//DIBUJO DEL CARRO
-		//Carro
-		color = glm::vec3(0.5f, 0.0f, 0.0f);
-		modelCarro = glm::mat4(1.0);
-		modelCarro = glm::translate(modelCarro, glm::vec3(0.0f, 3.0f, 0.0f));
-		modelCarro = glm::translate(modelCarro, carPosition);
-		modelCarro = glm::rotate(modelCarro, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		modelCarro = glm::scale(modelCarro, glm::vec3(8.0f, 8.0f, 8.0f));
-		modelaux = modelCarro;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCarro));
-		Carro_M.RenderModel();
-		//Cofre
-		color = glm::vec3(0.25f, 0.0f, 0.0f);
-		//modelCarro = modelaux;
-		modelCarro = glm::translate(modelCarro, glm::vec3(0.0f, -1.3f, 0.21f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion1()), glm::vec3(-1.0f, 0.0f, 0.0f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion2()), glm::vec3(1.0f, 0.0f, 0.0f));
-		//modelaux = model;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCarro));
-		Cofre_M.RenderModel();
-		//Llanta Delantera Derecha
-		color = glm::vec3(0.1f, 0.1f, 0.1f);
-		modelCarro = modelaux;
-		modelCarro = glm::translate(modelCarro, glm::vec3(-1.0f, -1.5f, -0.25f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion3()), glm::vec3(-1.0f, 0.0f, 0.0f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion4()), glm::vec3(1.0f, 0.0f, 0.0f));
-		//modelaux = model;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCarro));
-		LlantaDDer_M.RenderModel();
+		//Dado del ejercicio de clase texturizado por OpenGL
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-5.5f, 8.5f, -2.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		dadoTextureAnim.UseTexture();
+		meshList[5]->RenderMesh();
 
-		//Llanta Delantera izquierda
-		color = glm::vec3(0.1f, 0.1f, 0.1f);
-		modelCarro = modelaux;
-		modelCarro = glm::translate(modelCarro, glm::vec3(1.0f, -1.5f, -0.25f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion3()), glm::vec3(-1.0f, 0.0f, 0.0f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion4()), glm::vec3(1.0f, 0.0f, 0.0f));
-		//modelaux = model;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCarro));
-		LlantaDDer_M.RenderModel();
 
-		//Llanta Trasera Derecha
-		color = glm::vec3(0.1f, 0.1f, 0.1f);
-		modelCarro = modelaux;
-		modelCarro = glm::translate(modelCarro, glm::vec3(-1.0f, 1.3f, -0.25f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion3()), glm::vec3(-1.0f, 0.0f, 0.0f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion4()), glm::vec3(1.0f, 0.0f, 0.0f));
-		//modelaux = model;
-		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCarro));
-		LlantaDDer_M.RenderModel();
+		//Ejercicio 2:Importar el cubo texturizado en el programa de modelado con 
+		//la imagen dado_animales ya optimizada por ustedes
+		/*
+		//Dado importado
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-3.0f, 3.0f, -2.0f));
+		//model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Dado_M.RenderModel();*/
+		/*
+		//Dado importado
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-9.0f, 3.0f, -2.0f));
+		//model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Dadodae_M.RenderModel();
+		*/
+		/*
+		//Dado importado
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-6.0f, 3.0f, -2.0f));
+		//model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Dadoobj_M.RenderModel();
 
-		//Llanta Trasera Izquierda
-		color = glm::vec3(0.1f, 0.1f, 0.1f);
-		modelCarro = modelaux;
-		modelCarro = glm::translate(modelCarro, glm::vec3(1.0f, 1.3f, -0.25f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion3()), glm::vec3(-1.0f, 0.0f, 0.0f));
-		modelCarro = glm::rotate(modelCarro, glm::radians(mainWindow.getarticulacion4()), glm::vec3(1.0f, 0.0f, 0.0f));
-		//modelaux = model;
+		//Dado importado
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.0f, 3.0f, -2.0f));
+		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Dadofbx_M.RenderModel();
+		*/
+		//Dado importado con Blender
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-9.5f, 8.5f, -2.0f));
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		DadoAnim_M.RenderModel();
+
+
+		/*Reporte de práctica :
+		Ejercicio 1: Crear un dado de 8 caras y texturizarlo por medio de código
+		Ejercicio 2: Importar el modelo de su coche con sus 4 llantas acomodadas
+		y tener texturizadas las 4 llantas (diferenciar caucho y rin)  y
+		texturizar el logo de la Facultad de ingeniería en el cofre de su propio modelo de coche
+
+		*/
+		//Instancia del coche 
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), -0.5f, -3.0f));
+		modelaux = model;
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Kitt_M.RenderModel();
+
+		//Llanta delantera izquierda
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(7.0f, -0.5f, 8.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		color = glm::vec3(0.5f, 0.5f, 0.5f);//llanta con color gris
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCarro));
-		LlantaDDer_M.RenderModel();
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Llanta_M.RenderModel();
+
+		//Llanta trasera izquierda
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(15.5f, -0.5f, 8.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Llanta_M.RenderModel();
+
+		//Llanta delantera derecha
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(7.0f, -0.5f, 1.5f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Llanta_M.RenderModel();
+
+		//Llanta trasera derecha
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(15.5f, -0.5f, 1.5f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Llanta_M.RenderModel();
 
 		glUseProgram(0);
 
@@ -365,3 +533,11 @@ int main()
 
 	return 0;
 }
+/*
+//blending: transparencia o traslucidez
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		logofiTexture.UseTexture(); //textura con transparencia o traslucidez
+		FIGURA A RENDERIZAR de OpenGL, si es modelo importado no se declara UseTexture
+		glDisable(GL_BLEND);
+*/
