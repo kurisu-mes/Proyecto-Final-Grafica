@@ -1,4 +1,5 @@
 #include "Model.h"
+#include <iostream>
 
 
 
@@ -13,7 +14,7 @@ void Model::LoadModel(const std::string & fileName)
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
 	if (!scene)
 	{	
-		printf("Falló en cargar el modelo: %s \n", fileName, importer.GetErrorString());
+		printf("Falló en cargar el modelo: %s \n", fileName.c_str(), importer.GetErrorString());
 		return;
 	}
 	LoadNode(scene->mRootNode, scene);
@@ -130,14 +131,18 @@ void Model::LoadMaterials(const aiScene * scene)
 				{
 					//printf("entre a 1 / \n");
 					idx = std::string(path.data).rfind("/");//para quitar del path del modelo todo lo que este antes del \ de ubicación de directorio
+					//printf("\npath: %s\n", std::string(path.data).c_str());
 					filename = std::string(path.data).substr(idx + 1);
+					//printf("\nfilename: %s\n", filename.c_str());
+
 				}
-				/*else if(std::string(path.data).rfind("\\"))
+				else if(std::string(path.data).rfind("\\"))
 				{
-					printf(" entre a 2 \\  \n");
+					printf(" entre a 2 \n");
 					idx = std::string(path.data).rfind("\\");
 					filename = std::string(path.data).substr(idx + 1);
-				}*/
+					printf("\nfilename: %s\n", filename.c_str());
+				}
 				
 				
 				std::string tga ="tga";
@@ -150,7 +155,7 @@ void Model::LoadMaterials(const aiScene * scene)
 				{
 					if (!TextureList[i]->LoadTextureA())
 					{
-						printf("Falló en cargar la Textura :%s\n", texPath);
+						printf("Falló en cargar la Textura :%s\n", texPath.c_str());
 						delete TextureList[i];
 						TextureList[i] = nullptr;
 					}
@@ -159,7 +164,7 @@ void Model::LoadMaterials(const aiScene * scene)
 				{
 					if (!TextureList[i]->LoadTexture())
 					{
-						printf("Falló en cargar la Textura :%s\n", texPath);
+						printf("Falló en cargar la Textura :%s\n", texPath.c_str());
 						delete TextureList[i];
 						TextureList[i] = nullptr;
 					}

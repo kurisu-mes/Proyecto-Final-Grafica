@@ -9,7 +9,7 @@
 #include <gtc\matrix_transform.hpp>
 #include<gtc\type_ptr.hpp>
 #include "Mesh.h"
-#include "Shader_m.h"
+#include "Shader_light.h"
 class Skybox
 {
 public:
