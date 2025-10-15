@@ -1,4 +1,5 @@
 #include "Model.h"
+#include <iostream>
 
 
 
@@ -13,10 +14,11 @@ void Model::LoadModel(const std::string & fileName)
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
 	if (!scene)
 	{	
-		printf("Falló en cargar el modelo: %s \n", fileName, importer.GetErrorString());
+		printf("Falló en cargar el modelo: %s \n", fileName.c_str(), importer.GetErrorString());
 		return;
 	}
 	LoadNode(scene->mRootNode, scene);
+	LoadMaterials(scene);
 	}
 
 void Model::ClearModel()
@@ -31,13 +33,26 @@ void Model::ClearModel()
 		}
 	}
 
-	
+	for (unsigned int i = 0; i < TextureList.size(); i++)
+	{
+		if (TextureList[i])
+		{
+			delete TextureList[i];
+			TextureList[i] = nullptr;
+		}
+	}
+
 }
 
 void Model::RenderModel()
 {
 	for (unsigned int i = 0; i < MeshList.size(); i++)
 	{
+		unsigned int materialIndex = meshTotex[i];
+		if (!materialIndex< TextureList.size()&& TextureList[materialIndex])
+		{
+			TextureList[materialIndex]->UseTexture();
+		}
 		MeshList[i]->RenderMesh();
 
 	}
@@ -79,7 +94,8 @@ void Model::LoadMesh(aiMesh * mesh, const aiScene * scene)
 		{
 			vertices.insert(vertices.end(), { 0.0f,0.0f });
 		}
-		//Normals importante, las normales son negativas porque la luz interactúa con ellas de esa forma, cómo se vio con el dado/cubo
+		//Normals importante, las normales son negativas porque la luz interactúa con ellas de esa forma, cómo se vio con el 
+		
 		vertices.insert(vertices.end(), { -mesh->mNormals[i].x,-mesh->mNormals[i].y ,-mesh->mNormals[i].z });
 	}
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -94,5 +110,72 @@ void Model::LoadMesh(aiMesh * mesh, const aiScene * scene)
 	Mesh* newMesh = new Mesh();
 	newMesh->CreateMesh(&vertices[0], &indices[0], vertices.size(), indices.size());
 	MeshList.push_back(newMesh);
+	meshTotex.push_back(mesh->mMaterialIndex);
 }
 
+void Model::LoadMaterials(const aiScene * scene)
+{
+	TextureList.resize(scene->mNumMaterials);
+	for (unsigned int i = 0; i < scene ->mNumMaterials; i++)
+	{
+		aiMaterial* material = scene->mMaterials[i];
+		TextureList[i] = nullptr;
+		if (material->GetTextureCount(aiTextureType_DIFFUSE	))
+		{
+			aiString path;
+			if (material->GetTexture(aiTextureType_DIFFUSE,0,&path)==AI_SUCCESS)
+			{
+				int idx;
+				std::string filename;
+				if (std::string(path.data).rfind("/"))
+				{
+					//printf("entre a 1 / \n");
+					idx = std::string(path.data).rfind("/");//para quitar del path del modelo todo lo que este antes del \ de ubicación de directorio
+					//printf("\npath: %s\n", std::string(path.data).c_str());
+					filename = std::string(path.data).substr(idx + 1);
+					//printf("\nfilename: %s\n", filename.c_str());
+
+				}
+				else if(std::string(path.data).rfind("\\"))
+				{
+					printf(" entre a 2 \n");
+					idx = std::string(path.data).rfind("\\");
+					filename = std::string(path.data).substr(idx + 1);
+					printf("\nfilename: %s\n", filename.c_str());
+				}
+				
+				
+				std::string tga ="tga";
+				std::string png = "png";
+				std::size_t existetga = filename.find(tga);
+				std::size_t existepng= filename.find(png);
+				std::string texPath = std::string("Textures/") + filename;
+				TextureList[i] = new Texture(texPath.c_str());
+				if (existetga != std::string::npos || existepng != std::string::npos)
+				{
+					if (!TextureList[i]->LoadTextureA())
+					{
+						printf("Falló en cargar la Textura :%s\n", texPath.c_str());
+						delete TextureList[i];
+						TextureList[i] = nullptr;
+					}
+				}
+				else
+				{
+					if (!TextureList[i]->LoadTexture())
+					{
+						printf("Falló en cargar la Textura :%s\n", texPath.c_str());
+						delete TextureList[i];
+						TextureList[i] = nullptr;
+					}
+				}
+			}
+		}
+		if (!TextureList[i])
+		{
+			TextureList[i] = new Texture("Textures/plain.png"); //textura que se aplicará a los modelos si no tienen textura o la textura no se puede cargar
+			TextureList[i]->LoadTextureA();
+		}
+
+	}
+}
