@@ -53,6 +53,12 @@ Model Piso_M;
 
 Skybox skybox;
 
+//escritorio
+Model Angela_Desk;
+Model Angela_Chair;
+Texture Angela_Desk_Texture;
+Texture Angela_Chair_Texture;
+
 //materiales
 Material Material_brillante;
 Material Material_opaco;
@@ -218,6 +224,15 @@ int main()
 
 	Piso_M = Model();
 	Piso_M.LoadModel("Models/Piso.obj");
+
+	Angela_Desk = Model();
+	Angela_Desk.LoadModel("Models/escritorio.obj");
+	Angela_Chair = Model();
+	Angela_Chair.LoadModel("Models/silla_escritorio.obj");
+	Angela_Desk_Texture = Texture("Textures/Textura_Desk.png");
+	pisoTexture.LoadTextureA();
+	Angela_Chair_Texture = Texture("Textures/Silla_Texture.png");
+	pisoTexture.LoadTextureA();
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
@@ -401,7 +416,18 @@ int main()
 		Elementos = glm::translate(Elementos, glm::vec3(-55.0f, -1.0f, 30.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
-		meshList[0]->RenderMesh();
+		//meshList[0]->RenderMesh();
+		//modelos
+		Angela_Desk_Texture.UseTexture();
+		Angela_Desk.RenderModel();
+
+		Elementos = glm::translate(Elementos, glm::vec3(-5.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		//meshList[0]->RenderMesh();
+		//modelos
+		Angela_Chair_Texture.UseTexture();
+		Angela_Chair.RenderModel();
 
 		//El papu de rosa
 		Elementos = glm::mat4(1.0);
