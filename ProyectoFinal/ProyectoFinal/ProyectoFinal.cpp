@@ -321,7 +321,7 @@ int main()
 		glm::mat4 modelaux(1.0);
 		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::mat4 modelPiso(1.0);
-
+		glm::mat4 Elementos(1.0);
 		/* Piso simple con textura
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
@@ -338,6 +338,7 @@ int main()
 		//Piso modelado con Blender
 		modelPiso = glm::mat4(1.0);
 		modelPiso = glm::translate(modelPiso, glm::vec3(0.0f, -2.0f, 0.0f));
+		Elementos = modelPiso;
 		//model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiso));
 		Piso_M.RenderModel();
@@ -394,12 +395,121 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Blackhawk_M.RenderModel();
 
-		//Agave ¿qué sucede si lo renderizan antes del coche y el helicóptero?
+		//Cubos de posicion
+		//Recepcion
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(-55.0f, -1.0f, 30.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//El papu de rosa
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(-90.0f, -1.0f, 60.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Poke estatua (?) Gris
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(-90.0f, -1.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Ofrenda
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(-20.0f, -1.0f, -40.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+		//Skullman
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(-40.0f, -1.0f, -40.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Protoman
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(10.0f, -1.0f, 70.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Entrada al ring
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(100.0f, -1.0f, 50.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Mercenaria
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(95.0f, -1.0f, 47.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Ring de lucha/Ubicacion central de la piramide
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(172.5f, -1.0f, -25.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Poke arbol
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(80.0f, -1.0f, -55.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Ubicaciones centrales de la galeria
+		//------------------------------------------ 
+		// Limite a la izquierda
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(-40.0f, -1.0f, 30.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Centro de la parte central
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(40.0f, -1.0f, 20.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Limite a la derecha
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(110.0f, -1.0f, 20.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//Limite abajo
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(40.0f, -1.0f, 55.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+		//Limite arriba
+		Elementos = glm::mat4(1.0);
+		Elementos = glm::translate(Elementos, glm::vec3(40.0f, -1.0f, -5.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
+		meshList[0]->RenderMesh();
+
+		//------------------------------------------
+
+		//Agave
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -4.0f));
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		
+
 		//blending: transparencia o traslucidez
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
