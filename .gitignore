@@ -18,11 +18,25 @@
 x64/
 x86/
 
+# Ignora archivos de artefactos de compilación, pero NO los .dll o .exe
+# que necesitamos (como glfw3.dll, glew32.dll, etc.)
 *.pdb
 *.cache
 *.obj
-*.lib
 *.ilk
+*.lib
+
+## Recursos (Ignorados por solicitud) ##
+# Carpetas de modelos y texturas
+Models/
+Textures/
+
+# Archivos comprimidos (incluyendo los de tus capturas)
+*.zip
+*.rar
+*.7z
+Practica7x64.zip
+Texturas y modelos ProyectoFinal.zip
 
 ## Paquetes ##
 *.nupkg
@@ -32,19 +46,7 @@ packages/
 ## Archivos generados por VS ##
 *.dbmdl
 *.bak
-# *.log es muy genérico, lo quitamos por si acaso,
-# a menos que estés seguro de que solo son de VS.
 *.ldf
-
-## Recursos (Ignorados por solicitud) ##
-# Carpetas de modelos y texturas
-Models/
-Textures/
-
-# Archivos comprimidos
-*.zip
-*.rar
-*.7z
 
 ## Otros ##
 *.swp
