@@ -1,4 +1,5 @@
 ## Visual Studio temporales ##
+# Ignora la carpeta de configuración de VS y archivos de usuario
 .vs/
 *.suo
 *.user
@@ -6,18 +7,36 @@
 *.sln.docstates
 
 ## Compilación ##
+# Ignora las carpetas de salida de compilación estándar
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+[Dd]ebug/
+[Rr]elease/
 [Dd]ebug*/
 [Rr]elease*/
 x64/
 x86/
-*.exe
-*.dll
+
+# Ignora archivos de artefactos de compilación, pero NO los .dll o .exe
+# que necesitamos (como glfw3.dll, glew32.dll, etc.)
 *.pdb
 *.cache
 *.obj
+*.ilk
+*.lib
+
+## Recursos (Ignorados por solicitud) ##
+# Carpetas de modelos y texturas
+Models/
+Textures/
+
+# Archivos comprimidos (incluyendo los de tus capturas)
+*.zip
+*.rar
+*.7z
+Practica7x64.zip
+Texturas y modelos ProyectoFinal.zip
 
 ## Paquetes ##
 *.nupkg
@@ -27,7 +46,6 @@ packages/
 ## Archivos generados por VS ##
 *.dbmdl
 *.bak
-*.log
 *.ldf
 
 ## Otros ##

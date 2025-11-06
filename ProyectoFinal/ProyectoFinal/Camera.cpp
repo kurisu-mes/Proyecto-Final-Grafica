@@ -20,14 +20,22 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 {
 	GLfloat velocity = moveSpeed * deltaTime;
 
+	// Creamos un vector de movimiento 'front' que esté proyectado sobre el plano XZ
+	// Simplemente tomamos las componentes X y Z del vector 'front' y ponemos Y en 0.
+	glm::vec3 frontMovement = glm::vec3(front.x, 0.0f, front.z);
+
+	// Lo normalizamos para mantener una velocidad de movimiento constante.
+	// Si no lo normalizas, te moverás más lento cuando mires hacia arriba o abajo.
+	frontMovement = glm::normalize(frontMovement);
+
 	if (keys[GLFW_KEY_W])
 	{
-		position += front * velocity;
+		position += frontMovement * velocity;
 	}
 
 	if (keys[GLFW_KEY_S])
 	{
-		position -= front * velocity;
+		position -= frontMovement * velocity;
 	}
 
 	if (keys[GLFW_KEY_A])
@@ -83,6 +91,11 @@ void Camera::update()
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+	/*front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));*/
+
 	front = glm::normalize(front);
 
 	right = glm::normalize(glm::cross(front, worldUp));
