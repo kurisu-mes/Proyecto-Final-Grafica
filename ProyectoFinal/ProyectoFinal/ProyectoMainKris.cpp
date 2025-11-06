@@ -39,17 +39,6 @@ std::vector<Shader> shaderList;
 
 Camera camera;
 
-Texture brickTexture;
-Texture dirtTexture;
-Texture plainTexture;
-Texture pisoTexture;
-Texture AgaveTexture;
-
-Model Kitt_M;
-Model Llanta_M;
-Model Blackhawk_M;
-
-
 Skybox skybox;
 
 Model Piso_M;
@@ -237,24 +226,6 @@ int main()
 	CreateShaders();
 
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
-
-	brickTexture = Texture("Textures/brick.png");
-	brickTexture.LoadTextureA();
-	dirtTexture = Texture("Textures/dirt.png");
-	dirtTexture.LoadTextureA();
-	plainTexture = Texture("Textures/plain.png");
-	plainTexture.LoadTextureA();
-	pisoTexture = Texture("Textures/piso.tga");
-	pisoTexture.LoadTextureA();
-	AgaveTexture = Texture("Textures/Agave.tga");
-	AgaveTexture.LoadTextureA();
-
-	Kitt_M = Model();
-	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
-	Llanta_M = Model();
-	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
-	Blackhawk_M = Model();
-	Blackhawk_M.LoadModel("Models/uh60.obj");
 
 	//terreno
 	Piso_M = Model();
@@ -459,6 +430,7 @@ int main()
 		//Piso modelado con Blender
 		modelPiso = glm::mat4(1.0);
 		modelPiso = glm::translate(modelPiso, glm::vec3(0.0f, -2.0f, 0.0f));
+		modelPiso = glm::scale(modelPiso, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiso));
 		glUniform3fv(uniformColor, 1, glm::value_ptr(color));
 		PisoTexture.LoadTextureA();
@@ -467,7 +439,7 @@ int main()
 		//Cubos de posicion
 		//Recepcion
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(-35.0f, -2.0f, 18.0f));
+		elementos = glm::translate(elementos, glm::vec3(-15.0f, -2.0f, 18.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.3f, 1.3f, 1.3f));
 		elementos = glm::rotate(elementos, 30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
@@ -496,7 +468,7 @@ int main()
 
 		//Ofrenda
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(-20.0f, -2.0f, -45.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(-5.0f, -2.0f, -35.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		FloresT.UseTexture();
@@ -520,21 +492,21 @@ int main()
 
 		//Entrada al ring
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(100.0f, -1.0f, 50.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(85.0f, -1.0f, 50.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		meshList[0]->RenderMesh();
 
 		//Mercenaria
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(95.0f, -1.0f, 47.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(80.0f, -1.0f, 47.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		meshList[0]->RenderMesh();
 
 		//Ubicacion central de la piramide
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(172.5f, -2.0f, -25.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(125.5f, -2.0f, -25.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PiramideT.UseTexture();
 		PiramideRing.RenderModel();
@@ -555,7 +527,7 @@ int main()
 		//------------------------------------------ 
 		//MegaHawlucha
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(40.0f, -2.0f, 20.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(20.0f, -2.0f, 18.0f));
 		elementoLocal = elementos;
 		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -564,16 +536,14 @@ int main()
 
 		//Calendario
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		elementos = glm::translate(elementos, glm::vec3(15.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		CalendarioT.UseTexture();
 		CalendarioDoom.RenderModel();
 
 		//Penacho (con base)
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(-10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		elementos = glm::translate(elementos, glm::vec3(-10.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PenachoT.UseTexture();
 		PenachoMan.RenderModel();
@@ -585,84 +555,142 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		meshList[0]->RenderMesh();
 
-
 		//Limite a la derecha, cerca del ring
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(110.0f, -1.0f, 20.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(65.0f, -1.0f, 10.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		elementos = glm::scale(elementos, glm::vec3(1.0f, 4.0f, 10.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		meshList[0]->RenderMesh();
 
+
 		//Limite abajo, lejos, poner paredes
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(40.0f, -2.0f, 55.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		elementos = glm::scale(elementos, glm::vec3(0.5f, 0.5f, 0.5f));
+		elementos = glm::translate(elementos, glm::vec3(40.0f, -2.0f, 35.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementoLocal = elementos;
+		//elementos = glm::scale(elementos, glm::vec3(0.5f, 0.5f, 0.5f));
+		elementos = glm::rotate(elementos, 160 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		ParedGalT.UseTexture();
 		ParedGaleria.RenderModel();
 
-		//Limite abajo, lejos, poner paredes
-		//elementos = glm::mat4(1.0);
+		elementos = elementoLocal;
 		elementos = glm::translate(elementos, glm::vec3(10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		//elementos = glm::scale(elementos, glm::vec3(5.0f, 5.0f, 5.0f));
+		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		ExpositorT.UseTexture();
-		ExpositorGaleria.RenderModel();
+		ParedGalT.UseTexture();
+		ParedGaleria.RenderModel();
+
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(-10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		ParedGalT.UseTexture();
+		ParedGaleria.RenderModel();
 
 
 		//Limite arriba. FILA DE CABALLETES.
+		//1
 		caballetes = glm::mat4(1.0);
-		caballetes = glm::translate(caballetes, glm::vec3(40.0f, -2.0f, -5.0f));
+		caballetes = glm::translate(caballetes, glm::vec3(10.0f, -2.0f, 3.0f));
 		modelaux = caballetes;
-		//elementos = glm::scale(elementos, glm::vec3(4.0f, 2.0f, 1.0f));
+		caballetes = glm::scale(caballetes, glm::vec3(1.0f, 1.3f, 1.0f));
+		caballetes = glm::rotate(caballetes, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
 		CaballeteT.UseTexture();
 		//textura de cuadro en cuestión
 		Caballete1.RenderModel();
 
+		//2
 		caballetes = modelaux;
-		caballetes = glm::translate(caballetes, glm::vec3(7.0f, 0.0f, 0.0f));
+		caballetes = glm::translate(caballetes, glm::vec3(5.0f, 0.0f, 0.0f));
 		modelaux = caballetes;
-		//elementos = glm::scale(elementos, glm::vec3(4.0f, 2.0f, 1.0f));
+		caballetes = glm::scale(caballetes, glm::vec3(1.5f, 1.5f, 1.5f));
+		caballetes = glm::rotate(caballetes, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
 		CaballeteT.UseTexture();
 		//textura de cuadro en cuestión
 		Caballete2.RenderModel();
 
+		//3
 		caballetes = modelaux;
-		caballetes = glm::translate(caballetes, glm::vec3(7.0f, 0.0f, 0.0f));
-		caballetes = glm::scale(caballetes, glm::vec3(0.5f, 0.5f, 0.5f));
+		caballetes = glm::translate(caballetes, glm::vec3(3.0f, 0.0f, 0.0f));
 		modelaux = caballetes;
-		//elementos = glm::scale(elementos, glm::vec3(4.0f, 2.0f, 1.0f));
+		caballetes = glm::scale(caballetes, glm::vec3(0.8f, 0.8f, 0.8f));
+		caballetes = glm::rotate(caballetes, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestión
+		Caballete2.RenderModel();
+
+		//4
+		caballetes = modelaux;
+		caballetes = glm::translate(caballetes, glm::vec3(4.0f, 0.0f, 0.0f));
+		modelaux = caballetes;
+		caballetes = glm::rotate(caballetes, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
 		CaballeteT.UseTexture();
 		//textura de cuadro en cuestión
 		Caballete1.RenderModel();
 
+		//5
 		caballetes = modelaux;
-		caballetes = glm::translate(caballetes, glm::vec3(7.0f, 0.0f, 0.0f));
+		caballetes = glm::translate(caballetes, glm::vec3(3.0f, 0.0f, 0.0f));
 		modelaux = caballetes;
-		//elementos = glm::scale(elementos, glm::vec3(4.0f, 2.0f, 1.0f));
+		caballetes = glm::scale(caballetes, glm::vec3(1.5f, 1.5f, 1.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestión
+		Caballete1.RenderModel();
+
+		//6
+		caballetes = modelaux;
+		caballetes = glm::translate(caballetes, glm::vec3(6.0f, 0.0f, 0.0f));
+		modelaux = caballetes;
+		caballetes = glm::scale(caballetes, glm::vec3(1.0f, 1.3f, 1.5f));
+		caballetes = glm::rotate(caballetes, -10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
 		CaballeteT.UseTexture();
 		//textura de cuadro en cuestión
 		Caballete2.RenderModel();
+
+		//7
+		caballetes = modelaux;
+		caballetes = glm::translate(caballetes, glm::vec3(3.0f, 0.0f, 0.0f));
+		modelaux = caballetes;
+		caballetes = glm::scale(caballetes, glm::vec3(0.8f, 0.8f, 0.8f));
+		caballetes = glm::rotate(caballetes, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestión
+		Caballete1.RenderModel();
+
+		//8
+		caballetes = modelaux;
+		caballetes = glm::translate(caballetes, glm::vec3(4.0f, 0.0f, 0.0f));
+		modelaux = caballetes;
+		caballetes = glm::rotate(caballetes, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestión
+		Caballete2.RenderModel();
+
+		//9
+		caballetes = modelaux;
+		caballetes = glm::translate(caballetes, glm::vec3(5.0f, 0.0f, 0.0f));
+		modelaux = caballetes;
+		caballetes = glm::scale(caballetes, glm::vec3(1.0f, 1.4f, 1.0f));
+		caballetes = glm::rotate(caballetes, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(caballetes));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestión
+		Caballete1.RenderModel();
 
 		//------------------------------------------
-
-		//Agave
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -4.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
 
 		//blending: transparencia o traslucidez
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		AgaveTexture.UseTexture();
-		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[3]->RenderMesh();
 		glDisable(GL_BLEND);
 
 		glUseProgram(0);
