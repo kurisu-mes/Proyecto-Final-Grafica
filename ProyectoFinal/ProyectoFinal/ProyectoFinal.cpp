@@ -44,20 +44,54 @@ Texture dirtTexture;
 Texture plainTexture;
 Texture pisoTexture;
 Texture AgaveTexture;
+Texture PiramideTexture;
 
 Model Kitt_M;
 Model Llanta_M;
 Model Blackhawk_M;
+Model Piramide_M;
 
 Model Piso_M;
 
-Skybox skybox;
-
-//escritorio
 Model Angela_Desk;
 Model Angela_Chair;
 Texture Angela_Desk_Texture;
 Texture Angela_Chair_Texture;
+
+Model Ofrenda;
+Texture FloresT;
+Texture OneSinT;
+Texture OfrendaT;
+
+Model PiramideRing;
+Model Ring;
+Texture PiramideT;
+Texture RingT;
+
+//GALERIA
+//centro
+Model CalendarioDoom;
+Model PenachoMan;
+Model MegaHawlucha;
+Texture CalendarioT;
+Texture PenachoT;
+Texture MegaHawluchaT;
+
+//alrededores
+Model ParedGaleria;
+Model ExpositorGaleria;
+Model Caballete1;
+Model Caballete2;
+Texture ParedGalT;
+Texture ExpositorT;
+Texture CaballeteT;
+
+//modelos y texturas auxiliares
+Model birdlamp;
+Texture birdlampTexture;
+
+
+Skybox skybox;
 
 //materiales
 Material Material_brillante;
@@ -214,6 +248,18 @@ int main()
 	pisoTexture.LoadTextureA();
 	AgaveTexture = Texture("Textures/Agave.tga");
 	AgaveTexture.LoadTextureA();
+	PiramideTexture = Texture("Textures/PiramideOfrenda.png");
+	PiramideTexture.LoadTextureA();
+
+
+	Piramide_M = Model();
+	Piramide_M.LoadModel("Models/Piramide.obj");
+
+	Ring = Model();
+	Ring.LoadModel("Models/ring.obj");
+	RingT = Texture("Textures/RingBake.png");
+	RingT.LoadTextureA();
+
 
 	Kitt_M = Model();
 	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
@@ -225,14 +271,59 @@ int main()
 	Piso_M = Model();
 	Piso_M.LoadModel("Models/Piso.obj");
 
+	//recepcion
 	Angela_Desk = Model();
 	Angela_Desk.LoadModel("Models/escritorio.obj");
-	Angela_Chair = Model();
-	Angela_Chair.LoadModel("Models/silla_escritorio.obj");
 	Angela_Desk_Texture = Texture("Textures/Textura_Desk.png");
-	pisoTexture.LoadTextureA();
+	Angela_Desk_Texture.LoadTextureA();
+	Angela_Chair = Model();
+	Angela_Chair.LoadModel("Models/sillaAngela.obj");
 	Angela_Chair_Texture = Texture("Textures/Silla_Texture.png");
-	pisoTexture.LoadTextureA();
+	Angela_Chair_Texture.LoadTextureA();
+
+	//ofrenda
+	Ofrenda = Model();
+	Ofrenda.LoadModel("Models/ofrenda.obj");
+	FloresT = Texture("Textures/FloresCempasuchilTextura.png");
+	FloresT.LoadTextureA();
+	OfrendaT = Texture("Textures/BakeOfrenda.png");
+	OfrendaT.LoadTextureA();
+	OneSinT = Texture("Textures/OneSinTextura.png");
+	OneSinT.LoadTextureA();
+
+	//Mega Hawlucha
+	MegaHawlucha = Model();
+	MegaHawlucha.LoadModel("Models/MegaHawlucha.obj");
+	MegaHawluchaT = Texture("Textures/Estatua.png");
+	MegaHawluchaT.LoadTextureA();
+	//calendario doom
+	CalendarioDoom = Model();
+	CalendarioDoom.LoadModel("Models/DoomsdayCalendar.obj");
+	CalendarioT = Texture("Textures/DoomsdayCalT.png");
+	CalendarioT.LoadTextureA();
+	//penacho
+	PenachoMan = Model();
+	PenachoMan.LoadModel("Models/PenachoMan.obj");
+	PenachoT = Texture("Textures/PenachoT.png");
+	PenachoT.LoadTextureA();
+
+	//alrededores
+	ParedGaleria = Model();
+	ParedGaleria.LoadModel("Models/BaseGal1.obj");
+	ParedGalT = Texture("Textures/BaseGaleria1T.png");
+	ParedGalT.LoadTextureA();
+
+	ExpositorGaleria = Model();
+	ExpositorGaleria.LoadModel("Models/BaseGal2.obj");
+	ExpositorT = Texture("Textures/BaseGaleria2T.png");
+	ExpositorT.LoadTextureA();
+
+	Caballete1 = Model();
+	Caballete1.LoadModel("Models/CaballeteGal1.obj");
+	Caballete2 = Model();
+	Caballete2.LoadModel("Models/CaballeteGal2.obj");
+	CaballeteT = Texture("Textures/caballete1T.png");
+	CaballeteT.LoadTextureA();
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
@@ -288,6 +379,14 @@ int main()
 	
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 	////Loop mientras no se cierra la ventana
+
+	glm::mat4 model(1.0);
+	glm::mat4 modelaux(1.0);
+	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::mat4 modelPiso(1.0);
+	glm::mat4 Elementos(1.0);
+	glm::mat4 elementos(1.0);
+	glm::mat4 elementoLocal(1.0);
 	while (!mainWindow.getShouldClose())
 	{
 		GLfloat now = glfwGetTime();
@@ -332,11 +431,7 @@ int main()
 
 
 
-		glm::mat4 model(1.0);
-		glm::mat4 modelaux(1.0);
-		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-		glm::mat4 modelPiso(1.0);
-		glm::mat4 Elementos(1.0);
+		
 		/* Piso simple con textura
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
@@ -357,7 +452,7 @@ int main()
 		//model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiso));
 		Piso_M.RenderModel();
-
+		
 		//Instancia del coche 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f + mainWindow.getmuevex(), 0.5f, -3.0f));
@@ -416,18 +511,7 @@ int main()
 		Elementos = glm::translate(Elementos, glm::vec3(-55.0f, -1.0f, 30.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
-		//meshList[0]->RenderMesh();
-		//modelos
-		Angela_Desk_Texture.UseTexture();
-		Angela_Desk.RenderModel();
-
-		Elementos = glm::translate(Elementos, glm::vec3(-5.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
-		//meshList[0]->RenderMesh();
-		//modelos
-		Angela_Chair_Texture.UseTexture();
-		Angela_Chair.RenderModel();
+		meshList[0]->RenderMesh();
 
 		//El papu de rosa
 		Elementos = glm::mat4(1.0);
@@ -527,6 +611,195 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(Elementos));
 		meshList[0]->RenderMesh();
 
+
+		//Recepcion
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(43.0f, -2.0f, -15.0f));
+		elementos = glm::scale(elementos, glm::vec3(1.3f, 1.3f, 1.3f));
+		elementos = glm::rotate(elementos, 30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Angela_Desk_Texture.UseTexture();
+		Angela_Desk.RenderModel();
+
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, -2.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Angela_Chair_Texture.UseTexture();
+		Angela_Chair.RenderModel();
+
+		//Ofrenda
+		elementos = glm::mat4(1.0);
+		//elementos = glm::translate(elementos, glm::vec3(100.0f, -2.0f, -60.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(113.0f, -2.0f, -17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		FloresT.UseTexture();
+		OneSinT.UseTexture();
+		OfrendaT.UseTexture();
+		Ofrenda.RenderModel();
+
+		//Ubicacion central de la piramide
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(175.5f, -2.0f, 50.0f));
+		elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//elementos = glm::translate(elementos, glm::vec3(125.5f, -2.0f, 25.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		//elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		PiramideTexture.UseTexture();
+		Piramide_M.RenderModel();
+
+		//Ring de lucha
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		RingT.UseTexture();
+		Ring.RenderModel();
+
+		//MegaHawlucha
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(70.0f, -2.0f, 0.0f));
+		elementoLocal = elementos;
+		elementos = glm::rotate(elementos, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		MegaHawluchaT.UseTexture();
+		MegaHawlucha.RenderModel();
+
+		//Calendario
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(20.0f, 0.0f, -1.0f));
+		elementos = glm::rotate(elementos, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CalendarioT.UseTexture();
+		CalendarioDoom.RenderModel();
+
+		//Penacho (con base)
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(-15.0f, 0.0f, 16.0f));
+		elementos = glm::rotate(elementos, 150 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		PenachoT.UseTexture();
+		PenachoMan.RenderModel();
+
+		//Paredes exposicion
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementoLocal = elementos;
+		elementos = glm::rotate(elementos, 160 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		ParedGalT.UseTexture();
+		ParedGaleria.RenderModel();
+
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		ParedGalT.UseTexture();
+		ParedGaleria.RenderModel();
+
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(-10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		ParedGalT.UseTexture();
+		ParedGaleria.RenderModel();
+
+		//FILA DE caballetes.
+		//1
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(54.0f, -2.0f, -24.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.3f, 1.0f));
+		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete1.RenderModel();
+
+		//2
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
+		elementos = glm::rotate(elementos, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete2.RenderModel();
+
+		//3
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(0.8f, 0.8f, 0.8f));
+		elementos = glm::rotate(elementos, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete2.RenderModel();
+
+		//4
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete1.RenderModel();
+
+		//5
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete1.RenderModel();
+
+		//6
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(6.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.3f, 1.5f));
+		elementos = glm::rotate(elementos, -10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete2.RenderModel();
+
+		//7
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(0.8f, 0.8f, 0.8f));
+		elementos = glm::rotate(elementos, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete1.RenderModel();
+
+		//8
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete2.RenderModel();
+
+		//9
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
+		modelaux = elementos;
+		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.4f, 1.0f));
+		elementos = glm::rotate(elementos, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		CaballeteT.UseTexture();
+		//textura de cuadro en cuestion
+		Caballete1.RenderModel();
+
 		//------------------------------------------
 
 		//Agave
@@ -535,7 +808,7 @@ int main()
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		
-
+		/*
 		//blending: transparencia o traslucidez
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -543,7 +816,7 @@ int main()
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[3]->RenderMesh();
 		glDisable(GL_BLEND);
-
+		*/
 		glUseProgram(0);
 
 		mainWindow.swapBuffers();
