@@ -1,0 +1,62 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E5666A6B-D6D3-4C28-80B9-2EDD441FFFAD}|ProyectoFinal\\ProyectoFinal.vcxproj|C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\ProyectoFinal\\Camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{E5666A6B-D6D3-4C28-80B9-2EDD441FFFAD}|ProyectoFinal\\ProyectoFinal.vcxproj|solutionrelative:ProyectoFinal\\Camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E5666A6B-D6D3-4C28-80B9-2EDD441FFFAD}|ProyectoFinal\\ProyectoFinal.vcxproj|C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\ProyectoFinal\\ProyectoFinal.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{E5666A6B-D6D3-4C28-80B9-2EDD441FFFAD}|ProyectoFinal\\ProyectoFinal.vcxproj|solutionrelative:ProyectoFinal\\ProyectoFinal.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Camera.cpp",
+              "DocumentMoniker": "C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\ProyectoFinal\\Camera.cpp",
+              "RelativeDocumentMoniker": "ProyectoFinal\\Camera.cpp",
+              "ToolTip": "C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\ProyectoFinal\\Camera.cpp",
+              "RelativeToolTip": "ProyectoFinal\\Camera.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-10-29T15:39:24.935Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ProyectoFinal.cpp",
+              "DocumentMoniker": "C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\ProyectoFinal\\ProyectoFinal.cpp",
+              "RelativeDocumentMoniker": "ProyectoFinal\\ProyectoFinal.cpp",
+              "ToolTip": "C:\\Users\\manwi\\Documents\\GitHub\\Proyecto-Final-Grafica\\ProyectoFinal\\ProyectoFinal\\ProyectoFinal.cpp*",
+              "RelativeToolTip": "ProyectoFinal\\ProyectoFinal.cpp*",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAALoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-10-26T17:18:42.82Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
