@@ -34,7 +34,7 @@
 const float toRadians = 3.14159265f / 180.0f;
 const float PI = 3.14159265f;
 // Variable de control: Duración del ciclo completo en segundos (300s = 5 minutos)
-GLfloat cycleDuration = 60.0f;
+GLfloat cycleDuration = 100.0f;
 GLfloat minAmbient = 0.1f;
 GLfloat maxAmbient = 1.0f; // Valor original
 GLfloat minDiffuse = 0.1f;
@@ -434,27 +434,30 @@ int main()
 		lowerLight.y -= 0.3f;
 		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
-		// --- INICIO DE MODIFICACIÓN: CICLO DÍA/NOCHE ---
+		// --- CICLO DÍA/NOCHE ---
 		// Calcular el factor de iluminación (0.0 noche, 1.0 día)
 		GLfloat angle = (now / cycleDuration) * 2.0f * PI;
-		GLfloat lightFactor = (cos(angle) + 1.0f) * 0.5f; // Mapea -1..1 a 0..1
+		GLfloat PorcentajeLuz = (cos(angle) + 1.0f) * 0.5f; // Mapea -1..1 a 0..1
 
 		// Interpolar las intensidades
-		GLfloat currentAmbient = minAmbient + (maxAmbient - minAmbient) * lightFactor;
-		GLfloat currentDiffuse = minDiffuse + (maxDiffuse - minDiffuse) * lightFactor;
+		GLfloat currentAmbient = minAmbient + (maxAmbient - minAmbient) * PorcentajeLuz;
+		GLfloat currentDiffuse = minDiffuse + (maxDiffuse - minDiffuse) * PorcentajeLuz;
 
-		// Re-asignar la mainLight con las nuevas intensidades
-		// Se mantienen el color (1,1,1) y la dirección (0,0,-1)
+		GLfloat lightDirX = 0.0f;
+		GLfloat lightDirY = -cos(angle);
+		GLfloat lightDirZ = sin(angle);
+
 		mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
 			currentAmbient, currentDiffuse,
-			0.0f, 0.0f, -1.0f);
-		// --- FIN DE MODIFICACIÓN ---
-		if (lightFactor < 0.3f)
+			lightDirX, lightDirY, lightDirZ);
+
+
+		if (PorcentajeLuz < 0.3f)
 		{
 			lucesNocturnasEncendidas = true;
 			
 		}
-		else // Si es de día (lightFactor >= 0.3)
+		else 
 		{
 			lucesNocturnasEncendidas = false;
 			
