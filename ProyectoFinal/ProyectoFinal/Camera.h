@@ -16,6 +16,9 @@ public:
 	void keyControl(bool* keys, GLfloat deltaTime);
 	void mouseControl(GLfloat xChange, GLfloat yChange);
 
+	// Función para establecer el modo de la cámara (1, 2, o 3)
+	void setCameraMode(int mode);
+
 	glm::vec3 getCameraPosition();
 	glm::vec3 getCameraDirection();
 	glm::mat4 calculateViewMatrix();
@@ -34,6 +37,15 @@ private:
 
 	GLfloat moveSpeed;
 	GLfloat turnSpeed;
+
+	int cameraMode; // 1 = Principal, 2 = Aerea, 3 = Estatica
+
+	// Posición y dirección para la cámara estática (Modo 3)
+	glm::vec3 staticPosition;
+	glm::vec3 staticFront;
+
+	GLfloat alturaAerea;
+	GLfloat HPrimeraPersona;
 
 	void update();
 };
