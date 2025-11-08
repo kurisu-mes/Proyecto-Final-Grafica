@@ -560,6 +560,14 @@ int main()
 		{
 			camera.setCameraMode(3); // Modo Estático
 		}
+		if (keys[GLFW_KEY_4])
+		{
+			camera.setCameraMode(4); // Modo Estático
+		}
+		if (keys[GLFW_KEY_5])
+		{
+			camera.setCameraMode(5); // Modo Estático
+		}
 
 		// --- CICLO DÍA/NOCHE ---
 		// Calcular el factor de iluminación (0.0 noche, 1.0 día)
