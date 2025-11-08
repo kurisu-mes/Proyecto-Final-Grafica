@@ -72,7 +72,6 @@ Model Caballete1;
 Model Caballete2;
 
 //modelos y texturas auxiliares
-Model birdlamp;
 Model PuertaDer_M;
 Model PuertaIzq_M;
 Model Pilar_M;
@@ -80,6 +79,9 @@ Model Letrero_M;
 Texture Letrero_T;
 Model ArcoRing;
 Model PuertaR;
+
+Model capoLampara;
+Model fuegoLampara;
 
 
 
@@ -328,6 +330,12 @@ int main()
 	PuertaR = Model();
 	PuertaR.LoadModel("Models/puertaRotatoria.obj");
 
+	//lamparas
+	capoLampara = Model();
+	capoLampara.LoadModel("Models/daCapo.obj");
+	fuegoLampara = Model();
+	fuegoLampara.LoadModel("Models/firelamp.obj");
+	
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
@@ -482,14 +490,83 @@ int main()
 
 		//Piso modelado con Blender
 		modelPiso = glm::mat4(1.0);
-		modelPiso = glm::translate(modelPiso, glm::vec3(40.0f, -2.0f, 0.0f));
+		modelPiso = glm::translate(modelPiso, glm::vec3(40.0f, -2.5f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiso));
 		Piso_M.RenderModel();
+
+		//------------------------LAMPARAS------------------------------------------------
+		//entrada al ring
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(127.0f, -2.0f, 13.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = elementos;
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(136.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = elementos;
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+		//lamparas de por ahi
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, 7.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(60.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(50.0f, -2.0f, -23.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 22.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, -26.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
 
 		//Puerta
 		//Pilar izquierdo
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(38.0f, 1.0f, -1.8f));
+		model = glm::translate(model, glm::vec3(33.0f, 1.0f, -2.9f));
 		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		modelaux = model;
@@ -549,9 +626,9 @@ int main()
 		
 		//ARCO
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(120.0f, -2.0f, 13.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		elementos = glm::scale(elementos, glm::vec3(0.5f, 0.5f, 0.5f));
-		//elementos = glm::rotate(elementos, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::translate(elementos, glm::vec3(116.0f, -2.0f, 14.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::scale(elementos, glm::vec3(0.9f, 0.9f, 0.9f));
+		elementos = glm::rotate(elementos, -120 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		modelaux = elementos;
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -628,14 +705,6 @@ int main()
 
 		//Cubos de posicion
 
-		//arco ring
-		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(120.0f, 1.0f, 13.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		elementos = glm::rotate(elementos, -110 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(6.0f, 15.0f, 2.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		meshList[0]->RenderMesh();
-
 		//El papu de rosa
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(-90.0f, -1.0f, 60.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
@@ -667,7 +736,7 @@ int main()
 
 		//Ubicacion central de la piramide
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(155.5f, -2.0f, 39.0f));
+		elementos = glm::translate(elementos, glm::vec3(158.5f, -2.0f, 39.0f));
 		elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, -1.0f, 0.0f));
@@ -699,7 +768,7 @@ int main()
 
 		//Penacho (con base)
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(-15.0f, 0.0f, 16.0f));
+		elementos = glm::translate(elementos, glm::vec3(-20.0f, 0.0f, 16.0f));
 		elementos = glm::rotate(elementos, 150 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PenachoMan.RenderModel();
@@ -729,6 +798,7 @@ int main()
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(54.0f, -2.0f, -24.0f));
 		modelaux = elementos;
+		elementos = glm::translate(elementos, glm::vec3(0, 0.0f, 3.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.3f, 1.0f));
 		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -739,6 +809,7 @@ int main()
 		elementos = modelaux;
 		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
 		modelaux = elementos;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 2.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
 		elementos = glm::rotate(elementos, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
