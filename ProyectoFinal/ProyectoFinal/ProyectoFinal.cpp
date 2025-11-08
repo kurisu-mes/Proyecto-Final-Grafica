@@ -25,13 +25,20 @@
 #include"Model.h"
 #include "Skybox.h"
 
-//para iluminaci髇
+//para iluminaci贸n
 #include "CommonValues.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
 const float toRadians = 3.14159265f / 180.0f;
+const float PI = 3.14159265f;
+
+GLfloat cycleDuration = 100.0f;
+GLfloat minAmbient = 0.1f;
+GLfloat maxAmbient = 1.0f; // Valor original
+GLfloat minDiffuse = 0.1f;
+GLfloat maxDiffuse = 1.0f; // Valor original
 
 Window mainWindow;
 std::vector<Mesh*> meshList;
@@ -90,8 +97,21 @@ Texture CaballeteT;
 Model birdlamp;
 Texture birdlampTexture;
 
+//modelos y texturas auxiliares
+Model PuertaDer_M;
+Model PuertaIzq_M;
+Model Pilar_M;
+Model Letrero_M;
+Texture Letrero_T;
+Model ArcoRing;
+Model PuertaR;
+
+Model capoLampara;
+Model fuegoLampara;
+
 
 Skybox skybox;
+Skybox skyboxNoche;
 
 //materiales
 Material Material_brillante;
@@ -109,6 +129,24 @@ DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
+//variables para animaciones
+//Para el letrero------------------------------------------------------
+float toffsetLetrero = 0.0f;
+float velocidadLetrero = 0.01f;
+//Para la puerta
+float RpuertaDer = 0.0f; // Angulo de rotacion ACTUAL
+float TpuertaIzq = 0.0f; // Traslacion X ACTUAL
+float TpuertaIzq_Z = 0.0f; // Traslacion Z ACTUAL
+float AjusteP = -0.5f; // Ajuste para que la puerta no atraviese el pilar
+
+float TpuertaIzq_Target_X = -2.0f; //Desplazamiento objetivo en X
+float RpuertaDer_Target = 90.0f; // Rotacion objetivo de 90 grados
+float velocidadPuerta = 0.05f; // Multiplicador para la velocidad de la animacion
+
+//puertas ring
+float posXPuertaR = 0.0f;
+float movPuerta = 0.2f;
+
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
 
@@ -116,7 +154,7 @@ static const char* vShader = "shaders/shader_light.vert";
 static const char* fShader = "shaders/shader_light.frag";
 
 
-//funci髇 de calculo de normales por promedio de v閞tices 
+//funci贸n de calculo de normales por promedio de v茅rtices 
 void calcAverageNormals(unsigned int* indices, unsigned int indiceCount, GLfloat* vertices, unsigned int verticeCount,
 	unsigned int vLength, unsigned int normalOffset)
 {
@@ -226,7 +264,11 @@ void CreateShaders()
 	shaderList.push_back(*shader1);
 }
 
-
+//Sirve para poder hacer interpolacion lineal y calcular los angulos y posicion en cada frame
+float lerp(float a, float b, float t)
+{
+	return a + t * (b - a);
+}
 
 int main()
 {
@@ -325,6 +367,29 @@ int main()
 	CaballeteT = Texture("Textures/caballete1T.png");
 	CaballeteT.LoadTextureA();
 
+	//arcos
+	PuertaDer_M = Model();
+	PuertaDer_M.LoadModel("Models/PuertaDer.obj");
+	PuertaIzq_M = Model();
+	PuertaIzq_M.LoadModel("Models/PuertaIzq.obj");
+	Pilar_M = Model();
+	Pilar_M.LoadModel("Models/PilarDer.obj");
+	Letrero_M = Model();
+	Letrero_M.LoadModel("Models/Letrero.obj");
+	Letrero_T = Texture("Textures/Letrero.png");
+	Letrero_T.LoadTextureA();
+
+	ArcoRing = Model();
+	ArcoRing.LoadModel("Models/stoneArch.obj");
+	PuertaR = Model();
+	PuertaR.LoadModel("Models/puertaRotatoria.obj");
+
+	//lamparas
+	capoLampara = Model();
+	capoLampara.LoadModel("Models/daCapo.obj");
+	fuegoLampara = Model();
+	fuegoLampara.LoadModel("Models/firelamp.obj");
+
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
@@ -334,18 +399,28 @@ int main()
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
 
 	skybox = Skybox(skyboxFaces);
+	//skybox de noche
+	std::vector<std::string> skyboxFacesNoche;
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_rt.tga"); 
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_lf.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_dn.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_up.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_bk.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_ft.tga");
+
+	skyboxNoche = Skybox(skyboxFacesNoche);
 
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
 
-	//luz direccional, s髄o 1 y siempre debe de existir
+	//luz direccional, s贸lo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
-		0.3f, 0.3f,
+		1.0f, 1.0f,
 		0.0f, 0.0f, -1.0f);
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
-	//Declaraci髇 de primer luz puntual
+	//Declaraci贸n de primer luz puntual
 	pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
 		0.0f, 1.0f,
 		-6.0f, 1.5f, 1.5f,
@@ -380,6 +455,16 @@ int main()
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
 	////Loop mientras no se cierra la ventana
 
+	//Encender luces nocturnas
+	bool lucesNocturnasEncendidas = false;
+
+	printf("Controles:\n");
+	printf("WASD - Mover c谩mara\n");
+	//modos de camara
+	printf("1 - Modo Principal (Primera Persona)\n");
+	printf("2 - Modo A茅reo\n");
+	printf("3 - Modo Est谩tico\n");
+
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -394,15 +479,103 @@ int main()
 		deltaTime += (now - lastTime) / limitFPS;
 		lastTime = now;
 
+		//*******************ANIMACIONES*********************************
+				//Animacion de la puerta
+		if (mainWindow.getEntradaAbierta())
+		{
+			// --- ABRIR PUERTAS ---
+			// Interpolar suavemente hacia los valores objetivo
+			RpuertaDer = lerp(RpuertaDer, RpuertaDer_Target, velocidadPuerta * deltaTime);
+			TpuertaIzq = lerp(TpuertaIzq, TpuertaIzq_Target_X, velocidadPuerta * deltaTime);
+			TpuertaIzq_Z = lerp(TpuertaIzq_Z, AjusteP, velocidadPuerta * deltaTime);
+		}
+		else
+		{
+			// --- CERRAR PUERTAS ---
+			// Interpolar suavemente de vuelta a posicion original
+			RpuertaDer = lerp(RpuertaDer, 0.0f, velocidadPuerta * deltaTime);
+			TpuertaIzq = lerp(TpuertaIzq, 0.0f, velocidadPuerta * deltaTime);
+			TpuertaIzq_Z = lerp(TpuertaIzq_Z, 0.0f, velocidadPuerta * deltaTime);
+		}
+
+		//movimiento Puertas
+		if (mainWindow.getEntradaAbierta()) {
+			//cerradas, se abren
+			if (posXPuertaR > -90.0f) posXPuertaR -= 1.0f * deltaTime;
+		}
+		else {
+			//abiertas, se abren
+			if (posXPuertaR < 0.0f) posXPuertaR += 1.0f * deltaTime;
+		}
+
+
 		//Recibir eventos del usuario
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+		//---------- Camaras -----------------
+		// aadici贸n de control de teclado
+		bool* keys = mainWindow.getsKeys();
+
+		// Control de la c谩mara
+		camera.keyControl(keys, deltaTime);
+		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+
+		// Control para cambiar el modo de la c谩mara
+		if (keys[GLFW_KEY_1])
+		{
+			camera.setCameraMode(1); // Modo Principal
+		}
+		if (keys[GLFW_KEY_2])
+		{
+			camera.setCameraMode(2); // Modo A茅reo
+		}
+		if (keys[GLFW_KEY_3])
+		{
+			camera.setCameraMode(3); // Modo Est谩tico
+		}
+
+		// --- CICLO D脥A/NOCHE ---
+		// Calcular el factor de iluminaci贸n (0.0 noche, 1.0 d铆a)
+		GLfloat angle = (now / cycleDuration) * 2.0f * PI;
+		GLfloat PorcentajeLuz = (cos(angle) + 1.0f) * 0.5f; // Mapea -1..1 a 0..1
+
+		// Interpolar las intensidades
+		GLfloat currentAmbient = minAmbient + (maxAmbient - minAmbient) * PorcentajeLuz;
+		GLfloat currentDiffuse = minDiffuse + (maxDiffuse - minDiffuse) * PorcentajeLuz;
+
+		GLfloat lightDirX = 0.0f;
+		GLfloat lightDirY = -cos(angle);
+		GLfloat lightDirZ = sin(angle);
+
+		mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
+			currentAmbient, currentDiffuse,
+			lightDirX, lightDirY, lightDirZ);
+
+
+		if (PorcentajeLuz < 0.3f)
+		{
+			lucesNocturnasEncendidas = true;
+
+		}
+		else
+		{
+			lucesNocturnasEncendidas = false;
+
+		}
 
 		// Clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		//skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		if (lucesNocturnasEncendidas)
+		{
+			skyboxNoche.DrawSkybox(camera.calculateViewMatrix(), projection);
+		}
+		else
+		{
+			skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		}
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
@@ -410,7 +583,7 @@ int main()
 		uniformEyePosition = shaderList[0].GetEyePositionLocation();
 		uniformColor = shaderList[0].getColorLocation();
 		
-		//informaci髇 en el shader de intensidad especular y brillo
+		//informaci贸n en el shader de intensidad especular y brillo
 		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
 		uniformShininess = shaderList[0].GetShininessLocation();
 
@@ -418,13 +591,16 @@ int main()
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-		// luz ligada a la c醡ara de tipo flash
-		//sirve para que en tiempo de ejecuci髇 (dentro del while) se cambien propiedades de la luz
+		// luz ligada a la c谩mara de tipo flash
+		//sirve para que en tiempo de ejecuci贸n (dentro del while) se cambien propiedades de la luz
 			glm::vec3 lowerLight = camera.getCameraPosition();
 		lowerLight.y -= 0.3f;
 		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 
-		//informaci髇 al shader de fuentes de iluminaci髇
+		
+		
+
+		//informaci贸n al shader de fuentes de iluminaci贸n
 		shaderList[0].SetDirectionalLight(&mainLight);
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
@@ -496,7 +672,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Llanta_M.RenderModel();
 	
-		//Helic髉tero
+		//Helic贸ptero
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 6.0));
 		model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
@@ -799,6 +975,139 @@ int main()
 		CaballeteT.UseTexture();
 		//textura de cuadro en cuestion
 		Caballete1.RenderModel();
+
+		//------------------------LAMPARAS------------------------------------------------
+		//entrada al ring
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(127.0f, -2.0f, 13.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = elementos;
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(136.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = elementos;
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		fuegoLampara.RenderModel();
+
+		//lamparas de por ahi
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, 7.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(60.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(50.0f, -2.0f, -23.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 22.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, -26.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		capoLampara.RenderModel();
+
+
+		//Puerta
+		//Pilar izquierdo
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(33.0f, 1.0f, -2.9f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		Pilar_M.RenderModel();
+
+		//Puerta izquierda
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.35f, -0.7f, 0.0f));
+		model = glm::translate(model, glm::vec3(TpuertaIzq, 0.0f, TpuertaIzq_Z));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		PuertaIzq_M.RenderModel();
+
+		//Pilar derecho
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(3.75f, 0.0f, 0.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		Pilar_M.RenderModel();
+
+		//Puerta derecha
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.35f, -0.7f, 0.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(TpuertaIzq, 0.0f, TpuertaIzq_Z));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		PuertaDer_M.RenderModel();
+
+		//ARCO
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(116.0f, -2.0f, 14.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::scale(elementos, glm::vec3(0.9f, 0.9f, 0.9f));
+		elementos = glm::rotate(elementos, -120 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = elementos;
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		ArcoRing.RenderModel();
+
+		//puerta rotatoria
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, -5.5f));
+		elementos = glm::rotate(elementos, posXPuertaR * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		PuertaR.RenderModel();
+
+		//puerta rotatoria
+		elementos = modelaux;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 5.5f));
+		elementos = glm::rotate(elementos, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::rotate(elementos, posXPuertaR * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		PuertaR.RenderModel();
 
 		//------------------------------------------
 
