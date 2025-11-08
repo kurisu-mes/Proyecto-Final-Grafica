@@ -99,6 +99,7 @@ Texture birdlampTexture;
 
 
 Skybox skybox;
+Skybox skyboxNoche;
 
 //materiales
 Material Material_brillante;
@@ -341,6 +342,16 @@ int main()
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
 
 	skybox = Skybox(skyboxFaces);
+	//skybox de noche
+	std::vector<std::string> skyboxFacesNoche;
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_rt.tga"); 
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_lf.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_dn.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_up.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_bk.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_ft.tga");
+
+	skyboxNoche = Skybox(skyboxFacesNoche);
 
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
@@ -409,31 +420,6 @@ int main()
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
-		// Clear the window
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
-		shaderList[0].UseShader();
-		uniformModel = shaderList[0].GetModelLocation();
-		uniformProjection = shaderList[0].GetProjectionLocation();
-		uniformView = shaderList[0].GetViewLocation();
-		uniformEyePosition = shaderList[0].GetEyePositionLocation();
-		uniformColor = shaderList[0].getColorLocation();
-		
-		//información en el shader de intensidad especular y brillo
-		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
-		uniformShininess = shaderList[0].GetShininessLocation();
-
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-
-		// luz ligada a la cámara de tipo flash
-		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
-			glm::vec3 lowerLight = camera.getCameraPosition();
-		lowerLight.y -= 0.3f;
-		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
-
 		// --- CICLO DÍA/NOCHE ---
 		// Calcular el factor de iluminación (0.0 noche, 1.0 día)
 		GLfloat angle = (now / cycleDuration) * 2.0f * PI;
@@ -455,13 +441,48 @@ int main()
 		if (PorcentajeLuz < 0.3f)
 		{
 			lucesNocturnasEncendidas = true;
-			
+
 		}
-		else 
+		else
 		{
 			lucesNocturnasEncendidas = false;
-			
+
 		}
+
+		// Clear the window
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		if (lucesNocturnasEncendidas)
+		{
+			skyboxNoche.DrawSkybox(camera.calculateViewMatrix(), projection);
+		}
+		else
+		{
+			skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
+		}
+		shaderList[0].UseShader();
+		uniformModel = shaderList[0].GetModelLocation();
+		uniformProjection = shaderList[0].GetProjectionLocation();
+		uniformView = shaderList[0].GetViewLocation();
+		uniformEyePosition = shaderList[0].GetEyePositionLocation();
+		uniformColor = shaderList[0].getColorLocation();
+		
+		//información en el shader de intensidad especular y brillo
+		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
+		uniformShininess = shaderList[0].GetShininessLocation();
+
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
+		glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+
+		// luz ligada a la cámara de tipo flash
+		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
+			glm::vec3 lowerLight = camera.getCameraPosition();
+		lowerLight.y -= 0.3f;
+		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+
+		
 		
 
 		//información al shader de fuentes de iluminación
