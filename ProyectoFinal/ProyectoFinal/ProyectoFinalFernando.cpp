@@ -33,7 +33,7 @@
 #include "Material.h"
 const float toRadians = 3.14159265f / 180.0f;
 const float PI = 3.14159265f;
-// Variable de control: Duración del ciclo completo en segundos (300s = 5 minutos)
+
 GLfloat cycleDuration = 100.0f;
 GLfloat minAmbient = 0.1f;
 GLfloat maxAmbient = 1.0f; // Valor original
