@@ -29,7 +29,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 
 	// camara aérea
 	alturaAerea = 50.0f;
-
+	positionAerea = glm::vec3(startPosition.x, alturaAerea, startPosition.z);
 	HPrimeraPersona = startPosition.y;
 
 	update();
@@ -47,7 +47,7 @@ void Camera::setCameraMode(int mode)
 		cameraMode = mode;
 		if (mode == 2)
 		{
-			position.y = alturaAerea;
+			positionAerea.y = alturaAerea;
 		}
 	}
 }
@@ -86,19 +86,19 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 
 		if (keys[GLFW_KEY_W])
 		{
-			position.z -= velocity; 
+			positionAerea.z -= velocity; 
 		}
 		if (keys[GLFW_KEY_S])
 		{
-			position.z += velocity;
+			positionAerea.z += velocity;
 		}
 		if (keys[GLFW_KEY_A])
 		{
-			position.x -= velocity;
+			positionAerea.x -= velocity;
 		}
 		if (keys[GLFW_KEY_D])
 		{
-			position.x += velocity; 
+			positionAerea.x += velocity; 
 		}
 	}
 	// Modo 3: Cámara estática 
@@ -156,11 +156,9 @@ glm::mat4 Camera::calculateViewMatrix()
 	// Modo 2: Cámara aérea
 	else if (cameraMode == 2)
 	{
-		// Usa la 'position' (movida por WASD)
-		// Mira siempre hacia abajo (posición actual + vector -Y)
-		// El vector "arriba" de la cámara es 'hacia el fondo' del mundo (eje -Z)
-		return glm::lookAt(position,
-			position + glm::vec3(0.0f, -1.0f, 0.0f),
+		
+		return glm::lookAt(positionAerea,
+			positionAerea + glm::vec3(0.0f, -1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, -1.0f));
 	}
 	// Modo 3, 4 y 5: Cámara estática
@@ -183,8 +181,11 @@ glm::mat4 Camera::calculateViewMatrix()
 
 glm::vec3 Camera::getCameraPosition()
 {
-
-	if (cameraMode == 3)
+	if (cameraMode == 2)
+	{
+		return positionAerea;
+	}
+	else if (cameraMode == 3)
 	{
 		return staticPosition;
 	}
