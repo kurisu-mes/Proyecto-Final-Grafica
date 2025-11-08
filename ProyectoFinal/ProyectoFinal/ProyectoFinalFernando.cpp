@@ -401,6 +401,13 @@ int main()
 	//Encender luces nocturnas
 	bool lucesNocturnasEncendidas = false;
 
+	printf("Controles:\n");
+	printf("WASD - Mover cámara\n");
+	//modos de camara
+	printf("1 - Modo Principal (Primera Persona)\n");
+	printf("2 - Modo Aéreo\n");
+	printf("3 - Modo Estático\n");
+
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -419,6 +426,27 @@ int main()
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+		//---------- Camaras -----------------
+		// aadición de control de teclado
+		bool* keys = mainWindow.getsKeys();
+
+		// Control de la cámara
+		camera.keyControl(keys, deltaTime);
+		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+
+		// Control para cambiar el modo de la cámara
+		if (keys[GLFW_KEY_1])
+		{
+			camera.setCameraMode(1); // Modo Principal
+		}
+		if (keys[GLFW_KEY_2])
+		{
+			camera.setCameraMode(2); // Modo Aéreo
+		}
+		if (keys[GLFW_KEY_3])
+		{
+			camera.setCameraMode(3); // Modo Estático
+		}
 
 		// --- CICLO DÍA/NOCHE ---
 		// Calcular el factor de iluminación (0.0 noche, 1.0 día)
