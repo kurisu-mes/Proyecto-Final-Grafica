@@ -418,23 +418,23 @@ int main()
 	InciCola.LoadModel("Models/InciCola.obj");
 
 	std::vector<std::string> skyboxFaces;
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
-	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
+	skyboxFaces.push_back("Textures/Skybox/right_dia.tga");
+	skyboxFaces.push_back("Textures/Skybox/left_dia.tga");
+	skyboxFaces.push_back("Textures/Skybox/bottom_dia.tga");
+	skyboxFaces.push_back("Textures/Skybox/top_dia.tga");
+	skyboxFaces.push_back("Textures/Skybox/front_dia.tga");
+	skyboxFaces.push_back("Textures/Skybox/back_dia.tga");
 
 	skybox = Skybox(skyboxFaces);
 
 	//skybox de noche
 	std::vector<std::string> skyboxFacesNoche;
-	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_rt.tga");
-	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_lf.tga");
-	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_dn.tga");
-	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_up.tga");
-	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_bk.tga");
-	skyboxFacesNoche.push_back("Textures/Skybox/cupertin-lake-night_ft.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/right_noche.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/left_noche.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/bottom_noche.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/top_noche.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/front_noche.tga");
+	skyboxFacesNoche.push_back("Textures/Skybox/back_noche.tga");
 
 	skyboxNoche = Skybox(skyboxFacesNoche);
 
