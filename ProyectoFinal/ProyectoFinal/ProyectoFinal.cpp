@@ -33,7 +33,7 @@
 #include "Material.h"
 const float toRadians = 3.14159265f / 180.0f;
 
-GLfloat cycleDuration = 100.0f;
+GLfloat cycleDuration = 500.0f;
 GLfloat minAmbient = 0.1f;
 GLfloat maxAmbient = 1.0f; // Valor original
 GLfloat minDiffuse = 0.1f;
@@ -125,6 +125,53 @@ float velocidadPuerta = 0.05f; // Multiplicador para la velocidad de la animacio
 //puertas ring
 float posXPuertaR = 0.0f;
 float movPuerta = 0.2f;
+
+//Roland
+Model RolandTorso;
+Model RolandBrazoDer;
+Model RolandBrazoIzq;
+Model RolandPiernaDer;
+Model RolandPiernaIzq;
+//Incineroar
+Model InciCabeza;
+Model InciTorso;
+Model InciBD;
+Model InciBI;
+Model InciPD;
+Model InciPI;
+Model InciCola;
+//Prueba caminata
+float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
+float velocidadPaso = 0.005f;     // velocidad del ciclo de paso
+//float velocidadAvance = 0.005f;  // desplazamiento por frame
+
+int currentCameraMode = 1; // Rastreador de modo de cámara
+// Posición y rotación guardadas de Roland
+glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
+float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
+
+// Animacion compleja incineroar
+int recorrido = 1;
+float orienta = 0.0f; //Orientacion del cuerpo
+float tiempolocal = 0.0f; //temporizador de los giros
+float rotacionBrazoDerInci = 0.0f;
+float rotacionBrazoIzqInci = 0.0f;
+float rotacionPiernaDerInci = 0.0f;
+float rotacionPiernaIzqInci = 0.0f;
+float rotacioncabezaInci = 0.0f; //Rotaciones miembros del modelo
+//PosInicial Incineroar
+float pos_ini_x_inci = 0.0f;
+float pos_ini_z_inci = 0.0f;
+float velocidadpiernas = 5.0f;
+float velocidadbrazos = 4.0f;
+bool animacionInci = true;
+
+//Variables Movimiento Roland --PROTOTIPO
+float rotacionBrazoDer = 0.0f;
+float rotacionBrazoIzq = 0.0f;
+float rotacionPiernaDer = 0.0f;
+float rotacionPiernaIzq = 0.0f;
+bool caminarRoland = false;
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -259,7 +306,7 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
 	brickTexture = Texture("Textures/brick.png");
 	brickTexture.LoadTextureA();
@@ -340,7 +387,33 @@ int main()
 	capoLampara.LoadModel("Models/daCapo.obj");
 	fuegoLampara = Model();
 	fuegoLampara.LoadModel("Models/firelamp.obj");
-	
+
+	//Roland, carga de modelo
+	RolandTorso.LoadModel("Models/RolandTorsoArt.obj");
+	RolandBrazoDer = Model();
+	RolandBrazoDer.LoadModel("Models/RolandBrazoDerArt.obj");
+	RolandPiernaDer = Model();
+	RolandPiernaDer.LoadModel("Models/RolandPiernaDerArt.obj");
+	RolandBrazoIzq = Model();
+	RolandBrazoIzq.LoadModel("Models/RolandBrazoIzqArt.obj");
+	RolandPiernaIzq = Model();
+	RolandPiernaIzq.LoadModel("Models/RolandPiernaIzqArt.obj");
+	//Incineroar
+	InciCabeza = Model();
+	InciCabeza.LoadModel("Models/InciHead.obj");
+	InciTorso = Model();
+	InciTorso.LoadModel("Models/InciTorso.obj");
+	InciBD = Model();
+	InciBD.LoadModel("Models/InciBD.obj");
+	InciPD = Model();
+	InciPD.LoadModel("Models/InciPD.obj");
+	InciBI = Model();
+	InciBI.LoadModel("Models/InciBI.obj");
+	InciPI = Model();
+	InciPI.LoadModel("Models/InciPI.obj");
+	InciCola = Model();
+	InciCola.LoadModel("Models/InciCola.obj");
+
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
@@ -480,14 +553,27 @@ int main()
 		if (keys[GLFW_KEY_1])
 		{
 			camera.setCameraMode(1); // Modo Principal
+			currentCameraMode = 1;
 		}
 		if (keys[GLFW_KEY_2])
 		{
 			camera.setCameraMode(2); // Modo Aéreo
+			currentCameraMode = 2;
 		}
 		if (keys[GLFW_KEY_3])
 		{
 			camera.setCameraMode(3); // Modo Estático
+			currentCameraMode = 3;
+		}
+		if (keys[GLFW_KEY_4])
+		{
+			camera.setCameraMode(4); // Modo Estático
+			currentCameraMode = 4;
+		}
+		if (keys[GLFW_KEY_5])
+		{
+			camera.setCameraMode(5); // Modo Estático
+			currentCameraMode = 5;
 		}
 
 		// --- CICLO DÍA/NOCHE ---
@@ -510,6 +596,112 @@ int main()
 		if (PorcentajeLuz < 0.3f) lucesNocturnasEncendidas = true;
 		else lucesNocturnasEncendidas = false;
 
+		//Captura de barra espaciadora para animacion Roland
+
+		// --- Control de inicio/parada de caminado ---
+		if (mainWindow.getsKeys()[GLFW_KEY_W] || mainWindow.getsKeys()[GLFW_KEY_S])
+		{
+			caminarRoland = true;
+		}
+		else
+		{
+			caminarRoland = false;
+
+
+		}
+		// Funcion de movimiento Roland, temporal --> Evento ESPACIO y R
+
+		// --- Actualizacion de animacion Roland ---
+		if (caminarRoland)
+		{
+			// Actualiza fase de caminata
+			anguloMovimiento += velocidadPaso * deltaTime;
+
+			// Movimiento oscilante tipo seno
+			rotacionBrazoDer = 35.0f * sin(anguloMovimiento);
+			rotacionBrazoIzq = -35.0f * sin(anguloMovimiento);
+			rotacionPiernaDer = -35.0f * sin(anguloMovimiento);
+			rotacionPiernaIzq = 35.0f * sin(anguloMovimiento);
+
+		}
+
+		if (animacionInci)
+		{
+			tiempolocal += deltaTime * 0.01;
+
+			// Estado 1: avanza +x (brazos suben)
+			if (recorrido == 1) {
+				pos_ini_x_inci += 0.0025f * deltaTime * 60.0f;
+				orienta = 90.0f;
+
+				// Brazos subiendo (fase positiva)
+				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
+				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
+
+				// Piernas caminan alternadas
+				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
+				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
+
+				if (pos_ini_x_inci >= 200.0f) {
+					recorrido = 2;
+					tiempolocal = 0.0f;
+				}
+			}
+
+			//Estado 2: avanza +z (brazos bajan)
+			else if (recorrido == 2) {
+				pos_ini_z_inci += 0.0025f * deltaTime * 60.0f;
+				orienta = 0.0f;
+
+				// Brazos bajando (fase invertida)
+				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
+				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
+
+				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
+				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
+
+				if (pos_ini_z_inci >= 250.0f) {
+					recorrido = 3;
+					tiempolocal = 0.0f;
+				}
+			}
+
+			//  Estado 3: avanza -x (brazos suben otra vez) 
+			else if (recorrido == 3) {
+				pos_ini_x_inci -= 0.0025f * deltaTime * 60.0f;
+				orienta = -90.0f;
+
+				// Brazos subiendo de nuevo
+				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
+				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
+
+				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
+				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
+
+				if (pos_ini_x_inci <= -200.0f) {
+					recorrido = 4;
+					tiempolocal = 0.0f;
+				}
+			}
+
+			// Estado 4: avanza -z (brazos bajan otra vez) 
+			else if (recorrido == 4) {
+				pos_ini_z_inci -= 0.0025f * deltaTime * 60.0f;
+				orienta = 180.0f;
+
+				// Brazos bajando (fase invertida)
+				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
+				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
+
+				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
+				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
+
+				if (pos_ini_z_inci <= 100.0f) {
+					recorrido = 1;
+					tiempolocal = 0.0f;
+				}
+			}
+		}
 
 		// Clear the window
 		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
@@ -911,14 +1103,141 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PuertaR.RenderModel();
 
-		//------------------------------------------
+		//DIBUJADO ROLAND -- TEMPORAL
 
+		// === HUMANOIDE ROLAND ===
+
+		if (currentCameraMode == 1)
+		{
+			// 1. Obtener vectores de la cámara
+			glm::vec3 camPos = camera.getCameraPosition();
+			glm::vec3 camDir = camera.getCameraDirection();
+
+			// 2. Calcular dirección XZ (plana)
+			glm::vec3 avatarForward = glm::vec3(camDir.x, 0.0f, camDir.z);
+
+			// 3. Definir offset y nivel del suelo
+			GLfloat avatarDist = 2.0f;
+			GLfloat avatarYLevel = 2.0f; // Nivel del suelo
+
+			// 4. Normalizar y calcular rotación (Yaw)
+			if (glm::length(avatarForward) > 0.001f)
+			{
+				avatarForward = glm::normalize(avatarForward);
+				rolandAvatarYaw = atan2(avatarForward.x, avatarForward.z) + M_PI;
+			}
+			// (Si no, rolandAvatarYaw mantiene su último valor)
+
+			// 5. Calcular la posición final del avatar y guardarla
+			rolandAvatarPos = camPos + avatarForward * avatarDist;
+			rolandAvatarPos.y = avatarYLevel; // Fijar al suelo
+		}
+
+		// --- DIBUJADO DE ROLAND ---
+		// Dibuja a Roland CADA FRAME usando la última posición/rotación guardada
+
+		// 6. Crear la matriz 'base' (model) para Roland
+		glm::mat4 base = glm::mat4(1.0f);
+		base = glm::translate(base, rolandAvatarPos); // Usar la posición guardada
+		base = glm::rotate(base, rolandAvatarYaw, glm::vec3(0.0f, 1.0f, 0.0f)); // Usar la rotación guardada
+		base = glm::scale(base, glm::vec3(3.0f, 3.0f, 3.0f)); // Aplicar escala
+
+		// 7. Dibujar el Torso (base)
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
+		RolandTorso.RenderModel();
+
+		// ---- DIBUJAR MIEMBROS (animaciones de caminata) ----
+
+		//Brazo Derecho
+		glm::mat4 model0 = base;
+		model0 = glm::translate(model0, glm::vec3(0.17694f, -0.064725f, 0.035086f));
+		model0 = glm::rotate(model0, glm::radians(rotacionBrazoDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model0));
+		RolandBrazoDer.RenderModel();
+
+		//Brazo Izquierdo
+		model0 = base;
+		model0 = glm::translate(model0, glm::vec3(-0.17694f, -0.067725f, 0.017086f));
+		model0 = glm::rotate(model0, glm::radians(rotacionBrazoIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model0));
+		RolandBrazoIzq.RenderModel();
+
+		//Pierna Derecha
+		model0 = base;
+		model0 = glm::translate(model0, glm::vec3(0.071255f, -0.582795f, -0.01924f));
+		model0 = glm::rotate(model0, glm::radians(rotacionPiernaDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model0));
+		RolandPiernaDer.RenderModel();
+
+		//Pierna Izquierda
+		model0 = base;
+		model0 = glm::translate(model0, glm::vec3(-0.071255f, -0.582795f, -0.01924f));
+		model0 = glm::rotate(model0, glm::radians(rotacionPiernaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model0));
+		RolandPiernaIzq.RenderModel();
+
+		// AQUI ACABA ROLAND
+
+		// INCINEROAR
+		//Posicionar base (torso)
+		glm::mat4 baseInc = glm::mat4(1.0f);
+		baseInc = glm::translate(baseInc, glm::vec3(pos_ini_x_inci, 5.5f, pos_ini_z_inci));
+		baseInc = glm::rotate(baseInc, glm::radians(orienta), glm::vec3(0.0f, 1.0f, 0.0f));
+		baseInc = glm::scale(baseInc, glm::vec3(0.05f, 0.05f, 0.05f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseInc));
+		InciTorso.RenderModel();
+
+		//Cabeza
+		glm::mat4 model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(0.0f, 19.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciCabeza.RenderModel();
+
+		//BD
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(-42.9f, -14.0f, 2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionBrazoDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciBD.RenderModel();
+
+		//BI
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(42.9f, -14.0f, 2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionBrazoIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciBI.RenderModel();
+
+		//pD
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(-12.0f, -73.0f, -2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionPiernaDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciPD.RenderModel();
+
+		//pI
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(12.0f, -73.0f, -2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionPiernaIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+
+		InciPI.RenderModel();
+
+		//COLA
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(0.0f, -93.0f, -78.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciCola.RenderModel();
+
+		// Termina Incineroar
+
+		//------------------------------------------
+		/*
 		//Agave
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -4.0f));
 		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
+		*/
 		/*
 		//blending: transparencia o traslucidez
 		glEnable(GL_BLEND);
