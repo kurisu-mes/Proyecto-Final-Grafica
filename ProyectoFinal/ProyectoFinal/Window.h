@@ -20,10 +20,12 @@ public:
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
+	int getLightMode() { return lightMode; }
 	void swapBuffers() { return glfwSwapBuffers(mainWindow); }
 	
 	~Window();
 private: 
+	int lightMode;
 	GLFWwindow *mainWindow;
 	GLint width, height;
 	bool keys[1024];
