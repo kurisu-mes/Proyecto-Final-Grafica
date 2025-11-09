@@ -471,7 +471,7 @@ int main()
 	pointLights_Escenario3[2] = PointLight(1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
 	pointLights_Escenario3[3] = PointLight(1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
 
-	unsigned int spotLightCount = 0;
+	//unsigned int spotLightCount = 0;
 	//linterna
 	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
 		0.0f, 2.0f,
@@ -479,8 +479,21 @@ int main()
 		0.0f, -1.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		5.0f);
-	spotLightCount++;
+	//spotLightCount++;
 
+	spotLights[1] = SpotLight(1.0f, 1.0f, 0.0f, // Luz Amarilla 
+		1.0f, 2.0f,
+		0.0f, 0.0f, 0.0f, // Posición (temporal)
+		0.0f, -1.0f, 0.0f, // Dirección (temporal)
+		0.1f, 0.05f, 0.02f, // Atenuación
+		75.0f); // Ángulo
+
+	spotLights[2] = SpotLight(0.0f, 1.0f, 1.0f, // Luz Cyan
+		1.0f, 2.0f,
+		0.0f, 0.0f, 0.0f, // Posición (temporal)
+		0.0f, -1.0f, 0.0f, // Dirección (temporal)
+		0.1f, 0.05f, 0.02f, // Atenuación
+		45.0f); // Ángulo
 
 	//se crean mas luces puntuales y spotlight 
 
@@ -782,7 +795,21 @@ int main()
 		{
 			shaderList[0].SetPointLights(NULL, 0);
 		}
-		shaderList[0].SetSpotLights(spotLights, spotLightCount); 
+		//shaderList[0].SetSpotLights(spotLights, spotLightCount); 
+		
+		SpotLight activeSpotLights[MAX_SPOT_LIGHTS];
+		unsigned int activeSpotLightCount = 0;
+		activeSpotLights[activeSpotLightCount++] = spotLights[0];
+
+		// Si es de noche, añadir las 2 luces fijas
+		if (lucesNocturnasEncendidas)
+		{
+			activeSpotLights[activeSpotLightCount++] = spotLights[1];
+			activeSpotLights[activeSpotLightCount++] = spotLights[2];
+		}
+		
+
+		shaderList[0].SetSpotLights(activeSpotLights, activeSpotLightCount);
 
 		// --- FIN DE LÓGICA DE LUCES ---
 
@@ -822,6 +849,7 @@ int main()
 		//Ubicacion central de la piramide
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(158.5f, -2.0f, 39.0f));
+		spotLights[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, -1.0f, 0.0f));
@@ -896,6 +924,7 @@ int main()
 		//MegaHawlucha
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(70.0f, -2.0f, 0.0f));
+		spotLights[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::rotate(elementos, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
