@@ -160,13 +160,13 @@ float rotacionPiernaDerInci = 0.0f;
 float rotacionPiernaIzqInci = 0.0f;
 float rotacioncabezaInci = 0.0f; //Rotaciones miembros del modelo
 //PosInicial Incineroar
-float pos_ini_x_inci = 0.0f;
-float pos_ini_z_inci = 0.0f;
+float pos_ini_x_inci = -30.0f;
+float pos_ini_z_inci = -30.0f;
 float velocidadpiernas = 5.0f;
 float velocidadbrazos = 4.0f;
 bool animacionInci = true;
 
-//Variables Movimiento Roland --PROTOTIPO
+//Variables Movimiento Roland
 float rotacionBrazoDer = 0.0f;
 float rotacionBrazoIzq = 0.0f;
 float rotacionPiernaDer = 0.0f;
@@ -497,7 +497,7 @@ int main()
 	glm::mat4 elementos(1.0);
 	glm::mat4 elementoLocal(1.0);
 	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
-
+	glm::mat4 baseInc(1.0);
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
@@ -609,7 +609,7 @@ int main()
 
 
 		}
-		// Funcion de movimiento Roland, temporal --> Evento ESPACIO y R
+
 
 		// --- Actualizacion de animacion Roland ---
 		if (caminarRoland)
@@ -628,10 +628,16 @@ int main()
 		if (animacionInci)
 		{
 			tiempolocal += deltaTime * 0.01;
+			// Aumenté la velocidad para que coincida con el nuevo tamaño del recorrido
+			float inciSpeed = 0.0035f * deltaTime * 60.0f;
 
-			// Estado 1: avanza +x (brazos suben)
+			// Coordenadas del recorrido local (alrededor del 0,0 del ring)
+			float minXZ = -15.0f;
+			float maxXZ = 15.0f;
+
+			// Estado 1: avanza +x local
 			if (recorrido == 1) {
-				pos_ini_x_inci += 0.0025f * deltaTime * 60.0f;
+				pos_ini_x_inci += inciSpeed;
 				orienta = 90.0f;
 
 				// Brazos subiendo (fase positiva)
@@ -642,15 +648,16 @@ int main()
 				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
 				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
 
-				if (pos_ini_x_inci >= 200.0f) {
+				if (pos_ini_x_inci >= maxXZ) {
+					pos_ini_x_inci = maxXZ; // Ajustar a la esquina
 					recorrido = 2;
 					tiempolocal = 0.0f;
 				}
 			}
 
-			//Estado 2: avanza +z (brazos bajan)
+			//Estado 2: avanza +z local
 			else if (recorrido == 2) {
-				pos_ini_z_inci += 0.0025f * deltaTime * 60.0f;
+				pos_ini_z_inci += inciSpeed;
 				orienta = 0.0f;
 
 				// Brazos bajando (fase invertida)
@@ -660,15 +667,16 @@ int main()
 				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
 				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
 
-				if (pos_ini_z_inci >= 250.0f) {
+				if (pos_ini_z_inci >= maxXZ) {
+					pos_ini_z_inci = maxXZ; // Ajustar a la esquina
 					recorrido = 3;
 					tiempolocal = 0.0f;
 				}
 			}
 
-			//  Estado 3: avanza -x (brazos suben otra vez) 
+			// Estado 3: avanza -x local
 			else if (recorrido == 3) {
-				pos_ini_x_inci -= 0.0025f * deltaTime * 60.0f;
+				pos_ini_x_inci -= inciSpeed;
 				orienta = -90.0f;
 
 				// Brazos subiendo de nuevo
@@ -678,15 +686,16 @@ int main()
 				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
 				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
 
-				if (pos_ini_x_inci <= -200.0f) {
+				if (pos_ini_x_inci <= minXZ) {
+					pos_ini_x_inci = minXZ; // Ajustar a la esquina
 					recorrido = 4;
 					tiempolocal = 0.0f;
 				}
 			}
 
-			// Estado 4: avanza -z (brazos bajan otra vez) 
+			// Estado 4: avanza -z local
 			else if (recorrido == 4) {
-				pos_ini_z_inci -= 0.0025f * deltaTime * 60.0f;
+				pos_ini_z_inci -= inciSpeed;
 				orienta = 180.0f;
 
 				// Brazos bajando (fase invertida)
@@ -696,7 +705,8 @@ int main()
 				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
 				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
 
-				if (pos_ini_z_inci <= 100.0f) {
+				if (pos_ini_z_inci <= minXZ) {
+					pos_ini_z_inci = minXZ; // Ajustar a la esquina
 					recorrido = 1;
 					tiempolocal = 0.0f;
 				}
@@ -811,6 +821,64 @@ int main()
 		elementos = elementoLocal;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Ring.RenderModel();
+
+		// INCINEROAR
+		// 1. Empezar desde la matriz del ring (que ya está girada y en -2.0f Y)
+		baseInc = elementoLocal;
+
+		// 2. Aplicar el movimiento local (X, Z) y ajustar Y para ponerlo en el suelo (-2.5f)
+		//    (El ring está en -2.0, así que bajamos -0.5 más)
+		baseInc = glm::translate(baseInc, glm::vec3(pos_ini_x_inci, 3.5f, pos_ini_z_inci));
+
+		// 3. Aplicar la orientación local del modelo
+		baseInc = glm::rotate(baseInc, glm::radians(orienta), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		// 4. Aplicar la escala del modelo
+		baseInc = glm::scale(baseInc, glm::vec3(0.025f, 0.025f, 0.025f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseInc));
+		InciTorso.RenderModel();
+
+		//Cabeza
+		glm::mat4 model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(0.0f, 19.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciCabeza.RenderModel();
+
+		//BD
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(-42.9f, -14.0f, 2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionBrazoDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciBD.RenderModel();
+
+		//BI
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(42.9f, -14.0f, 2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionBrazoIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciBI.RenderModel();
+
+		//pD
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(-12.0f, -73.0f, -2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionPiernaDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciPD.RenderModel();
+
+		//pI
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(12.0f, -73.0f, -2.0f));
+		model1 = glm::rotate(model1, glm::radians(rotacionPiernaIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+
+		InciPI.RenderModel();
+
+		//COLA
+		model1 = baseInc;
+		model1 = glm::translate(model1, glm::vec3(0.0f, -93.0f, -78.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
+		InciCola.RenderModel();
 
 		//MegaHawlucha
 		elementos = glm::mat4(1.0);
@@ -1178,55 +1246,7 @@ int main()
 
 		// AQUI ACABA ROLAND
 
-		// INCINEROAR
-		//Posicionar base (torso)
-		glm::mat4 baseInc = glm::mat4(1.0f);
-		baseInc = glm::translate(baseInc, glm::vec3(pos_ini_x_inci, 5.5f, pos_ini_z_inci));
-		baseInc = glm::rotate(baseInc, glm::radians(orienta), glm::vec3(0.0f, 1.0f, 0.0f));
-		baseInc = glm::scale(baseInc, glm::vec3(0.05f, 0.05f, 0.05f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseInc));
-		InciTorso.RenderModel();
-
-		//Cabeza
-		glm::mat4 model1 = baseInc;
-		model1 = glm::translate(model1, glm::vec3(0.0f, 19.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
-		InciCabeza.RenderModel();
-
-		//BD
-		model1 = baseInc;
-		model1 = glm::translate(model1, glm::vec3(-42.9f, -14.0f, 2.0f));
-		model1 = glm::rotate(model1, glm::radians(rotacionBrazoDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
-		InciBD.RenderModel();
-
-		//BI
-		model1 = baseInc;
-		model1 = glm::translate(model1, glm::vec3(42.9f, -14.0f, 2.0f));
-		model1 = glm::rotate(model1, glm::radians(rotacionBrazoIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
-		InciBI.RenderModel();
-
-		//pD
-		model1 = baseInc;
-		model1 = glm::translate(model1, glm::vec3(-12.0f, -73.0f, -2.0f));
-		model1 = glm::rotate(model1, glm::radians(rotacionPiernaDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
-		InciPD.RenderModel();
-
-		//pI
-		model1 = baseInc;
-		model1 = glm::translate(model1, glm::vec3(12.0f, -73.0f, -2.0f));
-		model1 = glm::rotate(model1, glm::radians(rotacionPiernaIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
-
-		InciPI.RenderModel();
-
-		//COLA
-		model1 = baseInc;
-		model1 = glm::translate(model1, glm::vec3(0.0f, -93.0f, -78.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
-		InciCola.RenderModel();
+		
 
 		// Termina Incineroar
 
