@@ -143,7 +143,7 @@ Model InciCola;
 //Prueba caminata
 float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
 float velocidadPaso = 0.005f;     // velocidad del ciclo de paso
-float velocidadAvance = 0.005f;  // desplazamiento por frame
+//float velocidadAvance = 0.005f;  // desplazamiento por frame
 
 int currentCameraMode = 1; // Rastreador de modo de cámara
 // Posición y rotación guardadas de Roland
@@ -172,10 +172,6 @@ float rotacionBrazoIzq = 0.0f;
 float rotacionPiernaDer = 0.0f;
 float rotacionPiernaIzq = 0.0f;
 bool caminarRoland = false;
-float distanciacaminar = 0.0f;
-float PosRolx = 50.0f;
-float PosRolz = 50.0f;
-
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -603,17 +599,14 @@ int main()
 		//Captura de barra espaciadora para animacion Roland
 
 		// --- Control de inicio/parada de caminado ---
-		if (mainWindow.getsKeys()[GLFW_KEY_SPACE])
+		if (mainWindow.getsKeys()[GLFW_KEY_W] || mainWindow.getsKeys()[GLFW_KEY_S])
 		{
 			caminarRoland = true;
 		}
-		if (mainWindow.getsKeys()[GLFW_KEY_R])
+		else
 		{
 			caminarRoland = false;
 
-			PosRolx = 50.0f;
-			PosRolz = 50.0f;
-			distanciacaminar = 0.0f;
 
 		}
 		// Funcion de movimiento Roland, temporal --> Evento ESPACIO y R
@@ -630,8 +623,6 @@ int main()
 			rotacionPiernaDer = -35.0f * sin(anguloMovimiento);
 			rotacionPiernaIzq = 35.0f * sin(anguloMovimiento);
 
-			// Avanza sobre eje Z
-			distanciacaminar += velocidadAvance;
 		}
 
 		if (animacionInci)
