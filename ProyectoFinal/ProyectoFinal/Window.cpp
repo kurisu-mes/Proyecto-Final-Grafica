@@ -14,6 +14,8 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	estadoEntrada = false;
+	estadoRing = false;
+	estadoProto = false;
 	muevex = 2.0f;
 	lightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
@@ -120,6 +122,19 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow->estadoEntrada = !theWindow->estadoEntrada;
 	}
+
+	//Puertas Ring
+	if (key == GLFW_KEY_I && GLFW_PRESS == action)
+	{
+		theWindow->estadoRing = !theWindow->estadoRing;
+	}
+
+	//Animacion Protoman
+	if (key == GLFW_KEY_P && GLFW_PRESS == action)
+	{
+		theWindow->estadoProto = !theWindow->estadoProto;
+	}
+
 	// Control de escenarios de luces
 	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
 	{

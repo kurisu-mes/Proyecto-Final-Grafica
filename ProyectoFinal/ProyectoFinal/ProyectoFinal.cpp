@@ -45,20 +45,9 @@ std::vector<Shader> shaderList;
 
 Camera camera;
 
-Texture brickTexture;
-Texture dirtTexture;
 Texture plainTexture;
-Texture pisoTexture;
-Texture AgaveTexture;
-Texture PiramideTexture;
-
-Model Kitt_M;
-Model Llanta_M;
-Model Blackhawk_M;
-Model Piramide_M;
 
 Model Piso_M;
-
 Model Angela_Desk;
 Model Angela_Chair;
 Model Ofrenda;
@@ -78,16 +67,17 @@ Model Caballete1;
 Model Caballete2;
 
 //modelos y texturas auxiliares
-Model PuertaDer_M;
-Model PuertaIzq_M;
-Model Pilar_M;
+Model capoLampara;
+Model fuegoLampara;
+
+Model PuertaDerE;
+Model PuertaIzqE;
+Model PilaresE;
 Model Letrero_M;
 Texture Letrero_T;
 Model ArcoRing;
-Model PuertaR;
-
-Model capoLampara;
-Model fuegoLampara;
+Model PuertaDerR;
+Model PuertaIzqR;
 
 Skybox skybox;
 Skybox skyboxNoche;
@@ -116,18 +106,14 @@ PointLight pointLights_Escenario3[4];
 float toffsetLetrero = 0.0f;
 float velocidadLetrero = 0.01f;
 //Para la puerta
-float RpuertaDer = 0.0f; // Angulo de rotacion ACTUAL
-float TpuertaIzq = 0.0f; // Traslacion X ACTUAL
-float TpuertaIzq_Z = 0.0f; // Traslacion Z ACTUAL
+float Rpuerta = 0.0f; // Angulo de rotacion ACTUAL
+float TpuertaE = 0.0f; // Traslacion X ACTUAL
+float TpuertaE_Z = 0.0f; // Traslacion Z ACTUAL
 float AjusteP = -0.5f; // Ajuste para que la puerta no atraviese el pilar
 
-float TpuertaIzq_Target_X = -2.0f; //Desplazamiento objetivo en X
+float TpuertaE_Target_X = -3.0f; //Desplazamiento objetivo en X
 float RpuertaDer_Target = 90.0f; // Rotacion objetivo de 90 grados
 float velocidadPuerta = 0.05f; // Multiplicador para la velocidad de la animacion
-
-//puertas ring
-float posXPuertaR = 0.0f;
-float movPuerta = 0.2f;
 
 //Roland
 Model RolandTorso;
@@ -135,6 +121,7 @@ Model RolandBrazoDer;
 Model RolandBrazoIzq;
 Model RolandPiernaDer;
 Model RolandPiernaIzq;
+
 //Incineroar
 Model InciCabeza;
 Model InciTorso;
@@ -143,12 +130,22 @@ Model InciBI;
 Model InciPD;
 Model InciPI;
 Model InciCola;
+
+//Protoman
+Model ProtoCabeza;
+Model ProtoTorso;
+Model ProtoEscudo;
+Model ProtoIzqBrazo;
+Model ProtoDerBrazo;
+Model ProtoIzqPierna;
+Model ProtoDerPierna;
+
 //Prueba caminata
 float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
 float velocidadPaso = 0.005f;     // velocidad del ciclo de paso
-//float velocidadAvance = 0.005f;  // desplazamiento por frame
 
 int currentCameraMode = 1; // Rastreador de modo de cámara
+
 // Posición y rotación guardadas de Roland
 glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
 float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
@@ -162,6 +159,7 @@ float rotacionBrazoIzqInci = 0.0f;
 float rotacionPiernaDerInci = 0.0f;
 float rotacionPiernaIzqInci = 0.0f;
 float rotacioncabezaInci = 0.0f; //Rotaciones miembros del modelo
+
 //PosInicial Incineroar
 float pos_ini_x_inci = -30.0f;
 float pos_ini_z_inci = -30.0f;
@@ -175,6 +173,15 @@ float rotacionBrazoIzq = 0.0f;
 float rotacionPiernaDer = 0.0f;
 float rotacionPiernaIzq = 0.0f;
 bool caminarRoland = false;
+
+//Variables Movimiento Protoman
+float brazoProtoR = -90.0f;
+float escudoProto1 = 0.0f;
+float escudoProto2 = 0.0f;
+float posicionProto = 0.0f;
+float piernaProto = 0.0f;
+
+
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -311,23 +318,8 @@ int main()
 
 	camera = Camera(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
-	brickTexture = Texture("Textures/brick.png");
-	brickTexture.LoadTextureA();
-	dirtTexture = Texture("Textures/dirt.png");
-	dirtTexture.LoadTextureA();
 	plainTexture = Texture("Textures/plain.png");
 	plainTexture.LoadTextureA();
-	pisoTexture = Texture("Textures/piso.tga");
-	pisoTexture.LoadTextureA();
-	AgaveTexture = Texture("Textures/Agave.tga");
-	AgaveTexture.LoadTextureA();
-
-	Kitt_M = Model();
-	Kitt_M.LoadModel("Models/kitt_optimizado.obj");
-	Llanta_M = Model();
-	Llanta_M.LoadModel("Models/llanta_optimizada.obj");
-	Blackhawk_M = Model();
-	Blackhawk_M.LoadModel("Models/uh60.obj");
 
 	Piso_M = Model();
 	Piso_M.LoadModel("Models/pisoProyecto.obj");
@@ -343,8 +335,8 @@ int main()
 	Ofrenda.LoadModel("Models/ofrenda.obj");
 
 	//piramide
-	Piramide_M = Model();
-	Piramide_M.LoadModel("Models/Piramide.obj");
+	PiramideRing = Model();
+	PiramideRing.LoadModel("Models/Piramide.obj");
 	Ring = Model();
 	Ring.LoadModel("Models/ring.obj");
 
@@ -369,12 +361,12 @@ int main()
 	Caballete2.LoadModel("Models/CaballeteGal2.obj");
 
 	//arcos
-	PuertaDer_M = Model();
-	PuertaDer_M.LoadModel("Models/PuertaDer.obj");
-	PuertaIzq_M = Model();
-	PuertaIzq_M.LoadModel("Models/PuertaIzq.obj");
-	Pilar_M = Model();
-	Pilar_M.LoadModel("Models/PilarDer.obj");
+	PuertaDerE = Model();
+	PuertaDerE.LoadModel("Models/puertaDerEntrada.obj");
+	PuertaIzqE = Model();
+	PuertaIzqE.LoadModel("Models/puertaIzqEntrada.obj");
+	PilaresE = Model();
+	PilaresE.LoadModel("Models/pilaresEntrada.obj");
 	Letrero_M = Model();
 	Letrero_M.LoadModel("Models/Letrero.obj");
 	Letrero_T = Texture("Textures/Letrero.png");
@@ -382,8 +374,10 @@ int main()
 
 	ArcoRing = Model();
 	ArcoRing.LoadModel("Models/stoneArch.obj");
-	PuertaR = Model();
-	PuertaR.LoadModel("Models/puertaRotatoria.obj");
+	PuertaDerR = Model();
+	PuertaDerR.LoadModel("Models/puertaDerArco.obj");
+	PuertaIzqR = Model();
+	PuertaIzqR.LoadModel("Models/puertaIzqArco.obj");
 
 	//lamparas
 	capoLampara = Model();
@@ -401,6 +395,7 @@ int main()
 	RolandBrazoIzq.LoadModel("Models/RolandBrazoIzqArt.obj");
 	RolandPiernaIzq = Model();
 	RolandPiernaIzq.LoadModel("Models/RolandPiernaIzqArt.obj");
+
 	//Incineroar
 	InciCabeza = Model();
 	InciCabeza.LoadModel("Models/InciHead.obj");
@@ -416,6 +411,22 @@ int main()
 	InciPI.LoadModel("Models/InciPI.obj");
 	InciCola = Model();
 	InciCola.LoadModel("Models/InciCola.obj");
+
+	//Protoman
+	ProtoCabeza = Model();
+	ProtoCabeza.LoadModel("Models/protoHead.obj");
+	ProtoTorso = Model();
+	ProtoTorso.LoadModel("Models/protoTorso.obj");
+	ProtoEscudo = Model();
+	ProtoEscudo.LoadModel("Models/protoShield.obj");
+	ProtoIzqBrazo = Model();
+	ProtoIzqBrazo.LoadModel("Models/protoLArm.obj");
+	ProtoDerBrazo = Model();
+	ProtoDerBrazo.LoadModel("Models/protoRArm.obj");
+	ProtoIzqPierna = Model();
+	ProtoIzqPierna.LoadModel("Models/protoLLeg.obj");
+	ProtoDerPierna = Model();
+	ProtoDerPierna.LoadModel("Models/protoRLeg.obj");
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/right_dia.tga");
@@ -498,7 +509,7 @@ int main()
 	//se crean mas luces puntuales y spotlight 
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
-		uniformSpecularIntensity = 0, uniformShininess = 0;
+		uniformSpecularIntensity = 0, uniformShininess = 0, uniformTextureOffset = 0;
 	GLuint uniformColor = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 1000.0f);
@@ -521,6 +532,10 @@ int main()
 	glm::mat4 elementoLocal(1.0);
 	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
 	glm::mat4 baseInc(1.0);
+	glm::mat4 baseProto(1.0);
+	glm::mat4 brazoProto(1.0);
+
+
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
 	{
@@ -530,32 +545,31 @@ int main()
 		lastTime = now;
 
 		//*******************ANIMACIONES*********************************
+		//*******************ANIMACIONES*********************************
 				//Animacion de la puerta
 		if (mainWindow.getEntradaAbierta())
 		{
 			// --- ABRIR PUERTAS ---
 			// Interpolar suavemente hacia los valores objetivo
-			RpuertaDer = lerp(RpuertaDer, RpuertaDer_Target, velocidadPuerta * deltaTime);
-			TpuertaIzq = lerp(TpuertaIzq, TpuertaIzq_Target_X, velocidadPuerta * deltaTime);
-			TpuertaIzq_Z = lerp(TpuertaIzq_Z, AjusteP, velocidadPuerta * deltaTime);
+			TpuertaE = lerp(TpuertaE, TpuertaE_Target_X, velocidadPuerta * deltaTime);
+			TpuertaE_Z = lerp(TpuertaE_Z, AjusteP, velocidadPuerta * deltaTime);
 		}
 		else
 		{
 			// --- CERRAR PUERTAS ---
 			// Interpolar suavemente de vuelta a posicion original
-			RpuertaDer = lerp(RpuertaDer, 0.0f, velocidadPuerta * deltaTime);
-			TpuertaIzq = lerp(TpuertaIzq, 0.0f, velocidadPuerta * deltaTime);
-			TpuertaIzq_Z = lerp(TpuertaIzq_Z, 0.0f, velocidadPuerta * deltaTime);
+			TpuertaE = lerp(TpuertaE, 0.0f, velocidadPuerta * deltaTime);
+			TpuertaE_Z = lerp(TpuertaE_Z, 0.0f, velocidadPuerta * deltaTime);
 		}
 
-		//movimiento Puertas
-		if (mainWindow.getEntradaAbierta()) {
-			//cerradas, se abren
-			if (posXPuertaR > -90.0f) posXPuertaR -= 1.0f * deltaTime;
+		//Puertas Ring
+		if (mainWindow.getEstadoRing()) {
+			// --- ABRIR PUERTAS ---
+			Rpuerta = lerp(Rpuerta, RpuertaDer_Target, velocidadPuerta * deltaTime);
 		}
 		else {
-			//abiertas, se abren
-			if (posXPuertaR < 0.0f) posXPuertaR += 1.0f * deltaTime;
+			// --- CERRAR PUERTAS ---
+			Rpuerta = lerp(Rpuerta, 0.0f, velocidadPuerta * deltaTime);
 		}
 
 
@@ -738,6 +752,32 @@ int main()
 			}
 		}
 
+		//Animacion Protoman
+		if (mainWindow.getEstadoProto()) {
+			if (brazoProtoR < 0.0f) brazoProtoR += 3.0f * deltaTime;
+			else {
+				if (escudoProto1 < 90.0f) escudoProto1 += 3.0f * deltaTime;
+				if (escudoProto2 < 60.0f) escudoProto2 += 2.0f * deltaTime;
+				else {
+					if (piernaProto < 45.0f) {
+						piernaProto += 1.5f * deltaTime;
+						posicionProto -= 0.1f * deltaTime;
+					}
+				}
+			}
+		}
+		else {
+			if (piernaProto > 0.0f) {
+				piernaProto -= 1.5f * deltaTime;
+				posicionProto += 0.1f * deltaTime;
+			}
+			else {
+				if (escudoProto1 > 0.0f) escudoProto1 -= 3.0f * deltaTime;
+				if (escudoProto2 > 0.0f) escudoProto2 -= 2.0f * deltaTime;
+				else if (brazoProtoR > -90.0f) brazoProtoR -= 3.0f * deltaTime;
+			}
+		}
+
 		// Clear the window
 		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -757,6 +797,7 @@ int main()
 		uniformView = shaderList[0].GetViewLocation();
 		uniformEyePosition = shaderList[0].GetEyePositionLocation();
 		uniformColor = shaderList[0].getColorLocation();
+		//uniformTextureOffset = shaderList[0].getOffsetLocation();
 
 		//información en el shader de intensidad especular y brillo
 		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
@@ -856,7 +897,7 @@ int main()
 		//elementos = glm::translate(elementos, glm::vec3(125.5f, -2.0f, 25.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		//elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		Piramide_M.RenderModel();
+		PiramideRing.RenderModel();
 
 		//Ring de lucha
 		elementos = elementoLocal;
@@ -1136,65 +1177,30 @@ int main()
 
 
 		//--------------------------------- PUERTAS ----------------------------
-		//Pilar izquierdo
+		//Pilares entrada
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(33.0f, 1.0f, -2.9f));
+		model = glm::translate(model, glm::vec3(33.0f, -2.0f, 0.0f));
 		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 		modelaux = model;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		Pilar_M.RenderModel();
+		PilaresE.RenderModel();
 
 		//Puerta izquierda
 		model = modelaux;
-		model = glm::translate(model, glm::vec3(0.35f, -0.7f, 0.0f));
-		model = glm::translate(model, glm::vec3(TpuertaIzq, 0.0f, TpuertaIzq_Z));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -0.8f));
+		model = glm::translate(model, glm::vec3(TpuertaE, 0.0f, TpuertaE_Z));;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		PuertaIzq_M.RenderModel();
-
-		//Pilar derecho
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(3.75f, 0.0f, 0.0f));
-		modelaux = model;
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		Pilar_M.RenderModel();
+		PuertaIzqE.RenderModel();
 
 		//Puerta derecha
 		model = modelaux;
-		model = glm::translate(model, glm::vec3(0.35f, -0.7f, 0.0f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::translate(model, glm::vec3(TpuertaIzq, 0.0f, TpuertaIzq_Z));
+		model = glm::translate(model, glm::vec3(3.0f, 0.0f, -0.8f));
+		model = glm::translate(model, glm::vec3(-TpuertaE, 0.0f, TpuertaE_Z));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		PuertaDer_M.RenderModel();
-
-		//letrero
-		/*
-		* model = glm::mat4(1.0);
-		model = modelaux;
-		model = glm::translate(model, glm::vec3(-1.85f, 2.25f, 0.0f));
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		// Vector para el offset del letrero
-		// Para el letrero con desplazamiento
-		toffsetLetrero += velocidadLetrero * deltaTime;
-		if (toffsetLetrero > 1.0f)
-		{
-			toffsetLetrero = 0.0f;
-		}
-		glm::vec2 letreroOffset = glm::vec2(toffsetLetrero, 0.0f);
-		// Envio del offset al shader
-		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(letreroOffset));
-		Letrero_T.UseTexture();
-		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		Letrero_M.RenderModel();
-		toffset = glm::vec2(0.0f, 0.0f);
-		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
-		*/
+		PuertaDerE.RenderModel();
 
 		//ARCO
 		elementos = glm::mat4(1.0);
@@ -1206,24 +1212,27 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		ArcoRing.RenderModel();
 
-		//puerta rotatoria
+		//puerta rotatoria der
 		elementos = modelaux;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, -5.5f));
-		elementos = glm::rotate(elementos, posXPuertaR * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::translate(elementos, glm::vec3(6.5f, 0.0f, 2.2f));
+		elementos = glm::scale(elementos, glm::vec3(1.15f, 1.3f, 1.0f));
+		elementos = glm::rotate(elementos, Rpuerta * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//elementos = glm::rotate(elementos, posXPuertaR, glm::vec3(0.0f, 1.0f, 0.0f));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		PuertaR.RenderModel();
+		PuertaDerR.RenderModel();
 
-		//puerta rotatoria
+		//puerta rotatoria izq
 		elementos = modelaux;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 5.5f));
-		elementos = glm::rotate(elementos, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		elementos = glm::rotate(elementos, posXPuertaR * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::translate(elementos, glm::vec3(-6.0f, 0.0f, 2.2f));
+		elementos = glm::scale(elementos, glm::vec3(1.15f, 1.3f, 1.0f));
+		elementos = glm::rotate(elementos, -Rpuerta * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//elementos = glm::rotate(elementos, posXPuertaR * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		PuertaR.RenderModel();
+		PuertaIzqR.RenderModel();
 
-		//DIBUJADO ROLAND -- TEMPORAL
+		//------------------------------------------
 
 		// === HUMANOIDE ROLAND ===
 
@@ -1295,6 +1304,58 @@ int main()
 		model0 = glm::rotate(model0, glm::radians(rotacionPiernaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model0));
 		RolandPiernaIzq.RenderModel();
+
+		//------------------------------------------
+
+		// = PROTOMAN =
+		//Posicionar torso
+		baseProto = glm::mat4(1.0f);
+		baseProto = glm::translate(baseProto, glm::vec3(-15.0f, 0.6f, 20.0f + posicionProto));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseProto));
+		ProtoTorso.RenderModel();
+
+		//Cabeza
+		modelaux = baseProto;
+		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 0.56f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		ProtoCabeza.RenderModel();
+
+		//Brazo Derecho
+		brazoProto = baseProto;
+		brazoProto = glm::translate(brazoProto, glm::vec3(-0.3f, 0.325f, -0.16f));
+		brazoProto = glm::rotate(brazoProto, 60 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(brazoProto));
+		ProtoDerBrazo.RenderModel();
+
+		//escudo
+		modelaux = brazoProto;
+		modelaux = glm::translate(modelaux, glm::vec3(-0.56f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, escudoProto1 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, escudoProto2 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelaux = glm::rotate(modelaux, escudoProto1 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		ProtoEscudo.RenderModel();
+
+		//Brazo Izquierdo
+		modelaux = baseProto;
+		modelaux = glm::translate(modelaux, glm::vec3(0.5f, 0.4f, -0.16f));
+		modelaux = glm::rotate(modelaux, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, brazoProtoR * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		ProtoIzqBrazo.RenderModel();
+
+		//Pierna Derecha
+		modelaux = baseProto;
+		modelaux = glm::translate(modelaux, glm::vec3(-0.17f, -0.53f, -0.13f));
+		modelaux = glm::rotate(modelaux, piernaProto * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		ProtoDerPierna.RenderModel();
+
+		//Pierna Izquierda
+		modelaux = baseProto;
+		modelaux = glm::translate(modelaux, glm::vec3(0.25f, -0.53f, -0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		ProtoIzqPierna.RenderModel();
 
 
 		glUseProgram(0);
