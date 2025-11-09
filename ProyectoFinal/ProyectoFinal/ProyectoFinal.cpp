@@ -521,8 +521,17 @@ int main()
 	printf("WASD - Mover cámara\n");
 	//modos de camara
 	printf("1 - Modo Principal (Primera Persona)\n");
-	printf("2 - Modo Aéreo\n");
-	printf("3 - Modo Estático\n");
+	printf("2 - Modo Aereo\n");
+	printf("3 - Modo Estatico\n");
+	printf("4 - Modo Estatico 2\n");
+	printf("5 - Modo Estatico 3\n");
+
+	//Prender Luces
+	printf("Solo de noche se prenden las luces\n");
+	printf("Z para luces entrada\n");
+	printf("X para luces altar\n");
+	printf("C para luces antorchas\n");
+
 
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
