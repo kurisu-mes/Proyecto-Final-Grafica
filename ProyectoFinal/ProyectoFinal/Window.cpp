@@ -15,6 +15,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	height = windowHeight;
 	estadoEntrada = false;
 	muevex = 2.0f;
+	lightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -119,7 +120,19 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow->estadoEntrada = !theWindow->estadoEntrada;
 	}
-
+	// Control de escenarios de luces
+	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+	{
+		theWindow->lightMode = 1; // Comportamiento 1
+	}
+	if (key == GLFW_KEY_X && action == GLFW_PRESS)
+	{
+		theWindow->lightMode = 2; // Comportamiento 2
+	}
+	if (key == GLFW_KEY_C && action == GLFW_PRESS)
+	{
+		theWindow->lightMode = 3; // Comportamiento 3
+	}
 
 	if (key >= 0 && key < 1024)
 	{
