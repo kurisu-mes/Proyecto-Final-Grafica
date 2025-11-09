@@ -15,10 +15,18 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 
 	cameraMode = 1; // Empezar en modo principal por defecto
 
-	// camara estática
-	staticPosition = glm::vec3(0.0f, 2.0f, -20.0f);   // Posición 
-	staticFront = glm::vec3(1.0f, 0.0f, 0.0f); // Dirección 
+	// camara estática RING
+	//staticPosition = glm::vec3(153.5f, 14.0f, 32.0f);   // Posición 
+	//staticFront = glm::vec3(0.9f, -1.5f, 1.1f); // Dirección 
 
+	// camara estática OFRENDA
+	//staticPosition = glm::vec3(90.0f, 12.0f, -12.0f);   // Posición 
+	//staticFront = glm::vec3(0.8f, -0.4f, -0.2f); // Dirección
+
+	//camara estatica galeria
+	staticPosition = glm::vec3(38.0f, 15.0f, -20.0f);   // Posición 
+	staticFront = glm::vec3(0.8f, -0.2f, 0.6f); // Dirección 
+	
 	// camara aérea
 	alturaAerea = 50.0f;
 

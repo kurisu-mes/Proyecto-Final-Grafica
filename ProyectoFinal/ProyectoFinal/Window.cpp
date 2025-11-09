@@ -14,6 +14,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	estadoEntrada = false;
+	estadoProtoman = false;
 	muevex = 2.0f;
 	for (size_t i = 0; i < 1024; i++)
 	{
@@ -120,6 +121,11 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		theWindow->estadoEntrada = !theWindow->estadoEntrada;
 	}
 
+	//Protoman
+	if (key == GLFW_KEY_P && GLFW_PRESS == action)
+	{
+		theWindow->estadoProtoman = !theWindow->estadoProtoman;
+	}
 
 	if (key >= 0 && key < 1024)
 	{

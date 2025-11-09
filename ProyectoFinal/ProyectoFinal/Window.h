@@ -15,6 +15,7 @@ public:
 	GLfloat getYChange();
 	GLfloat getmuevex() { return muevex; }
 	bool getEntradaAbierta() { return estadoEntrada; }
+	bool getEstadoProtoman() { return estadoProtoman; }
 	
 
 	bool getShouldClose() {
@@ -34,7 +35,7 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
-	bool mouseFirstMoved, estadoEntrada;
+	bool mouseFirstMoved, estadoEntrada = false, estadoProtoman = false;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);
 
