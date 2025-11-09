@@ -33,7 +33,7 @@
 #include "Material.h"
 const float toRadians = 3.14159265f / 180.0f;
 
-GLfloat cycleDuration = 100.0f;
+GLfloat cycleDuration = 500.0f;
 GLfloat minAmbient = 0.1f;
 GLfloat maxAmbient = 1.0f; // Valor original
 GLfloat minDiffuse = 0.1f;
@@ -144,6 +144,12 @@ Model InciCola;
 float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
 float velocidadPaso = 0.005f;     // velocidad del ciclo de paso
 float velocidadAvance = 0.005f;  // desplazamiento por frame
+
+int currentCameraMode = 1; // Rastreador de modo de cámara
+// Posición y rotación guardadas de Roland
+glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
+float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
+
 // Animacion compleja incineroar
 int recorrido = 1;
 float orienta = 0.0f; //Orientacion del cuerpo
@@ -304,7 +310,7 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
 	brickTexture = Texture("Textures/brick.png");
 	brickTexture.LoadTextureA();
@@ -551,22 +557,27 @@ int main()
 		if (keys[GLFW_KEY_1])
 		{
 			camera.setCameraMode(1); // Modo Principal
+			currentCameraMode = 1;
 		}
 		if (keys[GLFW_KEY_2])
 		{
 			camera.setCameraMode(2); // Modo Aéreo
+			currentCameraMode = 2;
 		}
 		if (keys[GLFW_KEY_3])
 		{
 			camera.setCameraMode(3); // Modo Estático
+			currentCameraMode = 3;
 		}
 		if (keys[GLFW_KEY_4])
 		{
 			camera.setCameraMode(4); // Modo Estático
+			currentCameraMode = 4;
 		}
 		if (keys[GLFW_KEY_5])
 		{
 			camera.setCameraMode(5); // Modo Estático
+			currentCameraMode = 5;
 		}
 
 		// --- CICLO DÍA/NOCHE ---
@@ -1105,15 +1116,49 @@ int main()
 
 		// === HUMANOIDE ROLAND ===
 
-		//Posicionar base (torso)
+		if (currentCameraMode == 1)
+		{
+			// 1. Obtener vectores de la cámara
+			glm::vec3 camPos = camera.getCameraPosition();
+			glm::vec3 camDir = camera.getCameraDirection();
+
+			// 2. Calcular dirección XZ (plana)
+			glm::vec3 avatarForward = glm::vec3(camDir.x, 0.0f, camDir.z);
+
+			// 3. Definir offset y nivel del suelo
+			GLfloat avatarDist = 2.0f;
+			GLfloat avatarYLevel = 2.0f; // Nivel del suelo
+
+			// 4. Normalizar y calcular rotación (Yaw)
+			if (glm::length(avatarForward) > 0.001f)
+			{
+				avatarForward = glm::normalize(avatarForward);
+				rolandAvatarYaw = atan2(avatarForward.x, avatarForward.z) + M_PI;
+			}
+			// (Si no, rolandAvatarYaw mantiene su último valor)
+
+			// 5. Calcular la posición final del avatar y guardarla
+			rolandAvatarPos = camPos + avatarForward * avatarDist;
+			rolandAvatarPos.y = avatarYLevel; // Fijar al suelo
+		}
+
+		// --- DIBUJADO DE ROLAND ---
+		// Dibuja a Roland CADA FRAME usando la última posición/rotación guardada
+
+		// 6. Crear la matriz 'base' (model) para Roland
 		glm::mat4 base = glm::mat4(1.0f);
-		base = glm::translate(base, glm::vec3(PosRolx, 7.0f, PosRolz - distanciacaminar));
-		base = glm::scale(base, glm::vec3(5.0f, 5.0f, 5.0f));
+		base = glm::translate(base, rolandAvatarPos); // Usar la posición guardada
+		base = glm::rotate(base, rolandAvatarYaw, glm::vec3(0.0f, 1.0f, 0.0f)); // Usar la rotación guardada
+		base = glm::scale(base, glm::vec3(3.0f, 3.0f, 3.0f)); // Aplicar escala
+
+		// 7. Dibujar el Torso (base)
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(base));
 		RolandTorso.RenderModel();
 
+		// ---- DIBUJAR MIEMBROS (animaciones de caminata) ----
+
 		//Brazo Derecho
-		glm::mat4 model0 = base; //-0.057086f
+		glm::mat4 model0 = base;
 		model0 = glm::translate(model0, glm::vec3(0.17694f, -0.064725f, 0.035086f));
 		model0 = glm::rotate(model0, glm::radians(rotacionBrazoDer), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model0));
