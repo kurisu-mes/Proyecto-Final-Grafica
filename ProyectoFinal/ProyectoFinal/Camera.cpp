@@ -23,9 +23,9 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	staticPosition4 = glm::vec3(90.0f, 12.0f, -12.0f);
 	staticFront4 = glm::vec3(0.8f, -0.4f, -0.2f);
 
-	// Posición y dirección para la cámara estática (Modo 5)
-	staticPosition5 = glm::vec3(0.0f, 2.0f, 0.0f);
-	staticFront5 = glm::vec3(1.0f, 0.0f, 0.0f);
+	// Posición y dirección para la cámara estática (Modo 5, Galería)
+	staticPosition5 = glm::vec3(38.0f, 15.0f, -20.0f);   // Posición 
+	staticFront5 = glm::vec3(0.8f, -0.2f, 0.6f); // Dirección
 
 	// camara aérea
 	alturaAerea = 50.0f;
