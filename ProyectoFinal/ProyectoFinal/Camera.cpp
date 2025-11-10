@@ -15,21 +15,21 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 
 	cameraMode = 1; // Empezar en modo principal por defecto
 
-	// camara estática RING
-	//staticPosition = glm::vec3(153.5f, 14.0f, 32.0f);   // Posición 
-	//staticFront = glm::vec3(0.9f, -1.5f, 1.1f); // Dirección 
+	// camara estï¿½tica (Modo 3, Ring)
+	staticPosition = glm::vec3(153.5f, 14.0f, 32.0f);   // Posiciï¿½n 
+	staticFront = glm::vec3(0.9f, -1.5f, 1.1f); // Direcciï¿½n 
 
-	// camara estática OFRENDA
-	//staticPosition = glm::vec3(90.0f, 12.0f, -12.0f);   // Posición 
-	//staticFront = glm::vec3(0.8f, -0.4f, -0.2f); // Dirección
+	// Posiciï¿½n y direcciï¿½n para la cï¿½mara estï¿½tica (Modo 4, Ofrenda)
+	staticPosition4 = glm::vec3(90.0f, 12.0f, -12.0f);
+	staticFront4 = glm::vec3(0.8f, -0.4f, -0.2f);
 
-	//camara estatica galeria
-	staticPosition = glm::vec3(38.0f, 15.0f, -20.0f);   // Posición 
-	staticFront = glm::vec3(0.8f, -0.2f, 0.6f); // Dirección 
+	// Posiciï¿½n y direcciï¿½n para la cï¿½mara estï¿½tica (Modo 5, Galerï¿½a)
+	staticPosition5 = glm::vec3(38.0f, 15.0f, -20.0f);   // Posiciï¿½n 
+	staticFront5 = glm::vec3(0.8f, -0.2f, 0.6f); // Direcciï¿½n
 	
-	// camara aérea
+	// camara aï¿½rea
 	alturaAerea = 50.0f;
-
+	positionAerea = glm::vec3(startPosition.x, alturaAerea, startPosition.z);
 	HPrimeraPersona = startPosition.y;
 
 	update();
@@ -37,8 +37,8 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 
 void Camera::setCameraMode(int mode)
 {
-	// Simple validación para asegurarnos de que el modo es 1, 2, o 3
-	if (mode >= 1 && mode <= 3)
+	// Simple validaciï¿½n para asegurarnos de que el modo es 1, 2, 3,4 o 5
+	if (mode >= 1 && mode <= 5)
 	{
 		if (mode == 1)
 		{
@@ -47,7 +47,7 @@ void Camera::setCameraMode(int mode)
 		cameraMode = mode;
 		if (mode == 2)
 		{
-			position.y = alturaAerea;
+			positionAerea.y = alturaAerea;
 		}
 	}
 }
@@ -56,7 +56,7 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 {
 	GLfloat velocity = moveSpeed * deltaTime;
 
-	// Modo 1: Cámara principal 
+	// Modo 1: Cï¿½mara principal 
 	if (cameraMode == 1)
 	{
 		
@@ -80,29 +80,37 @@ void Camera::keyControl(bool* keys, GLfloat deltaTime)
 			position += right * velocity;
 		}
 	}
-	//Camara aérea
+	//Camara aï¿½rea
 	else if (cameraMode == 2)
 	{
 
 		if (keys[GLFW_KEY_W])
 		{
-			position.z -= velocity; 
+			positionAerea.z -= velocity; 
 		}
 		if (keys[GLFW_KEY_S])
 		{
-			position.z += velocity;
+			positionAerea.z += velocity;
 		}
 		if (keys[GLFW_KEY_A])
 		{
-			position.x -= velocity;
+			positionAerea.x -= velocity;
 		}
 		if (keys[GLFW_KEY_D])
 		{
-			position.x += velocity; 
+			positionAerea.x += velocity; 
 		}
 	}
-	// Modo 3: Cámara estática 
+	// Modo 3: Cï¿½mara estï¿½tica 
 	else if (cameraMode == 3)
+	{
+		// *No hace nada*
+	}
+	else if (cameraMode == 4)
+	{
+		// *No hace nada*
+	}
+	else if (cameraMode == 5)
 	{
 		// *No hace nada*
 	}
@@ -139,36 +147,55 @@ glm::mat4 Camera::calculateViewMatrix()
 {
 	//return glm::lookAt(position, position + front, up);
 
-	// Modo 1: Cámara principal
+	// Modo 1: Cï¿½mara principal
 	if (cameraMode == 1)
 	{
-		// Usa la posición y dirección (front) calculadas por el mouse
+		// Usa la posiciï¿½n y direcciï¿½n (front) calculadas por el mouse
 		return glm::lookAt(position, position + front, up);
 	}
-	// Modo 2: Cámara aérea
+	// Modo 2: Cï¿½mara aï¿½rea
 	else if (cameraMode == 2)
 	{
-		// Usa la 'position' (movida por WASD)
-		// Mira siempre hacia abajo (posición actual + vector -Y)
-		// El vector "arriba" de la cámara es 'hacia el fondo' del mundo (eje -Z)
-		return glm::lookAt(position,
-			position + glm::vec3(0.0f, -1.0f, 0.0f),
+		
+		return glm::lookAt(positionAerea,
+			positionAerea + glm::vec3(0.0f, -1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, -1.0f));
 	}
-	// Modo 3: Cámara estática
-	else // (cameraMode == 3)
+	// Modo 3, 4 y 5: Cï¿½mara estï¿½tica
+	else if (cameraMode == 3)
 	{
-		// Usa la posición y dirección estáticas que definimos en el constructor
+		// Usa la posiciï¿½n y direcciï¿½n estï¿½ticas que definimos en el constructor
 		return glm::lookAt(staticPosition, staticPosition + staticFront, worldUp);
+	}
+	else if (cameraMode == 4)
+	{
+		// Usa la posiciï¿½n y direcciï¿½n estï¿½ticas que definimos en el constructor
+		return glm::lookAt(staticPosition4, staticPosition4 + staticFront4, worldUp);
+	}
+	else if (cameraMode == 5)
+	{
+		// Usa la posiciï¿½n y direcciï¿½n estï¿½ticas que definimos en el constructor
+		return glm::lookAt(staticPosition5, staticPosition5 + staticFront5, worldUp);
 	}
 }
 
 glm::vec3 Camera::getCameraPosition()
 {
-
-	if (cameraMode == 3)
+	if (cameraMode == 2)
+	{
+		return positionAerea;
+	}
+	else if (cameraMode == 3)
 	{
 		return staticPosition;
+	}
+	else if (cameraMode == 4)
+	{
+		return staticPosition4;
+	}
+	if (cameraMode == 5)
+	{
+		return staticPosition5;
 	}
 	return position;
 }
@@ -185,9 +212,17 @@ glm::vec3 Camera::getCameraDirection()
 	{
 		return glm::vec3(0.0f, -1.0f, 0.0f); // Siempre mira hacia abajo
 	}
-	else // Modo 3
+	else if (cameraMode == 3)// Modo 3
 	{
 		return glm::normalize(staticFront);
+	}
+	else if (cameraMode == 4)// Modo 4
+	{
+		return glm::normalize(staticFront4);
+		}
+	else if (cameraMode == 5)// Modo 5
+	{
+		return glm::normalize(staticFront5);
 	}
 }
 

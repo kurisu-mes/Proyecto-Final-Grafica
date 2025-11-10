@@ -27,6 +27,7 @@ public:
 
 private:
 	glm::vec3 position;
+	glm::vec3 positionAerea;
 	glm::vec3 front;
 	glm::vec3 up;
 	glm::vec3 right;
@@ -43,6 +44,14 @@ private:
 	// Posición y dirección para la cámara estática (Modo 3)
 	glm::vec3 staticPosition;
 	glm::vec3 staticFront;
+
+	// Posición y dirección para la cámara estática (Modo 4)
+	glm::vec3 staticPosition4;
+	glm::vec3 staticFront4;
+
+	// Posición y dirección para la cámara estática (Modo 5)
+	glm::vec3 staticPosition5;
+	glm::vec3 staticFront5;
 
 	GLfloat alturaAerea;
 	GLfloat HPrimeraPersona;
