@@ -19,6 +19,9 @@ public:
 	bool getEstadoProto() { return estadoProto; }
 	bool getanimPhantump() { return animPhantump; }
 	void setanimPhantump(bool value) { animPhantump = value; }
+	bool getanimMawile() { return animMawile; }
+	void setanimMawile(bool value) { animMawile = value; }
+
 	
 
 	bool getShouldClose() {
@@ -40,7 +43,7 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
-	bool mouseFirstMoved, estadoEntrada, estadoRing, estadoProto, animPhantump;
+	bool mouseFirstMoved, estadoEntrada, estadoRing, estadoProto, animPhantump, animMawile;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);
 

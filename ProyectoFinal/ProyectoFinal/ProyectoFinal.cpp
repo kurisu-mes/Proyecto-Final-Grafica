@@ -120,6 +120,16 @@ Model PhantumpCabeza;
 Model PhantumpCuerpo;
 Model PhantumpBrazos;
 
+//Modelo Mawile
+Model MawileCabeza;
+Model MawileCuerpo;
+Model MawileBI;
+Model MawileMI;
+Model MawileBD;
+Model MawileMD;
+Model MawilePI;
+Model MawilePD;
+
 //Roland
 Model RolandTorso;
 Model RolandBrazoDer;
@@ -196,8 +206,26 @@ float rotacion_brazos = 0.0f;
 float elevacion = 0.0f;
 float elevacion_cuerpo = 0.0f;
 float ladeo_cabeza = 0.0f;
-bool subiendo = false;
-bool bajando = false;
+bool subiendo = true;
+bool bajando = true;
+
+//Variables posicionales Mawile y de animacion
+
+float pos_ini_x_ma = 10.0f;
+float pos_ini_y_ma = 0.0f;
+float pos_ini_z_ma = -30.0f;
+float rotacion_cab_si_ma = 0.0f;
+float rotacion_cab_no_ma = 0.0f;
+float rotacion_brazos_ma = 0.0f;
+float rotacion_manos_ma = 0.0f;
+float desplazamiento_brazos_z = 0.0f;
+float tiempollora = 0.0f;
+bool animMa = false;
+bool si = false;
+bool no = false;
+bool pausa = false;
+int estadoma = 0;
+
 
 
 // Vertex Shader
@@ -455,6 +483,26 @@ int main()
 	ProtoDerPierna = Model();
 	ProtoDerPierna.LoadModel("Models/protoRLeg.obj");
 
+	//Mawile
+	MawileCabeza = Model();
+	MawileCabeza.LoadModel("Models/MawileCabeza.obj");
+	MawileCuerpo = Model();
+	MawileCuerpo.LoadModel("Models/MawileCuerpo.obj");
+	MawileBI = Model();
+	MawileBI.LoadModel("Models/MawileBI1.obj");
+	MawileMI = Model();
+	MawileMI.LoadModel("Models/MawileBI2.obj");
+	MawileBD = Model();
+	MawileBD.LoadModel("Models/MawileBD1.obj");
+	MawileMD = Model();
+	MawileMD.LoadModel("Models/MawileBD2.obj");
+	MawilePI = Model();
+	MawilePI.LoadModel("Models/MawilePI.obj");
+	MawilePD = Model();
+	MawilePD.LoadModel("Models/MawilePD.obj");
+
+	
+
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/right_dia.tga");
 	skyboxFaces.push_back("Textures/Skybox/left_dia.tga");
@@ -573,6 +621,9 @@ int main()
 	glm::mat4 basePhantump(1.0);
 	glm::mat4 baseMawile(1.0);
 	glm::mat4 model3(1.0f);
+	glm::mat4 model4(1.0f);
+	glm::mat4 herenciaMa(1.0f);
+	glm::mat4 herenciaMa1(1.0f);
 
 
 	////Loop mientras no se cierra la ventana
@@ -800,7 +851,7 @@ int main()
 		if (subiendo) {
 			rotacion_brazos -= 2.5f * deltaTime;
 			elevacion_cuerpo += 0.1f * deltaTime;
-			ladeo_cabeza -= 0.5f * deltaTime;
+			ladeo_cabeza -= 0.25f * deltaTime;
 
 			if (elevacion_cuerpo >= altura_max) {
 				subiendo = false;
@@ -810,7 +861,7 @@ int main()
 
 		// Fase descendente
 		if (bajando) {
-			ladeo_cabeza += 0.5f * deltaTime;
+			ladeo_cabeza += 0.25f * deltaTime;
 			rotacion_brazos += 2.5f * deltaTime;
 			elevacion_cuerpo -= 0.05f * deltaTime;
 			
@@ -829,9 +880,86 @@ int main()
 
 		//Animación Mawile
 		
+		if (mainWindow.getanimMawile() && estadoma == 0) {
+			estadoma = 1;
+		}
+		if (estadoma == 1) {
+		//Levanta sus manos
+			rotacion_brazos_ma += 30.0f * deltaTime * 0.04f;
+			if (rotacion_brazos_ma >= 90.0f) {
+				rotacion_brazos_ma = 90.0f;
+				estadoma = 2;
+			}
+		}
+		if (estadoma == 2) {
+			rotacion_manos_ma += 40.0f * deltaTime * 0.04f;
+			if (rotacion_manos_ma >= 90.0f) {
+				rotacion_manos_ma = 90.0f;
+				tiempollora = 0.0f;
+				estadoma = 3;
+			}
 
+		}
+		if (estadoma == 3) {
+			tiempollora += deltaTime;
+			if (si) {
+				rotacion_cab_si_ma += 2.0f * deltaTime * 0.04f;
+				if (rotacion_cab_si_ma >= 5.0f) {
+					si = false;
+				}
+			else {
+					rotacion_cab_si_ma -= 2.0f * deltaTime * 0.04f;
+					if (rotacion_cab_si_ma <= -5.0f) {
+						si = true;
+					}
+				}
+			}
+			if (no) {
+				rotacion_cab_no_ma += 1.50f * deltaTime * 0.04f;
+				if (rotacion_cab_no_ma >= 5.0f) {
+					no = false;
+				}
+			}
+			else {
+					rotacion_cab_no_ma -= 1.50f * deltaTime * 0.04f;
+					if (rotacion_cab_no_ma <= -5.0f) {
+						no = true;
+					}
+				}
+			if (tiempollora >= 9.0f) {
+				estadoma = 4;
+			
+			}
+			
+		}
+		if (estadoma == 4) {
+			rotacion_brazos_ma -= 30.0f * deltaTime * 0.04f;
+			rotacion_manos_ma -= 40.0f * deltaTime * 0.04f;
 
+			// Enderezar cabeza
+			if (rotacion_cab_si_ma > 0)
+				rotacion_cab_si_ma -= 10.0f * deltaTime * 0.04f;
+			else if (rotacion_cab_si_ma < 0)
+				rotacion_cab_si_ma += 10.0f * deltaTime * 0.04f;
 
+			if (rotacion_cab_no_ma > 0)
+				rotacion_cab_no_ma -= 1.0f * deltaTime * 0.04f;
+			else if (rotacion_cab_no_ma < 0)
+				rotacion_cab_no_ma += 1.0f * deltaTime * 0.04f;
+
+			// Cuando vuelve a la pose inicial
+			if (rotacion_brazos_ma <= 0.0f && rotacion_manos_ma <= 0.0f) {
+				rotacion_brazos_ma = 0.0f;
+				rotacion_manos_ma = 0.0f;
+				rotacion_cab_si_ma = 0.0f;
+				rotacion_cab_no_ma = 0.0f;
+				estadoma = 0; // vuelve al estado inactivo
+				mainWindow.setanimMawile(false); // apagar trigger
+			}
+		}
+
+		
+		
 
 
 		//Animacion Protoman
@@ -1467,7 +1595,57 @@ int main()
 
 		//-------------------------------------------------------------------------------------------------
 		//Modelo Mawile
+		baseMawile = glm::mat4(1.0f);
+		baseMawile = glm::translate(baseMawile, glm::vec3(pos_ini_x_ma, pos_ini_y_ma, pos_ini_z_ma));
+		baseMawile = glm::scale(baseMawile, glm::vec3(0.1f, 0.1f, 0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseMawile));
+		MawileCuerpo.RenderModel();
 
+		//Brazos Izq
+		herenciaMa = baseMawile;
+		herenciaMa = glm::translate(herenciaMa, glm::vec3(10.2406f, -1.70517f, -0.732285f));
+		herenciaMa = glm::rotate(herenciaMa, glm::radians(-rotacion_brazos_ma), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(herenciaMa));
+		MawileBI.RenderModel();
+
+		model4 = herenciaMa;
+		model4 = glm::translate(model4, glm::vec3(17.9444f, -10.85983f, 0.05895f));
+		model4 = glm::rotate(model4, glm::radians(-rotacion_manos_ma), glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model4));
+		MawileMI.RenderModel();
+
+		//Cabeza
+		model4 = baseMawile;
+		model4 = glm::translate(model4, glm::vec3(0.0f, 23.7079f, -30.5368f));
+		model4 = glm::rotate(model4, glm::radians(-rotacion_cab_si_ma), glm::vec3(1.0f, 0.0f, 0.0f));
+		model4 = glm::rotate(model4, glm::radians(-rotacion_cab_no_ma), glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model4));
+		MawileCabeza.RenderModel();
+
+		//Brazos Der
+		herenciaMa1 = baseMawile;
+		herenciaMa1 = glm::translate(herenciaMa1, glm::vec3(-10.2406f, -1.70517f, -0.732285f));
+		herenciaMa1 = glm::rotate(herenciaMa1, glm::radians(-rotacion_brazos_ma), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(herenciaMa1));
+		MawileBD.RenderModel();
+
+		model4 = herenciaMa1;
+		model4 = glm::translate(model4, glm::vec3(-17.9444f, -10.85983f, 0.05895f));
+		model4 = glm::rotate(model4, glm::radians(rotacion_manos_ma), glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model4));
+		MawileMD.RenderModel();
+
+		//Piernas
+
+		model4 = baseMawile;
+		model4 = glm::translate(model4, glm::vec3(10.3968f, -31.4319f, -0.196301f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model4));
+		MawilePI.RenderModel();
+
+		model4 = baseMawile;
+		model4 = glm::translate(model4, glm::vec3(-10.3968f, -31.4319f, -0.196301f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model4));
+		MawilePD.RenderModel();
 
 		glUseProgram(0);
 
