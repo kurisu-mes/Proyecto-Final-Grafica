@@ -66,6 +66,18 @@ Model ExpositorGaleria;
 Model Caballete1;
 Model Caballete2;
 
+//objetos de exposicion
+Model Lienzo1;
+Model Lienzo2;
+Model Lienzo3;
+Model Lienzo4;
+Model Lienzo5;
+Model Lienzo6;
+
+Model Tomahawk;
+Model MewFossil;
+Model BongBong;
+
 //modelos y texturas auxiliares
 Model capoLampara;
 Model fuegoLampara;
@@ -312,7 +324,6 @@ void CreateObjects()
 
 }
 
-
 void CreateShaders()
 {
 	Shader* shader1 = new Shader();
@@ -380,6 +391,26 @@ int main()
 	Caballete2 = Model();
 	Caballete2.LoadModel("Models/CaballeteGal2.obj");
 
+	Tomahawk = Model();
+	Tomahawk.LoadModel("Models/TomahawkMan.obj");
+	MewFossil = Model();
+	MewFossil.LoadModel("Models/mewFossil.obj");
+	BongBong = Model();
+	BongBong.LoadModel("Models/bongbong.obj");
+
+	Lienzo1 = Model();
+	Lienzo1.LoadModel("Models/Lienzo1.obj");
+	Lienzo2 = Model();
+	Lienzo2.LoadModel("Models/Lienzo2.obj");
+	Lienzo3 = Model();
+	Lienzo3.LoadModel("Models/Lienzo3.obj");
+	Lienzo4 = Model();
+	Lienzo4.LoadModel("Models/Lienzo4.obj");
+	Lienzo5 = Model();
+	Lienzo5.LoadModel("Models/Lienzo5.obj");
+	Lienzo6 = Model();
+	Lienzo6.LoadModel("Models/Lienzo6.obj");
+
 	//arcos
 	PuertaDerE = Model();
 	PuertaDerE.LoadModel("Models/puertaDerEntrada.obj");
@@ -389,7 +420,7 @@ int main()
 	PilaresE.LoadModel("Models/pilaresEntrada.obj");
 	Letrero_M = Model();
 	Letrero_M.LoadModel("Models/Letrero.obj");
-	Letrero_T = Texture("Textures/Letrero.png");
+	Letrero_T = Texture("Textures/bongbong.png");
 	Letrero_T.LoadTextureA();
 
 	ArcoRing = Model();
@@ -1033,122 +1064,150 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		CalendarioDoom.RenderModel();
 
-		//Penacho (con base)
+		//Base penacho
 		elementos = elementoLocal;
 		elementos = glm::translate(elementos, glm::vec3(-20.0f, 0.0f, 16.0f));
 		elementos = glm::rotate(elementos, 150 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		ExpositorGaleria.RenderModel();
+
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 3.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PenachoMan.RenderModel();
 
 		//Paredes exposicion
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		elementoLocal = elementos;
 		elementos = glm::rotate(elementos, 160 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		ParedGaleria.RenderModel();
 
+		//armas megaman
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 4.0f, 0.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Tomahawk.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(100.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		ParedGaleria.RenderModel();
 
+		//mew
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(-10.0f, 0.0f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 5.0f, 0.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		MewFossil.RenderModel();
+
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		ParedGaleria.RenderModel();
+
+		//bong bong
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 5.0f, 0.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		BongBong.RenderModel();
+
 
 		//FILA DE caballetes.
 		//1
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(54.0f, -2.0f, -24.0f));
-		elementoLocal = elementos;
-		elementos = glm::translate(elementos, glm::vec3(0, 0.0f, 3.0f));
+		elementos = glm::translate(elementos, glm::vec3(54.0f, -2.0f, -21.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.3f, 1.0f));
 		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
 		Caballete1.RenderModel();
+
+		//lienzo 1
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Lienzo1.RenderModel();
 
 		//2
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 2.0f));
-		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(61.0f, -2.0f, -22.0f));
+		elementos = glm::scale(elementos, glm::vec3(1.3f, 1.3f, 1.3f));
 		elementos = glm::rotate(elementos, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
 		Caballete2.RenderModel();
+
+		//lienzo 2
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Lienzo2.RenderModel();
 
 		//3
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
-		elementos = glm::scale(elementos, glm::vec3(0.8f, 0.8f, 0.8f));
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(65.0f, -2.0f, -23.0f));
 		elementos = glm::rotate(elementos, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
 		Caballete2.RenderModel();
+
+		//lienzo 3
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Lienzo3.RenderModel();
 
 		//4
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(69.0f, -2.0f, -23.0f));
+		elementos = glm::scale(elementos, glm::vec3(0.9f, 0.9f, 0.9f));
 		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
 		Caballete1.RenderModel();
+
+		//lienzo 4
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Lienzo4.RenderModel();
 
 		//5
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(74.0f, -2.0f, -23.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
+		elementos = glm::rotate(elementos, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
 		Caballete1.RenderModel();
+
+		//lienzo 5
+		elementos = elementoLocal;
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
+		Lienzo5.RenderModel();
+
 
 		//6
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(6.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
+		elementos = glm::mat4(1.0);
+		elementos = glm::translate(elementos, glm::vec3(79.0f, -2.0f, -23.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.3f, 1.5f));
 		elementos = glm::rotate(elementos, -10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
 		Caballete2.RenderModel();
 
-		//7
+		//lienzo 6
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(4.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
-		elementos = glm::scale(elementos, glm::vec3(0.8f, 0.8f, 0.8f));
-		elementos = glm::rotate(elementos, 10 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
-		Caballete1.RenderModel();
-
-		//8
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(6.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
-		elementos = glm::rotate(elementos, 15 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
-		Caballete2.RenderModel();
-
-		//9
-		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(5.0f, 0.0f, 0.0f));
-		elementoLocal = elementos;
-		elementos = glm::scale(elementos, glm::vec3(1.0f, 1.4f, 1.0f));
-		elementos = glm::rotate(elementos, -20 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
-		//textura de cuadro en cuestion
-		Caballete1.RenderModel();
+		Lienzo6.RenderModel();
 
 
 		//------------------------LAMPARAS------------------------------------------------
