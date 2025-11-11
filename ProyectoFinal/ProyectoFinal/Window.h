@@ -17,7 +17,8 @@ public:
 	bool getEntradaAbierta() { return estadoEntrada; }
 	bool getEstadoRing() { return estadoRing; }
 	bool getEstadoProto() { return estadoProto; }
-
+	bool getanimPhantump() { return animPhantump; }
+	void setanimPhantump(bool value) { animPhantump = value; }
 	
 
 	bool getShouldClose() {
@@ -39,7 +40,7 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
-	bool mouseFirstMoved, estadoEntrada, estadoRing, estadoProto;
+	bool mouseFirstMoved, estadoEntrada, estadoRing, estadoProto, animPhantump;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);
 

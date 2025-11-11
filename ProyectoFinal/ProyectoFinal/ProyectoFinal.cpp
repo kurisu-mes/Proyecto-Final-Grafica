@@ -115,6 +115,11 @@ float TpuertaE_Target_X = -3.0f; //Desplazamiento objetivo en X
 float RpuertaDer_Target = 90.0f; // Rotacion objetivo de 90 grados
 float velocidadPuerta = 0.05f; // Multiplicador para la velocidad de la animacion
 
+//Modelo Phantump
+Model PhantumpCabeza;
+Model PhantumpCuerpo;
+Model PhantumpBrazos;
+
 //Roland
 Model RolandTorso;
 Model RolandBrazoDer;
@@ -181,6 +186,18 @@ float escudoProto2 = 0.0f;
 float posicionProto = 0.0f;
 float piernaProto = 0.0f;
 
+//Variables animación simple Phantump
+
+float pos_ini_x_pha = 5.0f;
+float pos_ini_z_pha = -20.0f;
+float pos_ini_y_pha = 0.0f;
+float altura_max = 3.0f;
+float rotacion_brazos = 0.0f;
+float elevacion = 0.0f;
+float elevacion_cuerpo = 0.0f;
+float ladeo_cabeza = 0.0f;
+bool subiendo = false;
+bool bajando = false;
 
 
 // Vertex Shader
@@ -385,6 +402,16 @@ int main()
 	fuegoLampara = Model();
 	fuegoLampara.LoadModel("Models/firelamp.obj");
 
+	//Phantump
+	PhantumpCabeza = Model();
+	PhantumpCabeza.LoadModel("Models/PhantumpCabeza.obj");
+	PhantumpCuerpo = Model();
+	PhantumpCuerpo.LoadModel("Models/PhantumpCuerpo.obj");
+	PhantumpBrazos = Model();
+	PhantumpBrazos.LoadModel("Models/PhantumpBrazos.obj");
+
+	//
+
 	//Roland, carga de modelo
 	RolandTorso.LoadModel("Models/RolandTorsoArt.obj");
 	RolandBrazoDer = Model();
@@ -543,6 +570,9 @@ int main()
 	glm::mat4 baseInc(1.0);
 	glm::mat4 baseProto(1.0);
 	glm::mat4 brazoProto(1.0);
+	glm::mat4 basePhantump(1.0);
+	glm::mat4 baseMawile(1.0);
+	glm::mat4 model3(1.0f);
 
 
 	////Loop mientras no se cierra la ventana
@@ -760,6 +790,49 @@ int main()
 				}
 			}
 		}
+		//Animación Phantump
+		
+		if (mainWindow.getanimPhantump() && !subiendo && !bajando) {
+			subiendo = true;
+		}
+
+		// Fase ascendente
+		if (subiendo) {
+			rotacion_brazos -= 2.5f * deltaTime;
+			elevacion_cuerpo += 0.1f * deltaTime;
+			ladeo_cabeza -= 0.5f * deltaTime;
+
+			if (elevacion_cuerpo >= altura_max) {
+				subiendo = false;
+				bajando = true;
+			}
+		}
+
+		// Fase descendente
+		if (bajando) {
+			ladeo_cabeza += 0.5f * deltaTime;
+			rotacion_brazos += 2.5f * deltaTime;
+			elevacion_cuerpo -= 0.05f * deltaTime;
+			
+			if (elevacion_cuerpo <= 0.0f) {
+				bajando = false;
+
+				// Detenemos anim
+				mainWindow.setanimPhantump(false);
+				rotacion_brazos = 0.0f;
+				ladeo_cabeza = 0.0f;
+				elevacion_cuerpo = 0.0f;
+			}
+		}
+
+
+
+		//Animación Mawile
+		
+
+
+
+
 
 		//Animacion Protoman
 		if (mainWindow.getEstadoProto()) {
@@ -1365,6 +1438,35 @@ int main()
 		modelaux = glm::translate(modelaux, glm::vec3(0.25f, -0.53f, -0.1f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		ProtoIzqPierna.RenderModel();
+
+		//------------------------------------------------------------------------------------------------
+		//Modelo Phantump
+
+		//Cuerpo, torso como base
+		basePhantump = glm::mat4(1.0f);
+		basePhantump = glm::translate(basePhantump, glm::vec3(pos_ini_x_pha, pos_ini_y_pha + elevacion_cuerpo, pos_ini_z_pha));
+		basePhantump = glm::scale(basePhantump, glm::vec3(0.1f,0.1f,0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(basePhantump));
+		PhantumpCuerpo.RenderModel();
+
+		//Brazos
+		model3 = basePhantump;
+		model3= glm::translate(model3, glm::vec3(0.0f, 0.953284f, 14.9372f));
+		model3 = glm::rotate(model3, glm::radians(rotacion_brazos), glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model3));
+		PhantumpBrazos.RenderModel();
+
+		//Cabeza
+		model3 = basePhantump;
+		model3 = glm::translate(model3, glm::vec3(0.0f, 23.2911 + elevacion, 13.0059f));
+		model3 = glm::rotate(model3, glm::radians(ladeo_cabeza), glm::vec3(0.0f,0.0f,1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model3));
+		PhantumpCabeza.RenderModel();
+
+
+
+		//-------------------------------------------------------------------------------------------------
+		//Modelo Mawile
 
 
 		glUseProgram(0);

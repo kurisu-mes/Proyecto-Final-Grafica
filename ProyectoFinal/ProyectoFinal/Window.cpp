@@ -16,6 +16,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	estadoEntrada = false;
 	estadoRing = false;
 	estadoProto = false;
+	animPhantump = false;
 	muevex = 2.0f;
 	lightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
@@ -133,6 +134,13 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	if (key == GLFW_KEY_P && GLFW_PRESS == action)
 	{
 		theWindow->estadoProto = !theWindow->estadoProto;
+	}
+	//Animacion Phantump
+
+	if (key == GLFW_KEY_L && GLFW_PRESS == action)
+	{
+		theWindow->setanimPhantump(!theWindow->getanimPhantump());
+
 	}
 
 	// Control de escenarios de luces
