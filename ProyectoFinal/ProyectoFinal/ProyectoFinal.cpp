@@ -107,11 +107,14 @@ static double limitFPS = 1.0 / 60.0;
 // luz direccional
 DirectionalLight mainLight;
 //para declarar varias luces de tipo pointlight
-SpotLight spotLights[MAX_SPOT_LIGHTS];
+//SpotLight spotLights[MAX_SPOT_LIGHTS];
+SpotLight linterna;                  // Linterna (se activa sola)
+SpotLight spotLights_Escenario1[4]; // (Z) 4 Lámparas Galería
+SpotLight spotLights_Escenario3[4]; // (C) 4 Antorchas Ring
 
-PointLight pointLights_Escenario1[4];
-PointLight pointLights_Escenario2[4];
-PointLight pointLights_Escenario3[4];
+// (X) 2 Altar + 1 Hawlucha
+SpotLight spotLights_Escenario2[4];
+PointLight pointLights[MAX_POINT_LIGHTS];
 
 //variables para animaciones
 //letras
@@ -598,50 +601,46 @@ int main()
 	//contador de luces puntuales
 
 	float attenConst = 0.3f;
-	float attenLin = 0.1f;
-	float attenQuad = 0.05f;
-
-	// Escenario 1 (Z): 4 Lamparas "capoLampara" (Amarillas)
-	pointLights_Escenario1[0] = PointLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-	pointLights_Escenario1[1] = PointLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-	pointLights_Escenario1[2] = PointLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-	pointLights_Escenario1[3] = PointLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-
-	// Escenario 2 (X): 2 Altar (Blancas) + 2 Lamparas (Amarillas)
-	pointLights_Escenario2[0] = PointLight(1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad); // Altar 1
-	pointLights_Escenario2[1] = PointLight(1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad); // Altar 2
-	pointLights_Escenario2[2] = PointLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad); // Lampara 5
-	pointLights_Escenario2[3] = PointLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad); // Lampara 6
-
-	// Escenario 3 (C): 4 Antorchas "fuegoLampara" (Naranjas)
-	pointLights_Escenario3[0] = PointLight(1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-	pointLights_Escenario3[1] = PointLight(1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-	pointLights_Escenario3[2] = PointLight(1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-	pointLights_Escenario3[3] = PointLight(1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0, 0, 0, attenConst, attenLin, attenQuad);
-
-	//unsigned int spotLightCount = 0;
+	float attenLin = 0.02f;
+	float attenQuad = 0.005f;
+	
 	//linterna
-	spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
+	spotLights_Escenario1[0] = SpotLight(1.0f, 1.0f, 1.0f,
 		0.0f, 2.0f,
 		0.0f, 0.0f, 0.0f,
 		0.0f, -1.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		5.0f);
+	//spotLights_Escenario1[0] = SpotLight(1.0f, 1.0f, 0.0f, 0.5f, 1.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 45.0f);
+	spotLights_Escenario1[1] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario1[2] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario1[3] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+
+	spotLights_Escenario2[0] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario2[1] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 89.0f);
+	spotLights_Escenario2[2] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario2[3] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+
+	spotLights_Escenario3[0] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario3[1] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario3[2] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+	spotLights_Escenario3[3] = SpotLight(1.0f, 1.0f, 0.5f, 0.5f, 2.0f, 0, 0, 0, 0.0f, -1.0f, 0.0f, attenConst, attenLin, attenQuad, 65.0f);
+
+	
 	//spotLightCount++;
 
-	spotLights[1] = SpotLight(1.0f, 1.0f, 0.0f, // Luz Amarilla 
-		1.0f, 2.0f,
-		0.0f, 0.0f, 0.0f, // Posición (temporal)
-		0.0f, -1.0f, 0.0f, // Dirección (temporal)
-		0.1f, 0.05f, 0.02f, // Atenuación
-		75.0f); // Ángulo
-
-	spotLights[2] = SpotLight(0.0f, 1.0f, 1.0f, // Luz Cyan
-		1.0f, 2.0f,
-		0.0f, 0.0f, 0.0f, // Posición (temporal)
-		0.0f, -1.0f, 0.0f, // Dirección (temporal)
-		0.1f, 0.05f, 0.02f, // Atenuación
-		45.0f); // Ángulo
+	pointLights[0] = PointLight(1.0f, 1.0f, 1.0f,
+		0.2f, 2.0f, 
+		0.0f, 0.0f, 0.0f,
+		0.3f, 0.02f, 0.005f);
+	pointLights[1] = PointLight(1.0f, 1.0f, 1.0f,
+		0.2f, 2.0f, 
+		0.0f, 0.0f, 0.0f,
+		0.3f, 0.02f, 0.005f);
+	pointLights[2] = PointLight(1.0f, 1.0f, 1.0f,
+		0.2f, 2.0f,  
+		0.0f, 0.0f, 0.0f,
+		0.3f, 0.02f, 0.005f); 
 
 	//se crean mas luces puntuales y spotlight 
 
@@ -1087,7 +1086,7 @@ int main()
 		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
 		glm::vec3 lowerLight = camera.getCameraPosition();
 		lowerLight.y -= 0.3f;
-		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
+		spotLights_Escenario1[0].SetFlash(lowerLight, camera.getCameraDirection());
 		shaderList[0].SetDirectionalLight(&mainLight);
 		int lightMode = mainWindow.getLightMode();
 		if (lucesNocturnasEncendidas)
@@ -1095,38 +1094,39 @@ int main()
 			switch (lightMode)
 			{
 			case 1: // (Tecla Z)
-				shaderList[0].SetPointLights(pointLights_Escenario1, 4);
+				shaderList[0].SetSpotLights(spotLights_Escenario1, 4);
 				break;
 			case 2: // (Tecla X)
-				shaderList[0].SetPointLights(pointLights_Escenario2, 4);
+				shaderList[0].SetSpotLights(spotLights_Escenario2, 4);
 				break;
 			case 3: // (Tecla C)
-				shaderList[0].SetPointLights(pointLights_Escenario3, 4);
+				shaderList[0].SetSpotLights(spotLights_Escenario3, 4);
 				break;
 			default: // Apagadas
-				shaderList[0].SetPointLights(NULL, 0);
+				shaderList[0].SetSpotLights(NULL, 0);
 				break;
 			}
 		}
 		else // Es de día
 		{
-			shaderList[0].SetPointLights(NULL, 0);
+			shaderList[0].SetSpotLights(NULL, 0);
 		}
-		//shaderList[0].SetSpotLights(spotLights, spotLightCount); 
 
-		SpotLight activeSpotLights[MAX_SPOT_LIGHTS];
-		unsigned int activeSpotLightCount = 0;
-		activeSpotLights[activeSpotLightCount++] = spotLights[0];
+
+		PointLight activePointLights[MAX_SPOT_LIGHTS];
+		unsigned int activePointLightCount = 0;
+		
 
 		// Si es de noche, añadir las 2 luces fijas
 		if (lucesNocturnasEncendidas)
 		{
-			activeSpotLights[activeSpotLightCount++] = spotLights[1];
-			activeSpotLights[activeSpotLightCount++] = spotLights[2];
+			activePointLights[activePointLightCount++] = pointLights[0];
+			activePointLights[activePointLightCount++] = pointLights[1];
+			activePointLights[activePointLightCount++] = pointLights[2];
 		}
 
 
-		shaderList[0].SetSpotLights(activeSpotLights, activeSpotLightCount);
+		shaderList[0].SetPointLights(activePointLights, activePointLightCount);
 
 		// --- FIN DE LÓGICA DE LUCES ---
 
@@ -1185,8 +1185,8 @@ int main()
 		elementos = glm::mat4(1.0);
 		//elementos = glm::translate(elementos, glm::vec3(100.0f, -2.0f, -60.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		elementos = glm::translate(elementos, glm::vec3(113.0f, -2.0f, -17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario2[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(-0.5f, 0.5f, -0.5f));
-		pointLights_Escenario2[1].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.5f, 0.5f, 0.5f));
+		pointLights[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(-0.5f, 2.5f, -0.5f));
+		pointLights[1].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.5f, 2.5f, 0.5f));
 		elementos = glm::rotate(elementos, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementos = glm::scale(elementos, glm::vec3(1.5f, 1.5f, 1.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1195,7 +1195,8 @@ int main()
 		//Ubicacion central de la piramide
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(158.5f, -2.0f, 39.0f));
-		spotLights[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		spotLights_Escenario2[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 4.5f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		
 		elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, -1.0f, 0.0f));
@@ -1270,7 +1271,7 @@ int main()
 		//MegaHawlucha
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(70.0f, -2.0f, 0.0f));
-		spotLights[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		pointLights[2].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 2.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::rotate(elementos, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
@@ -1434,7 +1435,7 @@ int main()
 		//entrada al ring
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(127.0f, -2.0f, 13.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario3[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario3[0].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f,-1.0f,0.0f));
 		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -1443,7 +1444,7 @@ int main()
 
 		elementos = elementoLocal;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario3[1].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario3[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		fuegoLampara.RenderModel();
@@ -1451,7 +1452,7 @@ int main()
 
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(136.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario3[2].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario3[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
@@ -1460,50 +1461,50 @@ int main()
 
 		elementos = elementoLocal;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario3[3].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario3[3].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		fuegoLampara.RenderModel();
 
 		//lamparas de galería
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario1[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso		
+		spotLights_Escenario2[0].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, 7.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario1[1].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario1[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(60.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario1[2].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario1[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(50.0f, -2.0f, -23.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario1[3].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario1[3].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 22.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario2[3].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario2[3].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, -26.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		pointLights_Escenario2[2].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
+		spotLights_Escenario2[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
