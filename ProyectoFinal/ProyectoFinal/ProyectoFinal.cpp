@@ -157,6 +157,18 @@ Model AveCuerpo;
 Model AveLW;
 Model AveRW;
 
+//Angela
+Model Angela;
+Model AngelaBrazo;
+Model AngelaAntebrazo;
+Model AngelaMano;
+
+//Eddie
+Model Eddie;
+Model EddieTapa;
+Model EddieAspas;
+
+
 //Prueba caminata
 float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
 float velocidadPaso = 0.1f;     // velocidad del ciclo de paso
@@ -213,6 +225,18 @@ float posAla;
 bool animvuelo = true;
 bool alasube = true;
 float velocidadaleteo = 0.003f;
+
+//Animacion Angela
+int faseAnimAngela = 0;
+float rotBrazoAng = 0.0f;
+float rotAnteBraAng = 0.0f;
+
+//Animacion Eddie
+bool animEddie = false;
+int estadoEddie = 0;
+float posEddieY = 0.0f;
+float posEddieZ = 0.0f;
+float anguloEddieY = 0.0f;
 
 
 // Vertex Shader
@@ -486,6 +510,24 @@ int main()
 	AveLW = Model();
 	AveLW.LoadModel("Models/AveLW.obj");
 
+	//Angela
+	Angela = Model();
+	Angela.LoadModel("Models/AngelaCuerpo.obj");
+	AngelaBrazo = Model();
+	AngelaBrazo.LoadModel("Models/AngelaBrazo.obj");
+	AngelaAntebrazo = Model();
+	AngelaAntebrazo.LoadModel("Models/AngelaAntebrazo.obj");
+	AngelaMano = Model();
+	AngelaMano.LoadModel("Models/AngelaMano.obj");
+
+	//Eddie
+	Eddie = Model();
+	Eddie.LoadModel("Models/cuerpoEddie.obj");
+	EddieTapa = Model();
+	EddieTapa.LoadModel("Models/tapaEddie.obj");
+	EddieAspas = Model();
+	EddieAspas.LoadModel("Models/aspaEddie.obj");
+
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/right_dia.tga");
 	skyboxFaces.push_back("Textures/Skybox/left_dia.tga");
@@ -577,14 +619,15 @@ int main()
 
 	printf("Controles:\n");
 	//modos de camara
-	printf("\CAMARA:\nWASD - Mover camara\n");
+	printf("\nCAMARA:\nWASD - Mover camara\n");
 	printf("1 - Modo Principal (Tercera Persona)\n2 - Modo Aereo\n");
 	printf("3 - Vista al Ring\n4 - Vista a la Ofrenda\n3 - Vista a la Galeria\n");
 	//animaciones
-	printf("\ANIMACIONES:\nO - Entrada principal\n");
+	printf("\nANIMACIONES:\nO - Entrada principal\n");
 	printf("I - Entrada al ring\nP - Protoman\n");
+	printf("L - Angela\n");
 	//luces
-	printf("\ILUMINACION:\nSolo de noche se prenden las luces\n\n");
+	printf("\nILUMINACION:\nSolo de noche se prenden las luces\n");
 	printf("Z para luces entrada\n");
 	printf("X para luces altar\n");
 	printf("C para luces antorchas\n");
@@ -603,6 +646,11 @@ int main()
 	glm::mat4 baseProto(1.0);
 	glm::mat4 brazoProto(1.0);
 	glm::mat4 baseAve(1.0);
+	glm::mat4 baseAngela(1.0);
+	glm::mat4 brazoAngela(1.0);
+	glm::mat4 antebrazoAngela(1.0);
+	glm::mat4 baseEddie(1.0);
+	glm::mat4 tapaEddie(1.0);
 
 
 	////Loop mientras no se cierra la ventana
@@ -863,6 +911,36 @@ int main()
 			posAla = sin(glm::radians(rotacionAla));
 		}
 
+		//ANIMACION SIMPLE ANGELA
+		if (mainWindow.getEstadoAngela()) {
+			//se vuelve true, comienza saludo
+			if (faseAnimAngela == 0) {
+				if (rotBrazoAng > -92.0f) {
+					rotBrazoAng -= 2.0f * deltaTime;
+					if (rotAnteBraAng < 92.0f) rotAnteBraAng += 2.0f * deltaTime;
+				}
+				else if (rotAnteBraAng > 0.0f) rotAnteBraAng -= 2.0f * deltaTime;
+				else faseAnimAngela = 1;
+			}
+
+			//termina saludo bajando el brazo, y reinicializa el bool
+			if (faseAnimAngela == 1) {
+				if (rotAnteBraAng < 92.0f) rotAnteBraAng += 2.0f * deltaTime;
+				else faseAnimAngela = 2;
+			}
+			if (faseAnimAngela == 2) {
+				if (rotBrazoAng < 0.0f) {
+					rotBrazoAng += 2.0f * deltaTime;
+					if (rotAnteBraAng > 0.0f) rotAnteBraAng -= 2.0f * deltaTime;
+				}
+				else {
+					faseAnimAngela = 0;
+					mainWindow.setEstadoAngela(false);
+				}
+					
+			}
+		}
+
 		// Clear the window
 		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -957,9 +1035,38 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Angela_Desk.RenderModel();
 
+		elementos = elementoLocal;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, -2.0f));
+		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Angela_Chair.RenderModel();
+
+		// = ANGELA =
+		//Posicionar torso
+		baseAngela = elementoLocal;
+		baseAngela = glm::translate(baseAngela, glm::vec3(0.0f, 1.6f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseAngela));
+		Angela.RenderModel();
+
+		//Brazo
+		brazoAngela = baseAngela;
+		brazoAngela = glm::translate(brazoAngela, glm::vec3(0.4f, 1.3f, 0.0f));
+		brazoAngela = glm::rotate(brazoAngela, rotBrazoAng * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(brazoAngela));
+		AngelaBrazo.RenderModel();
+
+		//Antebrazo
+		antebrazoAngela = brazoAngela;
+		antebrazoAngela = glm::translate(antebrazoAngela, glm::vec3(0.28f, -0.65f, 0.07f));
+		antebrazoAngela = glm::rotate(antebrazoAngela, rotAnteBraAng * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(antebrazoAngela));
+		AngelaAntebrazo.RenderModel();
+
+		//Mano
+		modelaux = antebrazoAngela;
+		modelaux = glm::translate(modelaux, glm::vec3(-0.45f, -0.055f, 0.75f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		AngelaMano.RenderModel();
 
 		//Ofrenda
 		elementos = glm::mat4(1.0);
@@ -1492,6 +1599,29 @@ int main()
 		modelaux = glm::rotate(modelaux, posAla, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		AveRW.RenderModel();
+
+		//EDDIE
+		baseEddie = glm::mat4(1.0f);
+		baseEddie = glm::translate(baseEddie, glm::vec3(0.0f, -2.0f + posEddieY, 0.0f + posEddieZ));
+		//baseAve = glm::rotate(baseAve, orienta_ave * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		//baseAve = glm::scale(baseAve, glm::vec3(10.0f, 10.0f, 10.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseEddie));
+		Eddie.RenderModel();
+
+		//tapa
+		tapaEddie = baseEddie;//0.083786f,-0.03725f
+		tapaEddie = glm::translate(tapaEddie, glm::vec3(0.0f, 1.5f, -0.7f));
+		tapaEddie = glm::rotate(tapaEddie, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(tapaEddie));
+		EddieTapa.RenderModel();
+
+		//aspas
+		modelaux = tapaEddie;
+		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 0.2f, 0.7f));
+		//modelaux = glm::rotate(modelaux, posEddie, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		EddieAspas.RenderModel();
+
 
 
 		glUseProgram(0);
