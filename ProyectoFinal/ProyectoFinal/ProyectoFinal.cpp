@@ -114,9 +114,17 @@ PointLight pointLights_Escenario2[4];
 PointLight pointLights_Escenario3[4];
 
 //variables para animaciones
+//letras
+						//		P	 R		O	Y		E	C		T	O      ESP	C		G	 E		I	  H		C	ESP	
+float posicionesLetrasX[] = { 0.6f, 0.0f, 0.4f, 0.2f, 0.8f, 0.4f, 0.4f, 0.4f, 0.6f, 0.4f, 0.2f, 0.8f, 0.6f, 0.4f, 0.4f, 0.6f };
+float posicionesLetrasY[] = { 0.4f, 0.2f, 0.4f, 0.0f, 0.8f, 0.8f, 0.2f, 0.4f, 0.0f, 0.8f, 0.6f, 0.8f, 0.6f, 0.6f, 0.8f, 0.0f };
+int velCambioLetra = 150; //cada cuando se cambia
+int cuentaCambioLetra = 0; //contador para cambio
+int pos1 = 0, pos2 = 1, pos3 = 2, pos4 = 3, pos5 = 4; //en que numero vamos
 //Para el letrero------------------------------------------------------
 float toffsetLetrero = 0.0f;
 float velocidadLetrero = 0.01f;
+
 //Para la puerta
 float Rpuerta = 0.0f; // Angulo de rotacion ACTUAL
 float TpuertaE = 0.0f; // Traslacion X ACTUAL
@@ -126,6 +134,11 @@ float AjusteP = -0.5f; // Ajuste para que la puerta no atraviese el pilar
 float TpuertaE_Target_X = -3.0f; //Desplazamiento objetivo en X
 float RpuertaDer_Target = 90.0f; // Rotacion objetivo de 90 grados
 float velocidadPuerta = 0.05f; // Multiplicador para la velocidad de la animacion
+
+//letreros
+Texture LetrasRingT;
+Texture LetreroEntradaT;
+
 
 //Roland
 Model RolandTorso;
@@ -235,9 +248,11 @@ float rotAnteBraAng = 0.0f;
 bool animEddie = false;
 int estadoEddie = 0;
 float posEddieY = 0.0f;
-float posEddieZ = 0.0f;
+float posEddieX = 0.0f;
+float anguloEddieTapa = 0.0f;
 float anguloEddieY = 0.0f;
-
+float anguloAspas = 0.0f;
+float rotacionAspas = 0.0f;
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -326,6 +341,18 @@ void CreateObjects()
 
 	};
 
+	unsigned int arcoIndices[] = {
+		0, 1, 2,
+		0, 2, 3,
+	};
+
+	GLfloat arcoVertices[] = {
+		-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,		0.2f, 0.0f,		0.0f, -1.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,		0.2f, 0.2f,		0.0f, -1.0f, 0.0f,
+		-1.0f, 1.0f, 0.0f,		0.0f, 0.2f,		0.0f, -1.0f, 0.0f,
+	};
+
 	Mesh* obj1 = new Mesh();
 	obj1->CreateMesh(vertices, indices, 32, 12);
 	meshList.push_back(obj1);
@@ -342,9 +369,15 @@ void CreateObjects()
 	obj4->CreateMesh(vegetacionVertices, vegetacionIndices, 64, 12);
 	meshList.push_back(obj4);
 
+	Mesh* obj5 = new Mesh();
+	obj5->CreateMesh(arcoVertices, arcoIndices, 32, 6);
+	meshList.push_back(obj5); // letrero ring
+
 	calcAverageNormals(indices, 12, vertices, 32, 8, 5);
 
 	calcAverageNormals(vegetacionIndices, 12, vegetacionVertices, 64, 8, 5);
+
+	//calcAverageNormals(arcoIndices, 6, arcoVertices, 32, 8, 5);
 
 }
 
@@ -444,8 +477,6 @@ int main()
 	PilaresE.LoadModel("Models/pilaresEntrada.obj");
 	Letrero_M = Model();
 	Letrero_M.LoadModel("Models/Letrero.obj");
-	Letrero_T = Texture("Textures/bongbong.png");
-	Letrero_T.LoadTextureA();
 
 	ArcoRing = Model();
 	ArcoRing.LoadModel("Models/stoneArch.obj");
@@ -527,6 +558,12 @@ int main()
 	EddieTapa.LoadModel("Models/tapaEddie.obj");
 	EddieAspas = Model();
 	EddieAspas.LoadModel("Models/aspaEddie.obj");
+
+	//letreros
+	LetrasRingT = Texture("Textures/megamanFont.tga");
+	LetrasRingT.LoadTextureA();
+	LetreroEntradaT = Texture("Textures/Titulo.png");
+	LetreroEntradaT.LoadTextureA();
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/right_dia.tga");
@@ -631,16 +668,12 @@ int main()
 	printf("Z para luces entrada\n");
 	printf("X para luces altar\n");
 	printf("C para luces antorchas\n");
-
-
-
+	
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
-	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::mat4 modelPiso(1.0);
 	glm::mat4 elementos(1.0);
 	glm::mat4 elementoLocal(1.0);
-	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
 	glm::mat4 baseRol(1.0);
 	glm::mat4 baseInc(1.0);
 	glm::mat4 baseProto(1.0);
@@ -651,6 +684,10 @@ int main()
 	glm::mat4 antebrazoAngela(1.0);
 	glm::mat4 baseEddie(1.0);
 	glm::mat4 tapaEddie(1.0);
+
+	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
 
 
 	////Loop mientras no se cierra la ventana
@@ -937,9 +974,82 @@ int main()
 					faseAnimAngela = 0;
 					mainWindow.setEstadoAngela(false);
 				}
-					
 			}
 		}
+		if(mainWindow.getsKeys()[GLFW_KEY_J])
+		{
+			animEddie = true;
+		}
+
+		if (animEddie) {
+			//hacer brinco
+			if (estadoEddie == 0) {
+				posEddieX += 0.1f * deltaTime;
+				if (posEddieY < 2.5f) posEddieY += 0.1f * deltaTime;
+				else estadoEddie = 1;
+			}
+			if (estadoEddie == 1) {
+				posEddieX += 0.1f * deltaTime;
+				if (posEddieY > 0.0f) posEddieY -= 0.1f * deltaTime;
+				else estadoEddie = 2;
+			}
+			//detenerse, abrir tapa, dar vuelta
+			if (estadoEddie == 2) {
+				if (anguloEddieTapa > -90.0f) anguloEddieTapa -= 1.5f * deltaTime;
+				else estadoEddie = 3;
+			}
+			if (estadoEddie == 3) {
+				if (anguloEddieTapa < 0.0f) anguloEddieTapa += 1.5f * deltaTime;
+				else if (anguloEddieY < 180.0f) anguloEddieY += 3.5f * deltaTime;
+				else estadoEddie = 4;
+			}
+
+			//hacer brinco de regreso
+			if (estadoEddie == 4) {
+				posEddieX -= 0.1f * deltaTime;
+				if (posEddieY < 2.5f) posEddieY += 0.1f * deltaTime;
+				else estadoEddie = 5;
+			}
+			if (estadoEddie == 5) {
+				posEddieX -= 0.1f * deltaTime;
+				if (posEddieY > 0.0f) posEddieY -= 0.1f * deltaTime;
+				else estadoEddie = 6;
+			}
+			//detenerse, abrir tapa, dar vuelta
+			if (estadoEddie == 6) {
+				if (anguloEddieTapa > -90.0f) anguloEddieTapa -= 1.5f * deltaTime;
+				else estadoEddie = 7;
+			}
+			if (estadoEddie == 7) {
+				if (anguloEddieTapa < 0.0f) anguloEddieTapa += 1.5f * deltaTime;
+				else if (anguloEddieY > 0.0f) anguloEddieY -= 3.5f * deltaTime;
+				else estadoEddie = 0;
+			}
+		}
+
+		anguloAspas += 30.0f * deltaTime;
+		rotacionAspas = cos(glm::radians(anguloAspas));
+
+		//cambio de letra
+		if (cuentaCambioLetra >= velCambioLetra) {
+			pos1++;
+			if (pos1 > 15) pos1 = 0;
+
+			pos2++;
+			if (pos2 > 15) 	pos2 = 0;
+
+			pos3++;
+			if (pos3 > 15) pos3 = 0;
+
+			pos4++;
+			if (pos4 > 15) 	pos4 = 0;
+
+			pos5++;
+			if (pos5 > 15) 	pos5 = 0;
+
+			cuentaCambioLetra = 0;
+		}
+		cuentaCambioLetra++;
 
 		// Clear the window
 		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
@@ -960,7 +1070,7 @@ int main()
 		uniformView = shaderList[0].GetViewLocation();
 		uniformEyePosition = shaderList[0].GetEyePositionLocation();
 		uniformColor = shaderList[0].getColorLocation();
-		//uniformTextureOffset = shaderList[0].getOffsetLocation();
+		uniformTextureOffset = shaderList[0].getOffsetLocation();
 
 		//información en el shader de intensidad especular y brillo
 		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
@@ -1352,7 +1462,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		fuegoLampara.RenderModel();
 
-		//lamparas de por ahi
+		//lamparas de galería
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		pointLights_Escenario1[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1451,6 +1561,59 @@ int main()
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PuertaIzqR.RenderModel();
+
+
+		//letrero del arco, letra 1
+		model = modelaux;
+		toffset = glm::vec2(posicionesLetrasX[pos1], posicionesLetrasY[pos1]);
+		model = glm::translate(model, glm::vec3(-3.5f, 11.0f, -4.0f));
+		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		LetrasRingT.UseTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+
+		//letrero del arco, letra 2
+		toffset = glm::vec2(posicionesLetrasX[pos2], posicionesLetrasY[pos2]);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, -0.0f));
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		LetrasRingT.UseTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+
+		//letrero del arco, letra 3
+		toffset = glm::vec2(posicionesLetrasX[pos3], posicionesLetrasY[pos3]);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		LetrasRingT.UseTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+
+		//letrero del arco, letra 4
+		toffset = glm::vec2(posicionesLetrasX[pos4], posicionesLetrasY[pos4]);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		LetrasRingT.UseTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+
+		//letrero del arco, letra 5
+		toffset = glm::vec2(posicionesLetrasX[pos5], posicionesLetrasY[pos5]);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		LetrasRingT.UseTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
 
 		//------------------------------------------
 
@@ -1602,23 +1765,23 @@ int main()
 
 		//EDDIE
 		baseEddie = glm::mat4(1.0f);
-		baseEddie = glm::translate(baseEddie, glm::vec3(0.0f, -2.0f + posEddieY, 0.0f + posEddieZ));
-		//baseAve = glm::rotate(baseAve, orienta_ave * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//baseAve = glm::scale(baseAve, glm::vec3(10.0f, 10.0f, 10.0f));
+		baseEddie = glm::translate(baseEddie, glm::vec3(5.0f + posEddieX, -2.0f + posEddieY, -10.0f));
+		baseEddie = glm::rotate(baseEddie, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseEddie = glm::rotate(baseEddie, anguloEddieY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseEddie));
 		Eddie.RenderModel();
 
 		//tapa
 		tapaEddie = baseEddie;//0.083786f,-0.03725f
 		tapaEddie = glm::translate(tapaEddie, glm::vec3(0.0f, 1.5f, -0.7f));
-		tapaEddie = glm::rotate(tapaEddie, -90 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		tapaEddie = glm::rotate(tapaEddie, anguloEddieTapa * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(tapaEddie));
 		EddieTapa.RenderModel();
 
 		//aspas
 		modelaux = tapaEddie;
 		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 0.2f, 0.7f));
-		//modelaux = glm::rotate(modelaux, posEddie, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, rotacionAspas, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		EddieAspas.RenderModel();
 
