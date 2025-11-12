@@ -85,8 +85,7 @@ Model fuegoLampara;
 Model PuertaDerE;
 Model PuertaIzqE;
 Model PilaresE;
-Model Letrero_M;
-Texture Letrero_T;
+Model LetreroM;
 Model ArcoRing;
 Model PuertaDerR;
 Model PuertaIzqR;
@@ -478,8 +477,8 @@ int main()
 	PuertaIzqE.LoadModel("Models/puertaIzqEntrada.obj");
 	PilaresE = Model();
 	PilaresE.LoadModel("Models/pilaresEntrada.obj");
-	Letrero_M = Model();
-	Letrero_M.LoadModel("Models/Letrero.obj");
+	LetreroM = Model();
+	LetreroM.LoadModel("Models/Letrero.obj");
 
 	ArcoRing = Model();
 	ArcoRing.LoadModel("Models/stoneArch.obj");
@@ -565,7 +564,7 @@ int main()
 	//letreros
 	LetrasRingT = Texture("Textures/megamanFont.tga");
 	LetrasRingT.LoadTextureA();
-	LetreroEntradaT = Texture("Textures/Titulo.png");
+	LetreroEntradaT = Texture("Textures/Letrero.png");
 	LetreroEntradaT.LoadTextureA();
 
 	std::vector<std::string> skyboxFaces;
@@ -687,6 +686,7 @@ int main()
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
+	glm::vec2 letreroOffset = glm::vec2(0.0f, 0.0f);
 
 
 	////Loop mientras no se cierra la ventana
@@ -984,15 +984,16 @@ int main()
 		*/
 
 		if (animEddie) {
+			
 			//hacer brinco
 			if (estadoEddie == 0) {
-				posEddieX += 0.1f * deltaTime;
-				if (posEddieY < 2.5f) posEddieY += 0.1f * deltaTime;
+				posEddieX += 0.05f;
+				if (posEddieY < 7.0f) posEddieY += 0.1f;
 				else estadoEddie = 1;
 			}
 			if (estadoEddie == 1) {
-				posEddieX += 0.1f * deltaTime;
-				if (posEddieY > 0.0f) posEddieY -= 0.1f * deltaTime;
+				posEddieX += 0.05f;
+				if (posEddieY > 0.0f) posEddieY -= 0.1f;
 				else estadoEddie = 2;
 			}
 			//detenerse, abrir tapa, dar vuelta
@@ -1008,13 +1009,13 @@ int main()
 
 			//hacer brinco de regreso
 			if (estadoEddie == 4) {
-				posEddieX -= 0.1f * deltaTime;
-				if (posEddieY < 2.5f) posEddieY += 0.1f * deltaTime;
+				posEddieX -= 0.05f;
+				if (posEddieY < 7.0f) posEddieY += 0.1f;
 				else estadoEddie = 5;
 			}
 			if (estadoEddie == 5) {
-				posEddieX -= 0.1f * deltaTime;
-				if (posEddieY > 0.0f) posEddieY -= 0.1f * deltaTime;
+				posEddieX -= 0.05f;
+				if (posEddieY > 0.0f) posEddieY -= 0.1f;
 				else estadoEddie = 6;
 			}
 			//detenerse, abrir tapa, dar vuelta
@@ -1536,11 +1537,33 @@ int main()
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		PuertaDerE.RenderModel();
 
+		//letrero Entrada
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.0f, 7.5f, 1.0f));
+		model = glm::scale(model, glm::vec3(1.7f, 2.5f, 1.0f));
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		// Vector para el offset del letrero
+		// Para el letrero con desplazamiento
+		toffsetLetrero += velocidadLetrero * deltaTime;
+		if (toffsetLetrero > 1.0f)	toffsetLetrero = 0.0f;
+
+		letreroOffset = glm::vec2(toffsetLetrero, 0.0f);
+		// Envio del offset al shader
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(letreroOffset));
+		LetreroEntradaT.UseTexture();
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		LetreroM.RenderModel();
+
+		//para evitar generar offset en otras texturas
+		toffset = glm::vec2(0.0f, 0.0f);
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
+
 		//ARCO
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(116.0f, -2.0f, 14.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
 		elementos = glm::scale(elementos, glm::vec3(0.9f, 0.9f, 0.9f));
-		elementos = glm::rotate(elementos, -120 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::rotate(elementos, 60 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		modelaux = elementos;
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1566,12 +1589,14 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PuertaIzqR.RenderModel();
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		//letrero del arco, letra 1
 		model = modelaux;
 		toffset = glm::vec2(posicionesLetrasX[pos1], posicionesLetrasY[pos1]);
-		model = glm::translate(model, glm::vec3(-3.5f, 11.0f, -4.0f));
-		model = glm::rotate(model, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(3.5f, 13.0f, -3.0f));
+		model = glm::rotate(model, -180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -1581,7 +1606,7 @@ int main()
 
 		//letrero del arco, letra 2
 		toffset = glm::vec2(posicionesLetrasX[pos2], posicionesLetrasY[pos2]);
-		model = glm::translate(model, glm::vec3(2.0f, 0.0f, -0.0f));
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
 		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -1771,14 +1796,14 @@ int main()
 
 		//EDDIE
 		baseEddie = glm::mat4(1.0f);
-		baseEddie = glm::translate(baseEddie, glm::vec3(0.0f + posEddieX, -2.0f + posEddieY, -10.0f));
+		baseEddie = glm::translate(baseEddie, glm::vec3(15.0f + posEddieX, -2.0f + posEddieY, -10.0f));
 		baseEddie = glm::rotate(baseEddie, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		baseEddie = glm::rotate(baseEddie, anguloEddieY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseEddie));
 		Eddie.RenderModel();
 
 		//tapa
-		tapaEddie = baseEddie;//0.083786f,-0.03725f
+		tapaEddie = baseEddie;
 		tapaEddie = glm::translate(tapaEddie, glm::vec3(0.0f, 1.5f, -0.7f));
 		tapaEddie = glm::rotate(tapaEddie, anguloEddieTapa * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(tapaEddie));
@@ -1791,7 +1816,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		EddieAspas.RenderModel();
 
-
+		glDisable(GL_BLEND);
 
 		glUseProgram(0);
 
