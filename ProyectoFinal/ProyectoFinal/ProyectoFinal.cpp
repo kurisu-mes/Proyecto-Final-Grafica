@@ -245,7 +245,7 @@ float rotBrazoAng = 0.0f;
 float rotAnteBraAng = 0.0f;
 
 //Animacion Eddie
-bool animEddie = false;
+bool animEddie = true;
 int estadoEddie = 0;
 float posEddieY = 0.0f;
 float posEddieX = 0.0f;
@@ -976,10 +976,13 @@ int main()
 				}
 			}
 		}
+		
+		/*
 		if(mainWindow.getsKeys()[GLFW_KEY_J])
 		{
 			animEddie = true;
 		}
+		*/
 
 		if (animEddie) {
 			//hacer brinco
@@ -1615,6 +1618,8 @@ int main()
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[4]->RenderMesh();
 
+		toffset = glm::vec2(0.0f, 0.0f);
+		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 		//------------------------------------------
 
 		// === HUMANOIDE ROLAND ===
@@ -1765,7 +1770,7 @@ int main()
 
 		//EDDIE
 		baseEddie = glm::mat4(1.0f);
-		baseEddie = glm::translate(baseEddie, glm::vec3(5.0f + posEddieX, -2.0f + posEddieY, -10.0f));
+		baseEddie = glm::translate(baseEddie, glm::vec3(0.0f + posEddieX, -2.0f + posEddieY, -10.0f));
 		baseEddie = glm::rotate(baseEddie, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		baseEddie = glm::rotate(baseEddie, anguloEddieY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseEddie));
