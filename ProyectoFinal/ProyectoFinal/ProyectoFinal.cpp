@@ -176,7 +176,6 @@ Model AveRW;
 Model Angela;
 Model AngelaBrazo;
 Model AngelaAntebrazo;
-Model AngelaMano;
 
 //Eddie
 Model Eddie;
@@ -550,8 +549,6 @@ int main()
 	AngelaBrazo.LoadModel("Models/AngelaBrazo.obj");
 	AngelaAntebrazo = Model();
 	AngelaAntebrazo.LoadModel("Models/AngelaAntebrazo.obj");
-	AngelaMano = Model();
-	AngelaMano.LoadModel("Models/AngelaMano.obj");
 
 	//Eddie
 	Eddie = Model();
@@ -1176,11 +1173,6 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(antebrazoAngela));
 		AngelaAntebrazo.RenderModel();
 
-		//Mano
-		modelaux = antebrazoAngela;
-		modelaux = glm::translate(modelaux, glm::vec3(-0.45f, -0.055f, 0.75f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		AngelaMano.RenderModel();
 
 		//Ofrenda
 		elementos = glm::mat4(1.0);
