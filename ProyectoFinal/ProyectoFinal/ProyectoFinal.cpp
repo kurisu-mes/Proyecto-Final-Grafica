@@ -31,6 +31,9 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
+
 const float toRadians = 3.14159265f / 180.0f;
 
 GLfloat cycleDuration = 100.0f;
@@ -225,6 +228,12 @@ bool si = false;
 bool no = false;
 bool pausa = false;
 int estadoma = 0;
+
+//Variables miniaudio
+
+ma_engine engine;
+ma_sound sonidoFondo;
+bool sonidopausa = false;
 
 
 
@@ -625,10 +634,25 @@ int main()
 	glm::mat4 herenciaMa(1.0f);
 	glm::mat4 herenciaMa1(1.0f);
 
+	//Función miniaudio
+	// Inicializar motor de audio
+	if (ma_engine_init(NULL, &engine) != MA_SUCCESS) {
+		std::cout << "Error inicializando miniaudio" << std::endl;
+		return -1;
+	}
+
+	// Cargar un sonido de archivo
+	if (ma_sound_init_from_file(&engine, "audio/rat-dance-music.wav", MA_SOUND_FLAG_DECODE, NULL, NULL, &sonidoFondo) != MA_SUCCESS) {
+		std::cout << "Error cargando archivo de sonido" << std::endl;
+	}
+	ma_sound_set_looping(&sonidoFondo, MA_TRUE);   // Música infinita
+	ma_sound_start(&sonidoFondo);                  // Reproducir
+
 
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
-	{
+	{	
+		
 		GLfloat now = glfwGetTime();
 		deltaTime = now - lastTime;
 		deltaTime += (now - lastTime) / limitFPS;
@@ -1651,6 +1675,9 @@ int main()
 
 		mainWindow.swapBuffers();
 	}
+	//Llamamos funciones miniaudio para liberar memoria
 
+	//ma_sound_uninit(&sonidoFondo);
+	//ma_engine_uninit(&engine);
 	return 0;
 }
