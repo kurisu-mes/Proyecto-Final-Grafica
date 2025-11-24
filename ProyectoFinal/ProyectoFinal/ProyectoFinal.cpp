@@ -24,6 +24,7 @@
 #include "Sphere.h"
 #include"Model.h"
 #include "Skybox.h"
+#include "Animaciones.h"
 
 //para iluminación
 #include "CommonValues.h"
@@ -48,54 +49,35 @@ Camera camera;
 Texture plainTexture;
 
 Model Piso_M;
-Model Angela_Desk;
-Model Angela_Chair;
+
+Model Angela_Desk, Angela_Chair;
 Model Ofrenda;
-Model PiramideRing;
-Model Ring;
+Model PiramideRing, Ring;
 
 //GALERIA
 //centro
-Model CalendarioDoom;
-Model PenachoMan;
-Model MegaHawlucha;
+Model CalendarioDoom, PenachoMan, MegaHawlucha;
 
 //alrededores
-Model ParedGaleria;
-Model ExpositorGaleria;
-Model Caballete1;
-Model Caballete2;
-
-//objetos de exposicion
-Model Lienzo1;
-Model Lienzo2;
-Model Lienzo3;
-Model Lienzo4;
-Model Lienzo5;
-Model Lienzo6;
-
-Model Tomahawk;
-Model MewFossil;
-Model BongBong;
+Model ParedGaleria, ExpositorGaleria;
+Model Caballete1, Caballete2;
+Model Lienzo1, Lienzo2, Lienzo3;
+Model Lienzo4, Lienzo5, Lienzo6;
+Model Tomahawk, MewFossil, BongBong;
 
 //modelos y texturas auxiliares
-Model capoLampara;
-Model fuegoLampara;
+Model capoLampara, fuegoLampara;
 
-Model PuertaDerE;
-Model PuertaIzqE;
-Model PilaresE;
-Model LetreroM;
-Model ArcoRing;
-Model PuertaDerR;
-Model PuertaIzqR;
+Model PuertaDerE, PuertaIzqE, PilaresE, LetreroM;
+Model ArcoRing, PuertaDerR, PuertaIzqR;
 
-Skybox skybox;
-Skybox skyboxNoche;
+Skybox skybox, skyboxNoche;
 
 //materiales
 Material Material_brillante;
 Material Material_opaco;
+
+Animaciones anim;
 
 
 //Sphere cabeza = Sphere(0.5, 20, 20);
@@ -115,72 +97,42 @@ SpotLight spotLights_Escenario3[4]; // (C) 4 Antorchas Ring
 SpotLight spotLights_Escenario2[4];
 PointLight pointLights[MAX_POINT_LIGHTS];
 
-//variables para animaciones
-//letras
-						//		P	 R		O	Y		E	C		T	O      ESP	C		G	 E		I	  H		C	ESP	
+//letreros
+Texture LetrasRingT;
+Texture LetreroEntradaT;
+//coordenadas letreros
+//		P	 R		O	Y		E	C		T	O      ESP	C		G	 E		I	  H		C	ESP	
 float posicionesLetrasX[] = { 0.6f, 0.0f, 0.4f, 0.2f, 0.8f, 0.4f, 0.4f, 0.4f, 0.6f, 0.4f, 0.2f, 0.8f, 0.6f, 0.4f, 0.4f, 0.6f };
 float posicionesLetrasY[] = { 0.4f, 0.2f, 0.4f, 0.0f, 0.8f, 0.8f, 0.2f, 0.4f, 0.0f, 0.8f, 0.6f, 0.8f, 0.6f, 0.6f, 0.8f, 0.0f };
-int velCambioLetra = 150; //cada cuando se cambia
 int cuentaCambioLetra = 0; //contador para cambio
+//letras
+int velCambioLetra = 60; //cada cuando se cambia
 int pos1 = 0, pos2 = 1, pos3 = 2, pos4 = 3, pos5 = 4; //en que numero vamos
 //Para el letrero------------------------------------------------------
 float toffsetLetrero = 0.0f;
 float velocidadLetrero = 0.01f;
 
-//Para la puerta
-float Rpuerta = 0.0f; // Angulo de rotacion ACTUAL
-float TpuertaE = 0.0f; // Traslacion X ACTUAL
-float TpuertaE_Z = 0.0f; // Traslacion Z ACTUAL
-float AjusteP = -0.5f; // Ajuste para que la puerta no atraviese el pilar
-
-float TpuertaE_Target_X = -3.0f; //Desplazamiento objetivo en X
-float RpuertaDer_Target = 90.0f; // Rotacion objetivo de 90 grados
-float velocidadPuerta = 0.05f; // Multiplicador para la velocidad de la animacion
-
-//letreros
-Texture LetrasRingT;
-Texture LetreroEntradaT;
-
-
 //Roland
-Model RolandTorso;
-Model RolandBrazoDer;
-Model RolandBrazoIzq;
-Model RolandPiernaDer;
-Model RolandPiernaIzq;
+Model RolandTorso, RolandBrazoDer, RolandBrazoIzq;
+Model RolandPiernaDer, RolandPiernaIzq;
 
 //Incineroar
-Model InciCabeza;
-Model InciTorso;
-Model InciBD;
-Model InciBI;
-Model InciPD;
-Model InciPI;
-Model InciCola;
+Model InciCabeza, InciTorso, InciCola;
+Model InciBD, InciBI, InciPD, InciPI;
 
 //Protoman
-Model ProtoCabeza;
-Model ProtoTorso;
-Model ProtoEscudo;
-Model ProtoIzqBrazo;
-Model ProtoDerBrazo;
-Model ProtoIzqPierna;
-Model ProtoDerPierna;
+Model ProtoCabeza, ProtoTorso, ProtoEscudo;
+Model ProtoIzqBrazo, ProtoDerBrazo;
+Model ProtoIzqPierna, ProtoDerPierna;
 
 //Ave Castigadora
-Model AveCuerpo;
-Model AveLW;
-Model AveRW;
+Model AveCuerpo, AveLW, AveRW;
 
 //Angela
-Model Angela;
-Model AngelaBrazo;
-Model AngelaAntebrazo;
+Model Angela, AngelaBrazo, AngelaAntebrazo;
 
 //Eddie
-Model Eddie;
-Model EddieTapa;
-Model EddieAspas;
+Model Eddie, EddieTapa, EddieAspas;
 
 
 //Prueba caminata
@@ -189,71 +141,16 @@ float velocidadPaso = 0.1f;     // velocidad del ciclo de paso
 
 int currentCameraMode = 1; // Rastreador de modo de cámara
 
+bool estadoActualAngela = false; // Estado actual de la animación de Angela
+bool animacionInci = true;
+bool animvuelo = true;
+bool animEddie = true;
+
+
 // Posición y rotación guardadas de Roland
 glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
 float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
-
-// Animacion compleja incineroar
-int recorrido = 1;
-float orienta = 0.0f; //Orientacion del cuerpo
-float tiempolocal = 0.0f; //temporizador de los giros
-float rotacionBrazoDerInci = 0.0f;
-float rotacionBrazoIzqInci = 0.0f;
-float rotacionPiernaDerInci = 0.0f;
-float rotacionPiernaIzqInci = 0.0f;
-float rotacioncabezaInci = 0.0f; //Rotaciones miembros del modelo
-
-//PosInicial Incineroar
-float pos_ini_x_inci = -30.0f;
-float pos_ini_z_inci = -30.0f;
-float velocidadpiernas = 5.0f;
-float velocidadbrazos = 4.0f;
-bool animacionInci = true;
-
-//Variables Movimiento Roland
-float rotacionBrazoDer = 0.0f;
-float rotacionBrazoIzq = 0.0f;
-float rotacionPiernaDer = 0.0f;
-float rotacionPiernaIzq = 0.0f;
 bool caminarRoland = false;
-
-//Variables Movimiento Protoman
-float brazoProtoR = -90.0f;
-float escudoProto1 = 0.0f;
-float escudoProto2 = 0.0f;
-float posicionProto = 0.0f;
-float piernaProto = 0.0f;
-
-//Posicional Ave
-float pos_ini_x_ave = 0.0f;
-float pos_ini_z_ave = 0.0f;
-float orienta_ave = 0.0f;
-float desplazamiento_vuelo = 0.5f;
-float tiempovuelo = 0.0f;
-float velocidadvuelo = 0.05f;
-float radio = 5.0f; //Para la circunferencia de vuelo
-float desplazamiento_x = 0.1f;
-float desplazamiento_z = 0.1f;
-float rotacionAla = 0.0f;
-float posAla;
-bool animvuelo = true;
-bool alasube = true;
-float velocidadaleteo = 0.003f;
-
-//Animacion Angela
-int faseAnimAngela = 0;
-float rotBrazoAng = 0.0f;
-float rotAnteBraAng = 0.0f;
-
-//Animacion Eddie
-bool animEddie = true;
-int estadoEddie = 0;
-float posEddieY = 0.0f;
-float posEddieX = 0.0f;
-float anguloEddieTapa = 0.0f;
-float anguloEddieY = 0.0f;
-float anguloAspas = 0.0f;
-float rotacionAspas = 0.0f;
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -390,23 +287,7 @@ void CreateShaders()
 }
 
 
-//Sirve para poder hacer interpolacion lineal y calcular los angulos y posicion en cada frame
-float lerp(float a, float b, float t)
-{
-	return a + t * (b - a);
-}
-
-
-int main()
-{
-	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
-	mainWindow.Initialise();
-
-	CreateObjects();
-	CreateShaders();
-
-	camera = Camera(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
-
+void CargarModelos() {
 	plainTexture = Texture("Textures/plain.png");
 	plainTexture.LoadTextureA();
 
@@ -589,6 +470,20 @@ int main()
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
+}
+
+int main()
+{
+	mainWindow = Window(1366, 768); // 1280, 1024 or 1024, 768
+	mainWindow.Initialise();
+
+	anim = Animaciones();
+
+	CreateObjects();
+	CreateShaders();
+	CargarModelos();
+
+	camera = Camera(glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
 
 	//luz direccional, sólo 1 y siempre debe de existir
 	mainLight = DirectionalLight(1.0f, 1.0f, 1.0f,
@@ -681,6 +576,7 @@ int main()
 	glm::mat4 tapaEddie(1.0);
 
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 lowerLight(1.0f);
 
 	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
 	glm::vec2 letreroOffset = glm::vec2(0.0f, 0.0f);
@@ -694,41 +590,13 @@ int main()
 		deltaTime += (now - lastTime) / limitFPS;
 		lastTime = now;
 
-		//*******************ANIMACIONES*********************************
-				//Animacion de la puerta
-		if (mainWindow.getEntradaAbierta())
-		{
-			// --- ABRIR PUERTAS ---
-			// Interpolar suavemente hacia los valores objetivo
-			TpuertaE = lerp(TpuertaE, TpuertaE_Target_X, velocidadPuerta * deltaTime);
-			TpuertaE_Z = lerp(TpuertaE_Z, AjusteP, velocidadPuerta * deltaTime);
-		}
-		else
-		{
-			// --- CERRAR PUERTAS ---
-			// Interpolar suavemente de vuelta a posicion original
-			TpuertaE = lerp(TpuertaE, 0.0f, velocidadPuerta * deltaTime);
-			TpuertaE_Z = lerp(TpuertaE_Z, 0.0f, velocidadPuerta * deltaTime);
-		}
-
-		//Puertas Ring
-		if (mainWindow.getEstadoRing()) {
-			// --- ABRIR PUERTAS ---
-			Rpuerta = lerp(Rpuerta, RpuertaDer_Target, velocidadPuerta * deltaTime);
-		}
-		else {
-			// --- CERRAR PUERTAS ---
-			Rpuerta = lerp(Rpuerta, 0.0f, velocidadPuerta * deltaTime);
-		}
-
-
 		//Recibir eventos del usuario
 		glfwPollEvents();
 		camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		//---------- Camaras -----------------
-		// aadición de control de teclado
+		// adición de control de teclado
 		bool* keys = mainWindow.getsKeys();
 
 		// Control de la cámara
@@ -783,286 +651,38 @@ int main()
 		else lucesNocturnasEncendidas = false;
 
 
-
+		//*******************ANIMACIONES*********************************
 		//Captura de barra espaciadora para animacion Roland
 
 		// --- Control de inicio/parada de caminado ---
-		if (mainWindow.getsKeys()[GLFW_KEY_W] || mainWindow.getsKeys()[GLFW_KEY_S])
-		{
-			caminarRoland = true;
-		}
-		else
-		{
-			caminarRoland = false;
-
-
+		if (currentCameraMode == 1) {
+			if (mainWindow.getsKeys()[GLFW_KEY_W] || mainWindow.getsKeys()[GLFW_KEY_S] || mainWindow.getsKeys()[GLFW_KEY_A] || mainWindow.getsKeys()[GLFW_KEY_D])
+				caminarRoland = true;
+			else caminarRoland = false;
 		}
 
+		anim.CaminataRoland(caminarRoland, deltaTime);
 
-		// --- Actualizacion de animacion Roland ---
-		if (caminarRoland)
-		{
-			// Actualiza fase de caminata
-			anguloMovimiento += velocidadPaso * deltaTime;
+		anim.EntradaPrincipal(mainWindow.getEntradaAbierta(), deltaTime);
+		anim.EntradaRing(mainWindow.getEstadoRing(), deltaTime);
 
-			// Movimiento oscilante tipo seno
-			rotacionBrazoDer = 35.0f * sin(anguloMovimiento);
-			rotacionBrazoIzq = -35.0f * sin(anguloMovimiento);
-			rotacionPiernaDer = -35.0f * sin(anguloMovimiento);
-			rotacionPiernaIzq = 35.0f * sin(anguloMovimiento);
+		anim.AnimacionProtoman(mainWindow.getEstadoProto(), deltaTime);
+		estadoActualAngela = anim.AnimacionAngela(mainWindow.getEstadoAngela(), deltaTime);
+		mainWindow.setEstadoAngela(estadoActualAngela);
 
-		}
-
-		if (animacionInci)
-		{
-			tiempolocal += deltaTime * 0.01;
-			// Aumenté la velocidad para que coincida con el nuevo tamaño del recorrido
-			float inciSpeed = 0.0035f * deltaTime * 60.0f;
-
-			// Coordenadas del recorrido local (alrededor del 0,0 del ring)
-			float minXZ = -15.0f;
-			float maxXZ = 15.0f;
-
-			// Estado 1: avanza +x local
-			if (recorrido == 1) {
-				pos_ini_x_inci += inciSpeed;
-				orienta = 90.0f;
-
-				// Brazos subiendo (fase positiva)
-				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-
-				// Piernas caminan alternadas
-				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-				if (pos_ini_x_inci >= maxXZ) {
-					pos_ini_x_inci = maxXZ; // Ajustar a la esquina
-					recorrido = 2;
-					tiempolocal = 0.0f;
-				}
-			}
-
-			//Estado 2: avanza +z local
-			else if (recorrido == 2) {
-				pos_ini_z_inci += inciSpeed;
-				orienta = 0.0f;
-
-				// Brazos bajando (fase invertida)
-				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-
-				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-				if (pos_ini_z_inci >= maxXZ) {
-					pos_ini_z_inci = maxXZ; // Ajustar a la esquina
-					recorrido = 3;
-					tiempolocal = 0.0f;
-				}
-			}
-
-			// Estado 3: avanza -x local
-			else if (recorrido == 3) {
-				pos_ini_x_inci -= inciSpeed;
-				orienta = -90.0f;
-
-				// Brazos subiendo de nuevo
-				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-
-				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-				if (pos_ini_x_inci <= minXZ) {
-					pos_ini_x_inci = minXZ; // Ajustar a la esquina
-					recorrido = 4;
-					tiempolocal = 0.0f;
-				}
-			}
-
-			// Estado 4: avanza -z local
-			else if (recorrido == 4) {
-				pos_ini_z_inci -= inciSpeed;
-				orienta = 180.0f;
-
-				// Brazos bajando (fase invertida)
-				rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-				rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-
-				rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-				rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-				if (pos_ini_z_inci <= minXZ) {
-					pos_ini_z_inci = minXZ; // Ajustar a la esquina
-					recorrido = 1;
-					tiempolocal = 0.0f;
-				}
-			}
-		}
-
-		//Animacion Protoman
-		if (mainWindow.getEstadoProto()) {
-			if (brazoProtoR < 0.0f) brazoProtoR += 3.0f * deltaTime;
-			else {
-				if (escudoProto1 < 90.0f) escudoProto1 += 3.0f * deltaTime;
-				if (escudoProto2 < 60.0f) escudoProto2 += 2.0f * deltaTime;
-				else {
-					if (piernaProto < 45.0f) {
-						piernaProto += 1.5f * deltaTime;
-						posicionProto -= 0.1f * deltaTime;
-					}
-				}
-			}
-		}
-		else {
-			if (piernaProto > 0.0f) {
-				piernaProto -= 1.5f * deltaTime;
-				posicionProto += 0.1f * deltaTime;
-			}
-			else {
-				if (escudoProto1 > 0.0f) escudoProto1 -= 3.0f * deltaTime;
-				if (escudoProto2 > 0.0f) escudoProto2 -= 2.0f * deltaTime;
-				else if (brazoProtoR > -90.0f) brazoProtoR -= 3.0f * deltaTime;
-			}
-		}
-
-		//ANIMACION VUELO AVE EN CIRCULOS
-		if (animvuelo) {
-			tiempovuelo += deltaTime * velocidadvuelo; //Captura tiempo, calcula velocidad anim
-			pos_ini_x_ave = desplazamiento_x + (radio * cos(tiempovuelo));
-			pos_ini_z_ave = desplazamiento_z + (radio * sin(tiempovuelo));
-			//Captura de parametrizacion de circulo (x,y) fuera de origen (h,k)
-			// x = h + radio * cos (t)
-			// y = k + radio * sin (t)
-			orienta_ave = glm::degrees(atan2(-sin(tiempovuelo), cos(tiempovuelo)));
-			//OBTIENE GRADOS MEDIANTE TAN(T) = CA/CO
-			// T = ATAN (-y / x)
-			desplazamiento_vuelo = sin(tiempovuelo * 2.5f) * 1.0f;
-			//Empieza declaracion de estados alas
-			rotacionAla += 30.0f * deltaTime;
-			posAla = sin(glm::radians(rotacionAla));
-		}
-
-		//ANIMACION SIMPLE ANGELA
-		if (mainWindow.getEstadoAngela()) {
-			//se vuelve true, comienza saludo
-			if (faseAnimAngela == 0) {
-				if (rotBrazoAng > -92.0f) {
-					rotBrazoAng -= 2.0f * deltaTime;
-					if (rotAnteBraAng < 92.0f) rotAnteBraAng += 2.0f * deltaTime;
-				}
-				else if (rotAnteBraAng > 0.0f) rotAnteBraAng -= 2.0f * deltaTime;
-				else faseAnimAngela = 1;
-			}
-
-			//termina saludo bajando el brazo, y reinicializa el bool
-			if (faseAnimAngela == 1) {
-				if (rotAnteBraAng < 92.0f) rotAnteBraAng += 2.0f * deltaTime;
-				else faseAnimAngela = 2;
-			}
-			if (faseAnimAngela == 2) {
-				if (rotBrazoAng < 0.0f) {
-					rotBrazoAng += 2.0f * deltaTime;
-					if (rotAnteBraAng > 0.0f) rotAnteBraAng -= 2.0f * deltaTime;
-				}
-				else {
-					faseAnimAngela = 0;
-					mainWindow.setEstadoAngela(false);
-				}
-			}
-		}
+		anim.AnimacionIncineroar(animacionInci, deltaTime);
+		anim.AnimacionPajaro(animvuelo, toRadians, deltaTime);
+		anim.AnimacionEddie(animEddie, toRadians, deltaTime);
 		
-		/*
-		if(mainWindow.getsKeys()[GLFW_KEY_J])
-		{
-			animEddie = true;
-		}
-		*/
-
-		if (animEddie) {
-			
-			//hacer brinco
-			if (estadoEddie == 0) {
-				posEddieX += 0.05f;
-				if (posEddieY < 7.0f) posEddieY += 0.1f;
-				else estadoEddie = 1;
-			}
-			if (estadoEddie == 1) {
-				posEddieX += 0.05f;
-				if (posEddieY > 0.0f) posEddieY -= 0.1f;
-				else estadoEddie = 2;
-			}
-			//detenerse, abrir tapa, dar vuelta
-			if (estadoEddie == 2) {
-				if (anguloEddieTapa > -90.0f) anguloEddieTapa -= 1.5f * deltaTime;
-				else estadoEddie = 3;
-			}
-			if (estadoEddie == 3) {
-				if (anguloEddieTapa < 0.0f) anguloEddieTapa += 1.5f * deltaTime;
-				else if (anguloEddieY < 180.0f) anguloEddieY += 3.5f * deltaTime;
-				else estadoEddie = 4;
-			}
-
-			//hacer brinco de regreso
-			if (estadoEddie == 4) {
-				posEddieX -= 0.05f;
-				if (posEddieY < 7.0f) posEddieY += 0.1f;
-				else estadoEddie = 5;
-			}
-			if (estadoEddie == 5) {
-				posEddieX -= 0.05f;
-				if (posEddieY > 0.0f) posEddieY -= 0.1f;
-				else estadoEddie = 6;
-			}
-			//detenerse, abrir tapa, dar vuelta
-			if (estadoEddie == 6) {
-				if (anguloEddieTapa > -90.0f) anguloEddieTapa -= 1.5f * deltaTime;
-				else estadoEddie = 7;
-			}
-			if (estadoEddie == 7) {
-				if (anguloEddieTapa < 0.0f) anguloEddieTapa += 1.5f * deltaTime;
-				else if (anguloEddieY > 0.0f) anguloEddieY -= 3.5f * deltaTime;
-				else estadoEddie = 0;
-			}
-		}
-
-		anguloAspas += 30.0f * deltaTime;
-		rotacionAspas = cos(glm::radians(anguloAspas));
-
-		//cambio de letra
-		if (cuentaCambioLetra >= velCambioLetra) {
-			pos1++;
-			if (pos1 > 15) pos1 = 0;
-
-			pos2++;
-			if (pos2 > 15) 	pos2 = 0;
-
-			pos3++;
-			if (pos3 > 15) pos3 = 0;
-
-			pos4++;
-			if (pos4 > 15) 	pos4 = 0;
-
-			pos5++;
-			if (pos5 > 15) 	pos5 = 0;
-
-			cuentaCambioLetra = 0;
-		}
-		cuentaCambioLetra++;
 
 		// Clear the window
 		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
 		if (lucesNocturnasEncendidas)
-		{
 			skyboxNoche.DrawSkybox(camera.calculateViewMatrix(), projection);
-		}
 		else
-		{
 			skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
-		}
 
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
@@ -1082,7 +702,7 @@ int main()
 
 		// luz ligada a la cámara de tipo flash
 		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
-		glm::vec3 lowerLight = camera.getCameraPosition();
+		lowerLight = camera.getCameraPosition();
 		lowerLight.y -= 0.3f;
 		spotLights_Escenario1[0].SetFlash(lowerLight, camera.getCameraDirection());
 		shaderList[0].SetDirectionalLight(&mainLight);
@@ -1106,10 +726,7 @@ int main()
 			}
 		}
 		else // Es de día
-		{
 			shaderList[0].SetSpotLights(NULL, 0);
-		}
-
 
 		PointLight activePointLights[MAX_SPOT_LIGHTS];
 		unsigned int activePointLightCount = 0;
@@ -1162,22 +779,21 @@ int main()
 		//Brazo
 		brazoAngela = baseAngela;
 		brazoAngela = glm::translate(brazoAngela, glm::vec3(0.4f, 1.3f, 0.0f));
-		brazoAngela = glm::rotate(brazoAngela, rotBrazoAng * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		brazoAngela = glm::rotate(brazoAngela, anim.rotBrazoAng * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(brazoAngela));
 		AngelaBrazo.RenderModel();
 
 		//Antebrazo
 		antebrazoAngela = brazoAngela;
 		antebrazoAngela = glm::translate(antebrazoAngela, glm::vec3(0.28f, -0.65f, 0.07f));
-		antebrazoAngela = glm::rotate(antebrazoAngela, rotAnteBraAng * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		antebrazoAngela = glm::rotate(antebrazoAngela, anim.rotAnteBraAng * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(antebrazoAngela));
 		AngelaAntebrazo.RenderModel();
 
 
 		//Ofrenda
 		elementos = glm::mat4(1.0);
-		//elementos = glm::translate(elementos, glm::vec3(100.0f, -2.0f, -60.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		elementos = glm::translate(elementos, glm::vec3(113.0f, -2.0f, -17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(113.0f, -2.0f, -17.0f));
 		pointLights[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(-0.5f, 2.5f, -0.5f));
 		pointLights[1].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.5f, 2.5f, 0.5f));
 		elementos = glm::rotate(elementos, -75 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -1193,8 +809,6 @@ int main()
 		elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::translate(elementos, glm::vec3(0.0f, -1.0f, 0.0f));
-		//elementos = glm::translate(elementos, glm::vec3(125.5f, -2.0f, 25.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
-		//elementos = glm::rotate(elementos, -125 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PiramideRing.RenderModel();
 
@@ -1206,14 +820,11 @@ int main()
 		// INCINEROAR
 		// 1. Empezar desde la matriz del ring (que ya está girada y en -2.0f Y)
 		baseInc = elementoLocal;
-
 		// 2. Aplicar el movimiento local (X, Z) y ajustar Y para ponerlo en el suelo (-2.5f)
 		//    (El ring está en -2.0, así que bajamos -0.5 más)
-		baseInc = glm::translate(baseInc, glm::vec3(pos_ini_x_inci, 3.5f, pos_ini_z_inci));
-
+		baseInc = glm::translate(baseInc, glm::vec3(anim.pos_ini_x_inci, 3.5f, anim.pos_ini_z_inci));
 		// 3. Aplicar la orientación local del modelo
-		baseInc = glm::rotate(baseInc, glm::radians(orienta), glm::vec3(0.0f, 1.0f, 0.0f));
-
+		baseInc = glm::rotate(baseInc, glm::radians(anim.orienta), glm::vec3(0.0f, 1.0f, 0.0f));
 		// 4. Aplicar la escala del modelo
 		baseInc = glm::scale(baseInc, glm::vec3(0.025f, 0.025f, 0.025f));
 
@@ -1229,30 +840,29 @@ int main()
 		//BD
 		modelaux = baseInc;
 		modelaux = glm::translate(modelaux, glm::vec3(-42.9f, -14.0f, 2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionBrazoDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionBrazoDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		InciBD.RenderModel();
 
 		//BI
 		modelaux = baseInc;
 		modelaux = glm::translate(modelaux, glm::vec3(42.9f, -14.0f, 2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionBrazoIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionBrazoIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		InciBI.RenderModel();
 
 		//pD
 		modelaux = baseInc;
 		modelaux = glm::translate(modelaux, glm::vec3(-12.0f, -73.0f, -2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionPiernaDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionPiernaDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		InciPD.RenderModel();
 
 		//pI
 		modelaux = baseInc;
 		modelaux = glm::translate(modelaux, glm::vec3(12.0f, -73.0f, -2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionPiernaIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionPiernaIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-
 		InciPI.RenderModel();
 
 		//COLA
@@ -1267,7 +877,6 @@ int main()
 		pointLights[2].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 2.0f, 0.0f));
 		elementoLocal = elementos;
 		elementos = glm::rotate(elementos, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		MegaHawlucha.RenderModel();
 
@@ -1293,7 +902,7 @@ int main()
 
 		//Paredes exposicion
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 17.0f));
 		elementos = glm::rotate(elementos, 160 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1301,12 +910,12 @@ int main()
 
 		//armas megaman
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 4.0f, 0.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 4.0f, 0.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Tomahawk.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(100.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(100.0f, -2.0f, 17.0f));
 		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1314,12 +923,12 @@ int main()
 
 		//mew
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 5.0f, 0.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 5.0f, 0.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		MewFossil.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, 17.0f));
 		elementos = glm::rotate(elementos, 200 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1327,7 +936,7 @@ int main()
 
 		//bong bong
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 5.0f, 0.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 5.0f, 0.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		BongBong.RenderModel();
 
@@ -1344,7 +953,7 @@ int main()
 
 		//lienzo 1
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Lienzo1.RenderModel();
 
@@ -1359,7 +968,7 @@ int main()
 
 		//lienzo 2
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Lienzo2.RenderModel();
 
@@ -1373,7 +982,7 @@ int main()
 
 		//lienzo 3
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Lienzo3.RenderModel();
 
@@ -1388,7 +997,7 @@ int main()
 
 		//lienzo 4
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Lienzo4.RenderModel();
 
@@ -1403,7 +1012,7 @@ int main()
 
 		//lienzo 5
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.5f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Lienzo5.RenderModel();
 
@@ -1419,7 +1028,7 @@ int main()
 
 		//lienzo 6
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 1.3f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Lienzo6.RenderModel();
 
@@ -1427,7 +1036,7 @@ int main()
 		//------------------------LAMPARAS------------------------------------------------
 		//entrada al ring
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(127.0f, -2.0f, 13.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(127.0f, -2.0f, 13.0f));
 		spotLights_Escenario3[0].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f,-1.0f,0.0f));
 		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
@@ -1436,7 +1045,7 @@ int main()
 		fuegoLampara.RenderModel();
 
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));
 		spotLights_Escenario3[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1444,7 +1053,7 @@ int main()
 
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(136.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(136.0f, -2.0f, 17.0f));
 		spotLights_Escenario3[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		elementos = glm::rotate(elementos, -30 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		elementoLocal = elementos;
@@ -1453,7 +1062,7 @@ int main()
 		fuegoLampara.RenderModel();
 
 		elementos = elementoLocal;
-		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(0.0f, 0.0f, 11.0f));
 		spotLights_Escenario3[3].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1461,42 +1070,42 @@ int main()
 
 		//lamparas de galería
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));//Siempre se tiene que tener -1 en Y para estar sobre el piso		
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));	
 		spotLights_Escenario2[0].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, 7.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, 7.0f));
 		spotLights_Escenario1[1].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(60.0f, -2.0f, 17.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(60.0f, -2.0f, 17.0f));
 		spotLights_Escenario1[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));		
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(50.0f, -2.0f, -23.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(50.0f, -2.0f, -23.0f));
 		spotLights_Escenario1[3].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 22.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(90.0f, -2.0f, 22.0f));
 		spotLights_Escenario2[3].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
 
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, -26.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(80.0f, -2.0f, -26.0f));
 		spotLights_Escenario2[2].SetFlash(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1516,7 +1125,7 @@ int main()
 		//Puerta izquierda
 		model = modelaux;
 		model = glm::translate(model, glm::vec3(-3.0f, 0.0f, -0.8f));
-		model = glm::translate(model, glm::vec3(TpuertaE, 0.0f, TpuertaE_Z));;
+		model = glm::translate(model, glm::vec3(anim.TpuertaE, 0.0f, anim.TpuertaE_Z));;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		PuertaIzqE.RenderModel();
@@ -1524,7 +1133,7 @@ int main()
 		//Puerta derecha
 		model = modelaux;
 		model = glm::translate(model, glm::vec3(3.0f, 0.0f, -0.8f));
-		model = glm::translate(model, glm::vec3(-TpuertaE, 0.0f, TpuertaE_Z));
+		model = glm::translate(model, glm::vec3(-anim.TpuertaE, 0.0f, anim.TpuertaE_Z));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		PuertaDerE.RenderModel();
@@ -1535,8 +1144,7 @@ int main()
 		model = glm::scale(model, glm::vec3(1.7f, 2.5f, 1.0f));
 		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		// Vector para el offset del letrero
-		// Para el letrero con desplazamiento
+		// Vector para el offset del letrero con desplazamiento
 		toffsetLetrero += velocidadLetrero * deltaTime;
 		if (toffsetLetrero > 1.0f)	toffsetLetrero = 0.0f;
 
@@ -1551,9 +1159,9 @@ int main()
 		toffset = glm::vec2(0.0f, 0.0f);
 		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 
-		//ARCO
+		//ARCO RING
 		elementos = glm::mat4(1.0);
-		elementos = glm::translate(elementos, glm::vec3(116.0f, -2.0f, 14.0f));//Siempre se tiene que tener -1 en Y para estar sobre el piso
+		elementos = glm::translate(elementos, glm::vec3(116.0f, -2.0f, 14.0f));
 		elementos = glm::scale(elementos, glm::vec3(0.9f, 0.9f, 0.9f));
 		elementos = glm::rotate(elementos, 60 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		modelaux = elementos;
@@ -1565,8 +1173,7 @@ int main()
 		elementos = modelaux;
 		elementos = glm::translate(elementos, glm::vec3(6.5f, 0.0f, 2.2f));
 		elementos = glm::scale(elementos, glm::vec3(1.15f, 1.3f, 1.0f));
-		elementos = glm::rotate(elementos, Rpuerta * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//elementos = glm::rotate(elementos, posXPuertaR, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::rotate(elementos, anim.Rpuerta * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PuertaDerR.RenderModel();
@@ -1575,14 +1182,34 @@ int main()
 		elementos = modelaux;
 		elementos = glm::translate(elementos, glm::vec3(-6.0f, 0.0f, 2.2f));
 		elementos = glm::scale(elementos, glm::vec3(1.15f, 1.3f, 1.0f));
-		elementos = glm::rotate(elementos, -Rpuerta * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		//elementos = glm::rotate(elementos, posXPuertaR * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		elementos = glm::rotate(elementos, -anim.Rpuerta * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		PuertaIzqR.RenderModel();
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		//cambio de letra
+		if (cuentaCambioLetra >= velCambioLetra) {
+			pos1++;
+			if (pos1 > 15) pos1 = 0;
+
+			pos2++;
+			if (pos2 > 15) 	pos2 = 0;
+
+			pos3++;
+			if (pos3 > 15) pos3 = 0;
+
+			pos4++;
+			if (pos4 > 15) 	pos4 = 0;
+
+			pos5++;
+			if (pos5 > 15) 	pos5 = 0;
+
+			cuentaCambioLetra = 0;
+		}
+		cuentaCambioLetra++;
 
 		//letrero del arco, letra 1
 		model = modelaux;
@@ -1681,33 +1308,31 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseRol));
 		RolandTorso.RenderModel();
 
-		// ---- DIBUJAR MIEMBROS (animaciones de caminata) ----
-
 		//Brazo Derecho
 		modelaux = baseRol;
 		modelaux = glm::translate(modelaux, glm::vec3(0.18f, -0.065f, 0.035f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionBrazoDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionBrazoDer), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		RolandBrazoDer.RenderModel();
 
 		//Brazo Izquierdo
 		modelaux = baseRol;
 		modelaux = glm::translate(modelaux, glm::vec3(-0.18f, -0.067f, 0.017f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionBrazoIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionBrazoIzq), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		RolandBrazoIzq.RenderModel();
 
 		//Pierna Derecha
 		modelaux = baseRol;
 		modelaux = glm::translate(modelaux, glm::vec3(0.071f, -0.58f, -0.02f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionPiernaDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionPiernaDer), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		RolandPiernaDer.RenderModel();
 
 		//Pierna Izquierda
 		modelaux = baseRol;
 		modelaux = glm::translate(modelaux, glm::vec3(-0.071f, -0.58f, -0.02f));
-		modelaux = glm::rotate(modelaux, glm::radians(rotacionPiernaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionPiernaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		RolandPiernaIzq.RenderModel();
 
@@ -1716,7 +1341,7 @@ int main()
 		// = PROTOMAN =
 		//Posicionar torso
 		baseProto = glm::mat4(1.0f);
-		baseProto = glm::translate(baseProto, glm::vec3(65.0f, 0.6f, 16.0f - posicionProto));
+		baseProto = glm::translate(baseProto, glm::vec3(65.0f, 0.6f, 16.0f - anim.posicionProto));
 		baseProto = glm::rotate(baseProto, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseProto));
 		ProtoTorso.RenderModel();
@@ -1737,9 +1362,9 @@ int main()
 		//escudo
 		modelaux = brazoProto;
 		modelaux = glm::translate(modelaux, glm::vec3(-0.56f, 0.0f, 0.0f));
-		modelaux = glm::rotate(modelaux, escudoProto1 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		modelaux = glm::rotate(modelaux, escudoProto2 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-		modelaux = glm::rotate(modelaux, escudoProto1 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.escudoProto1 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.escudoProto2 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelaux = glm::rotate(modelaux, anim.escudoProto1 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		ProtoEscudo.RenderModel();
 
@@ -1747,14 +1372,14 @@ int main()
 		modelaux = baseProto;
 		modelaux = glm::translate(modelaux, glm::vec3(0.5f, 0.4f, -0.16f));
 		modelaux = glm::rotate(modelaux, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		modelaux = glm::rotate(modelaux, brazoProtoR * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelaux = glm::rotate(modelaux, anim.brazoProtoR * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		ProtoIzqBrazo.RenderModel();
 
 		//Pierna Derecha
 		modelaux = baseProto;
 		modelaux = glm::translate(modelaux, glm::vec3(-0.17f, -0.53f, -0.13f));
-		modelaux = glm::rotate(modelaux, piernaProto * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.piernaProto * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		ProtoDerPierna.RenderModel();
 
@@ -1766,8 +1391,8 @@ int main()
 
 		//AVE CASTIGADORA
 		baseAve = glm::mat4(1.0f);
-		baseAve = glm::translate(baseAve, glm::vec3(20.0f + pos_ini_x_ave, 8.5f + desplazamiento_vuelo, 20.0f + pos_ini_z_ave));
-		baseAve = glm::rotate(baseAve, orienta_ave * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseAve = glm::translate(baseAve, glm::vec3(20.0f + anim.pos_ini_x_ave, 8.5f + anim.desplazamiento_vuelo, 20.0f + anim.pos_ini_z_ave));
+		baseAve = glm::rotate(baseAve, anim.orienta_ave * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		baseAve = glm::scale(baseAve, glm::vec3(10.0f, 10.0f, 10.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseAve));
 		AveCuerpo.RenderModel();
@@ -1775,36 +1400,36 @@ int main()
 		//LW
 		modelaux = baseAve;//0.083786f,-0.03725f
 		modelaux = glm::translate(modelaux, glm::vec3(0.06f, -0.04f, 0.0f));
-		modelaux = glm::rotate(modelaux, -posAla, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelaux = glm::rotate(modelaux, -anim.posAla, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		AveLW.RenderModel();
 
 		//RW
 		modelaux = baseAve;
 		modelaux = glm::translate(modelaux, glm::vec3(-0.06f, -0.04f, 0.0f));
-		modelaux = glm::rotate(modelaux, posAla, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelaux = glm::rotate(modelaux, anim.posAla, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		AveRW.RenderModel();
 
 		//EDDIE
 		baseEddie = glm::mat4(1.0f);
-		baseEddie = glm::translate(baseEddie, glm::vec3(15.0f + posEddieX, -2.0f + posEddieY, -10.0f));
+		baseEddie = glm::translate(baseEddie, glm::vec3(15.0f + anim.posEddieX, -2.0f + anim.posEddieY, -10.0f));
 		baseEddie = glm::rotate(baseEddie, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		baseEddie = glm::rotate(baseEddie, anguloEddieY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseEddie = glm::rotate(baseEddie, anim.anguloEddieY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseEddie));
 		Eddie.RenderModel();
 
 		//tapa
 		tapaEddie = baseEddie;
 		tapaEddie = glm::translate(tapaEddie, glm::vec3(0.0f, 1.5f, -0.7f));
-		tapaEddie = glm::rotate(tapaEddie, anguloEddieTapa * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		tapaEddie = glm::rotate(tapaEddie, anim.anguloEddieTapa * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(tapaEddie));
 		EddieTapa.RenderModel();
 
 		//aspas
 		modelaux = tapaEddie;
 		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 0.2f, 0.7f));
-		modelaux = glm::rotate(modelaux, rotacionAspas, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotacionAspas, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		EddieAspas.RenderModel();
 
