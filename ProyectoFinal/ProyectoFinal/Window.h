@@ -15,8 +15,11 @@ public:
 	GLfloat getYChange();
 	GLfloat getmuevex() { return muevex; }
 	bool getEntradaAbierta() { return estadoEntrada; }
+	bool getEstadoRing() { return estadoRing; }
+	bool getEstadoProto() { return estadoProto; }
+	bool getEstadoAngela() { return estadoAngela; }
+	void setEstadoAngela(bool nuevoEstado) { estadoAngela = nuevoEstado; }
 	
-
 	bool getShouldClose() {
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
@@ -36,7 +39,7 @@ private:
 	GLfloat xChange;
 	GLfloat yChange;
 	GLfloat muevex;
-	bool mouseFirstMoved, estadoEntrada;
+	bool mouseFirstMoved, estadoEntrada, estadoRing, estadoProto, estadoAngela;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);
 

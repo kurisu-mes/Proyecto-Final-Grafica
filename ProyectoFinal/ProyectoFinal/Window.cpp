@@ -14,6 +14,9 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	width = windowWidth;
 	height = windowHeight;
 	estadoEntrada = false;
+	estadoRing = false;
+	estadoProto = false;
+	estadoAngela = false;
 	muevex = 2.0f;
 	lightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
@@ -23,10 +26,10 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 }
 int Window::Initialise()
 {
-	//Inicialización de GLFW
+	//Inicializaciï¿½n de GLFW
 	if (!glfwInit())
 	{
-		printf("Falló inicializar GLFW");
+		printf("Fallï¿½ inicializar GLFW");
 		glfwTerminate();
 		return 1;
 	}
@@ -38,7 +41,7 @@ int Window::Initialise()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	//CREAR VENTANA
-	mainWindow = glfwCreateWindow(width, height, "PracticaXX:Nombre de la practica", NULL, NULL);
+	mainWindow = glfwCreateWindow(width, height, "Proyecto Final", NULL, NULL);
 
 	if (!mainWindow)
 	{
@@ -46,7 +49,7 @@ int Window::Initialise()
 		glfwTerminate();
 		return 1;
 	}
-	//Obtener tamaño de Buffer
+	//Obtener tamaï¿½o de Buffer
 	glfwGetFramebufferSize(mainWindow, &bufferWidth, &bufferHeight);
 
 	//asignar el contexto
@@ -61,7 +64,7 @@ int Window::Initialise()
 
 	if (glewInit() != GLEW_OK)
 	{
-		printf("Falló inicialización de GLEW");
+		printf("Fallï¿½ inicializaciï¿½n de GLEW");
 		glfwDestroyWindow(mainWindow);
 		glfwTerminate();
 		return 1;
@@ -72,7 +75,7 @@ int Window::Initialise()
 							 
 							 //Asignar Viewport
 	glViewport(0, 0, bufferWidth, bufferHeight);
-	//Callback para detectar que se está usando la ventana
+	//Callback para detectar que se estï¿½ usando la ventana
 	glfwSetWindowUserPointer(mainWindow, this);
 }
 
@@ -120,6 +123,25 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow->estadoEntrada = !theWindow->estadoEntrada;
 	}
+
+	//Puertas Ring
+	if (key == GLFW_KEY_I && GLFW_PRESS == action)
+	{
+		theWindow->estadoRing = !theWindow->estadoRing;
+	}
+
+	//Animacion Protoman
+	if (key == GLFW_KEY_P && GLFW_PRESS == action)
+	{
+		theWindow->estadoProto = !theWindow->estadoProto;
+	}
+
+	//Animacion Angela
+	if (key == GLFW_KEY_L && GLFW_PRESS == action)
+	{
+		theWindow->estadoAngela = !theWindow->estadoAngela;
+	}
+
 	// Control de escenarios de luces
 	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
 	{
