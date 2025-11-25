@@ -158,37 +158,49 @@ void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
 		if (!angelaplay) {
-			ma_sound_seek_to_pcm_frame(&efectoAngela, 0);   // Reinicia audio desde el inicio
-			ma_sound_start(&efectoAngela);                  // Reproduce
-			angelaplay = true;                         // Evitar repetir
+			ma_sound_seek_to_pcm_frame(&efectoAngela, 0);
+			ma_sound_start(&efectoAngela);
+			angelaplay = true;
 		}
-		//se vuelve true, comienza saludo
+
 		if (faseAnimAngela == 0) {
 			if (rotBrazoAng > -92.0f) {
 				rotBrazoAng -= 2.0f * deltaTime;
-				if (rotAnteBraAng < 92.0f) rotAnteBraAng += 2.0f * deltaTime;
+				if (rotAnteBraAng < 92.0f)
+					rotAnteBraAng += 2.0f * deltaTime;
 			}
-			else if (rotAnteBraAng > 0.0f) rotAnteBraAng -= 2.0f * deltaTime;
-			else faseAnimAngela = 1;
+			else if (rotAnteBraAng > 0.0f)
+				rotAnteBraAng -= 2.0f * deltaTime;
+			else
+				faseAnimAngela = 1;
 		}
 
-		//termina saludo bajando el brazo, y reinicializa el bool
 		if (faseAnimAngela == 1) {
-			if (rotAnteBraAng < 92.0f) rotAnteBraAng += 2.0f * deltaTime;
-			else faseAnimAngela = 2;
+			if (rotAnteBraAng < 92.0f)
+				rotAnteBraAng += 2.0f * deltaTime;
+			else
+				faseAnimAngela = 2;
 		}
+
 		if (faseAnimAngela == 2) {
 			if (rotBrazoAng < 0.0f) {
 				rotBrazoAng += 2.0f * deltaTime;
-				if (rotAnteBraAng > 0.0f) rotAnteBraAng -= 2.0f * deltaTime;
+				if (rotAnteBraAng > 0.0f)
+					rotAnteBraAng -= 2.0f * deltaTime;
 			}
 			else {
+				// Fin de animación
 				faseAnimAngela = 0;
 				angelaplay = false;
-				return(false);
+				return false;   // <-- OK
 			}
 		}
+
+		return true;  // <-- NECESARIO
 	}
+
+	// Si condicion es false, no animar.
+	return false;
 }
 
 //ANIMACION CAMINATA ROLAND
