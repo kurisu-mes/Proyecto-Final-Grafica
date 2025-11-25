@@ -32,6 +32,11 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Material.h"
+//Implementación librería miniaudio
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
+#include <filesystem> //Para captura de errores.
+#include <iostream>
 const float toRadians = 3.14159265f / 180.0f;
 
 GLfloat cycleDuration = 100.0f;
@@ -134,7 +139,6 @@ Model Angela, AngelaBrazo, AngelaAntebrazo;
 //Eddie
 Model Eddie, EddieTapa, EddieAspas;
 
-
 //Prueba caminata
 float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
 float velocidadPaso = 0.1f;     // velocidad del ciclo de paso
@@ -151,6 +155,20 @@ bool animEddie = true;
 glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
 float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
 bool caminarRoland = false;
+
+//Variables miniaudio
+
+ma_engine engine;
+ma_sound sonidoFondo;
+ma_sound ambientalRing;
+ma_sound ambientalgaleria;
+ma_sound efectoProtoman;
+ma_sound efectoAngela;
+ma_sound sonidoEspacialVordt;
+bool sonidopausa = false;
+bool engineinit = false;
+bool ambientinit = false;
+bool spatialinit = false;
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -581,6 +599,51 @@ int main()
 	glm::vec2 toffset = glm::vec2(0.0f, 0.0f);
 	glm::vec2 letreroOffset = glm::vec2(0.0f, 0.0f);
 
+	//Función miniaudio
+	// 
+	// Inicializar motor de audio
+	if (ma_engine_init(NULL, &engine) != MA_SUCCESS) {
+		std::cout << "Error inicializando miniaudio" << std::endl;
+		return -1;
+	}
+	//Carga de sonidos desde carpeta audio
+	//Ring ambiental
+	if (ma_sound_init_from_file(&engine, "audio/Ring_Ambiental.wav",
+		MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, &ambientalRing) != MA_SUCCESS) {
+		std::cout << "Error cargando sonido del ring\n"; //Excepción para capturar error al momento de cargar audio ring
+	}
+	ma_sound_set_looping(&ambientalRing, MA_TRUE);
+	ma_sound_set_volume(&ambientalRing, 0.0f);   // Inicializado en 0 hasta que se acerque el usuario
+	ma_sound_start(&ambientalRing);
+
+	// Ofrenda ambiental
+	if (ma_sound_init_from_file(&engine, "audio/Galeria_Ambiental.wav",
+		MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, NULL, &ambientalgaleria) != MA_SUCCESS) {
+		std::cout << "Error cargando sonido de la ofrenda\n"; //Captura de excepción
+	}
+	ma_sound_set_looping(&ambientalgaleria, MA_TRUE);
+	ma_sound_set_volume(&ambientalgaleria, 0.0f); // Volumen inicializado en 0
+	ma_sound_start(&ambientalgaleria);
+	// Soundtrack
+	if (ma_sound_init_from_file(&engine, "audio/Soundtrack.wav", MA_SOUND_FLAG_DECODE, NULL, NULL, &sonidoFondo) != MA_SUCCESS) {
+		std::cout << "Error cargando archivo de sonido" << std::endl;
+	}
+	ma_sound_set_looping(&sonidoFondo, MA_TRUE);   // Música infinita
+	ma_sound_start(&sonidoFondo);                  // Reproducir
+
+	// SONIDOS DE EFECTOS
+	// Efecto Protoman
+	if (ma_sound_init_from_file(&engine, "audio/ProtomanFX.wav",
+		MA_SOUND_FLAG_DECODE, NULL, NULL, &efectoProtoman) != MA_SUCCESS) {
+		std::cout << "Error cargando sonido ProtoFX\n";
+	}
+
+	// Efecto Angela
+	if (ma_sound_init_from_file(&engine, "audio/AngelaFX.wav",
+		MA_SOUND_FLAG_DECODE, NULL, NULL, &efectoAngela) != MA_SUCCESS) {
+		std::cout << "Error cargando sonido AngelaFX\n";
+	}
+	
 
 	////Loop mientras no se cierra la ventana
 	while (!mainWindow.getShouldClose())
@@ -744,6 +807,41 @@ int main()
 		shaderList[0].SetPointLights(activePointLights, activePointLightCount);
 
 		// --- FIN DE LÓGICA DE LUCES ---
+
+		// --- AUDIO SOUNDTRACK Y AMBIENTAL
+
+		// Calculo de distancias para audio ambiental.
+
+		glm::vec3 posRing = glm::vec3(158.5f, 0.0f, 39.0f); //Heredamos la posicion del ring
+
+		glm::vec3 posGaleria = glm::vec3(70.0f, -2.0f, 0.0f); // Heredamos posicion de la galeria
+
+
+		glm::vec3 posJugador = camera.getCameraPosition();
+
+		// Distancia al ring
+		float distRing = glm::distance(posJugador, posRing);
+
+		// Distancia a ofrenda
+		float distGaleria = glm::distance(posJugador, posGaleria);
+
+		// Escala de distancia
+		float maxDist = 50.0f;
+
+		// Volumen local normalizado
+		float volRing = 1.0f - glm::clamp(distRing / maxDist, 0.0f, 1.0f);
+		float volGaleria = 1.0f - glm::clamp(distGaleria/ maxDist, 0.0f, 1.0f);
+
+		// Aplicar volumen a sonidos espaciales
+		ma_sound_set_volume(&ambientalRing, volRing);
+		ma_sound_set_volume(&ambientalgaleria, volGaleria);
+
+		// Reducir soundtrack al acercarse a cualquiera
+		float reduccion = (volRing > volGaleria ? volRing : volGaleria);
+		float volSoundtrack = 1.0f - 0.8f * reduccion;
+		ma_sound_set_volume(&sonidoFondo, volSoundtrack);
+
+		// --------- FIN DE FUNCIONES AUDIO --------------
 
 		//Piso modelado con Blender
 		modelPiso = glm::mat4(1.0);

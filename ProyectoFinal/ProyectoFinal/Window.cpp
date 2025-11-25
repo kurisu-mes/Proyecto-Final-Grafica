@@ -1,4 +1,8 @@
 #include "Window.h"
+#include "miniaudio.h"
+
+extern ma_sound sonidoFondo;
+extern bool sonidopausa;
 
 Window::Window()
 {
@@ -141,7 +145,17 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow->estadoAngela = !theWindow->estadoAngela;
 	}
-
+	// Control audio
+	if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+		if (!sonidopausa) {
+			ma_sound_stop(&sonidoFondo);
+			sonidopausa = true;
+		}
+		else {
+			ma_sound_start(&sonidoFondo);
+			sonidopausa = false;
+		}
+	}
 	// Control de escenarios de luces
 	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
 	{

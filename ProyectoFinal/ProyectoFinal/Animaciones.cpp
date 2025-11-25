@@ -1,4 +1,10 @@
 #include "Animaciones.h"
+#include "miniaudio.h"
+
+extern ma_sound efectoProtoman;
+extern ma_sound efectoAngela;
+static bool protoplay = false;
+static bool angelaplay = false;
 
 Animaciones::Animaciones()
 {
@@ -116,6 +122,12 @@ void Animaciones::EntradaRing(bool condicion, GLfloat deltaTime)
 //ANIMACION SIMPLE PROTOMAN
 void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
+		//Inicia efecto de sonido
+		if (!protoplay) {
+			ma_sound_seek_to_pcm_frame(&efectoProtoman, 0);   // Reinicia audio desde el inicio
+			ma_sound_start(&efectoProtoman);                  // Reproduce
+			protoplay = true;                         // Evitar repetir
+		}
 		if (brazoProtoR < 0.0f) brazoProtoR += 3.0f * deltaTime;
 		else {
 			if (escudoProto1 < 90.0f) escudoProto1 += 3.0f * deltaTime;
@@ -129,6 +141,7 @@ void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 		}
 	}
 	else {
+		protoplay = false; //Apaga sonido, inicializa de nuevo la variable que enciende el audio.
 		if (piernaProto > 0.0f) {
 			piernaProto -= 1.5f * deltaTime;
 			posicionProto += 0.1f * deltaTime;
@@ -144,6 +157,11 @@ void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 //ANIMACION SIMPLE ANGELA
 bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
+		if (!angelaplay) {
+			ma_sound_seek_to_pcm_frame(&efectoAngela, 0);   // Reinicia audio desde el inicio
+			ma_sound_start(&efectoAngela);                  // Reproduce
+			angelaplay = true;                         // Evitar repetir
+		}
 		//se vuelve true, comienza saludo
 		if (faseAnimAngela == 0) {
 			if (rotBrazoAng > -92.0f) {
@@ -166,6 +184,7 @@ bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 			}
 			else {
 				faseAnimAngela = 0;
+				angelaplay = false;
 				return(false);
 			}
 		}
