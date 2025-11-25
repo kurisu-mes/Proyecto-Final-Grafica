@@ -837,7 +837,7 @@ int main()
 
 		// Reducir soundtrack al acercarse a cualquiera
 		float reduccion = (volRing > volGaleria ? volRing : volGaleria);
-		float volSoundtrack = 1.0f - 0.9f * reduccion;
+		float volSoundtrack = 0.9f - 0.9f * reduccion;
 		ma_sound_set_volume(&sonidoFondo, volSoundtrack);
 
 		// --------- FIN DE FUNCIONES AUDIO --------------
