@@ -159,6 +159,7 @@ bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
 		if (!angelaplay) {
 			ma_sound_seek_to_pcm_frame(&efectoAngela, 0);
+			ma_sound_set_volume(&efectoAngela, 1.5f);
 			ma_sound_start(&efectoAngela);
 			angelaplay = true;
 		}
