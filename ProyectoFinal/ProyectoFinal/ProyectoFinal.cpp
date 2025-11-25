@@ -164,7 +164,6 @@ ma_sound ambientalRing;
 ma_sound ambientalgaleria;
 ma_sound efectoProtoman;
 ma_sound efectoAngela;
-ma_sound sonidoEspacialVordt;
 bool sonidopausa = false;
 bool engineinit = false;
 bool ambientinit = false;
