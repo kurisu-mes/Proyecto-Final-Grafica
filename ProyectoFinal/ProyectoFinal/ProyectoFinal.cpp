@@ -110,8 +110,7 @@ PointLight pointLights_Escenario1[4];
 PointLight pointLights_Escenario2[4];
 PointLight pointLights_Escenario3[4];
 
-
-PointLight pointLights[MAX_POINT_LIGHTS]; 
+PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights1[1];// (Z) 4 Lámparas Galería
 SpotLight spotLights2[1]; 
 SpotLight spotLights3[1];// (C) 4 Antorchas Ring
@@ -827,7 +826,7 @@ int main()
 		
 
 		// Clear the window
-		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//skybox.DrawSkybox(camera.calculateViewMatrix(), projection);
 		if (lucesNocturnasEncendidas)
@@ -856,17 +855,17 @@ int main()
 		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
 		
 
-		// --- A) La Linterna (SIEMPRE ACTIVA) ---
-		lowerLight = camera.getCameraPosition();
-		lowerLight.y -= 0.3f;
-		linterna.SetFlash(lowerLight, camera.getCameraDirection());
-
-		lucesSpotParaShader[0] = linterna; // Guardamos en la posición 0
-		spotCount++; // Llevamos 1 luz
-
+	
 		if (lucesNocturnasEncendidas)
 		{
 			int mode = mainWindow.getSpotLightMode();
+
+			lowerLight = camera.getCameraPosition();
+			lowerLight.y -= 0.3f;
+			linterna.SetFlash(lowerLight, camera.getCameraDirection());
+
+			lucesSpotParaShader[0] = linterna; 
+			spotCount++; 
 
 			switch (mode)
 			{
@@ -1273,6 +1272,7 @@ int main()
 		//lamparas de galería
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(36.0f, -2.0f, -5.5f));	
+		pointLights_Escenario1[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f));
 		pointLights_Escenario2[0].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
@@ -1295,6 +1295,7 @@ int main()
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(50.0f, -2.0f, -23.0f));
 		pointLights_Escenario1[3].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f));
+		pointLights_Escenario2[1].SetPos(glm::vec3(elementos[3]) + glm::vec3(0.0f, 5.0f, 0.0f));
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		capoLampara.RenderModel();
