@@ -1,4 +1,8 @@
 #include "Window.h"
+#include "miniaudio.h"
+
+extern ma_sound sonidoFondo;
+extern bool sonidopausa;
 
 Window::Window()
 {
@@ -17,6 +21,8 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	estadoRing = false;
 	estadoProto = false;
 	estadoAngela = false;
+	estadoPokeArbol = false;
+	estadoRefrescos = false;
 	muevex = 2.0f;
 	lightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
@@ -109,14 +115,6 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-	if (key == GLFW_KEY_Y)
-	{
-		theWindow-> muevex += 1.0;
-	}
-	if (key == GLFW_KEY_U)
-	{
-		theWindow-> muevex -= 1.0;
-	}
 
 	//Puertas Entrada
 	if (key == GLFW_KEY_O && GLFW_PRESS == action)
@@ -140,6 +138,31 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	if (key == GLFW_KEY_L && GLFW_PRESS == action)
 	{
 		theWindow->estadoAngela = !theWindow->estadoAngela;
+	}
+
+
+	//Animacion Arbol
+	if (key == GLFW_KEY_K && GLFW_PRESS == action)
+	{
+		theWindow->estadoPokeArbol = !theWindow->estadoPokeArbol;
+	}
+
+	//Animacion Expendedora
+	if (key == GLFW_KEY_J && GLFW_PRESS == action)
+	{
+		theWindow->estadoRefrescos = !theWindow->estadoRefrescos;
+	}
+
+	// Control audio
+	if (key == GLFW_KEY_U && action == GLFW_PRESS) {
+		if (!sonidopausa) {
+			ma_sound_stop(&sonidoFondo);
+			sonidopausa = true;
+		}
+		else {
+			ma_sound_start(&sonidoFondo);
+			sonidopausa = false;
+		}
 	}
 
 	// Control de escenarios de luces

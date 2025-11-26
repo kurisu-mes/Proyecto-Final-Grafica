@@ -1,6 +1,12 @@
 #include "Animaciones.h"
+#include "miniaudio.h"
 
-Animaciones::Animaciones()
+extern ma_sound efectoProtoman;
+extern ma_sound efectoAngela;
+static bool protoplay = false;
+static bool angelaplay = false;
+
+Animaciones::Animaciones() //inicializa variables
 {
 	//Para la puerta
 	Rpuerta = 0.0f; // Angulo de rotacion ACTUAL
@@ -71,6 +77,43 @@ Animaciones::Animaciones()
 	minXZ = -15.0f;
 	maxXZ = 15.0f;
 	inciSpeed = 0.0f;
+
+	// Keys Excavadora
+	movBase_x = 0.0f;
+	movBase_z = 0.0f;
+	giroCabina = 0.0f;
+	giroBrazo = -60.0f;
+	giroAnteB = 120.0f;
+	giroGarra = 60.0f;
+
+	FrameIndexExc = 0;
+	playIndexExc = 0; //a partir de cual
+	i_curr_stepsExc = 0;
+
+	// Keys Arbol
+	rotTronco = 0.0f;
+	movBase = 0.0f;
+	movCopa = 0.0f;
+	caidaBaya = 0.0f;
+	
+	FrameIndexPoke = 0;
+	playIndexPoke = 0; //a partir de cual
+	i_curr_stepsPoke = 0;
+	playedPoke = false;
+
+	// Keys Refresco
+	rotMaquina = 0.0f;
+	movBoton = 0.0f;
+	movBandeja = 0.0f;
+	posRefrescoY = 0.0f;
+	posRefrescoZ = 0.0f;
+	tipoRefresco = 0;
+	refrescoAleatorio = false;
+
+	FrameIndexCola = 0;		
+	playIndexCola = 0; //a partir de cual
+	i_curr_stepsCola = 0;
+	playedCola = false;
 }
 
 //Sirve para poder hacer interpolacion lineal y calcular los angulos y posicion en cada frame
@@ -116,6 +159,12 @@ void Animaciones::EntradaRing(bool condicion, GLfloat deltaTime)
 //ANIMACION SIMPLE PROTOMAN
 void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
+		//Inicia efecto de sonido
+		if (!protoplay) {
+			ma_sound_seek_to_pcm_frame(&efectoProtoman, 0);   // Reinicia audio desde el inicio
+			ma_sound_start(&efectoProtoman);                  // Reproduce
+			protoplay = true;                         // Evitar repetir
+		}
 		if (brazoProtoR < 0.0f) brazoProtoR += 3.0f * deltaTime;
 		else {
 			if (escudoProto1 < 90.0f) escudoProto1 += 3.0f * deltaTime;
@@ -129,6 +178,7 @@ void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 		}
 	}
 	else {
+		protoplay = false; //Apaga sonido, inicializa de nuevo la variable que enciende el audio.
 		if (piernaProto > 0.0f) {
 			piernaProto -= 1.5f * deltaTime;
 			posicionProto += 0.1f * deltaTime;
@@ -144,6 +194,12 @@ void Animaciones::AnimacionProtoman(bool condicion, GLfloat deltaTime) {
 //ANIMACION SIMPLE ANGELA
 bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
+		if (!angelaplay) {
+			ma_sound_seek_to_pcm_frame(&efectoAngela, 0);   // Reinicia audio desde el inicio
+			ma_sound_set_volume(&efectoAngela, 1.5f);
+			ma_sound_start(&efectoAngela);                  // Reproduce
+			angelaplay = true;                         // Evitar repetir
+		}
 		//se vuelve true, comienza saludo
 		if (faseAnimAngela == 0) {
 			if (rotBrazoAng > -92.0f) {
@@ -166,6 +222,7 @@ bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 			}
 			else {
 				faseAnimAngela = 0;
+				angelaplay = false;
 				return(false);
 			}
 		}
@@ -347,3 +404,379 @@ void Animaciones::AnimacionEddie(bool condicion, float toRadians, GLfloat deltaT
 	rotacionAspas = cos(anguloAspas * toRadians);
 }
 
+// Keyframes EXCAVADORA
+typedef struct _Excavadora
+{
+	float movBase_x;
+	float movBase_z;
+	float giroCabina;
+	float giroBrazo;
+	float giroAnteB;
+	float giroGarra;
+
+	float movBase_xInc;
+	float movBase_zInc;
+	float giroCabinaInc;
+	float giroBrazoInc;
+	float giroAnteBInc;
+	float giroGarraInc;
+
+}EXCAVAR;
+EXCAVAR KeyFrameExc[MAX_FRAMES]; //numero de frames a almacenar
+
+//carga las keyframes del archivo
+void Animaciones::loadKeyframesExc() {
+
+	std::ifstream file(keyFramesExcavadora); // se abre el .txt para su lectura
+	std::string line; //guarda en un string cada linea
+
+	//Verifica si se puede abrir el archivo antes de intentar leerlo
+	if (!file.is_open()) {
+		printf("No se encontro el archivo %s\n", keyFramesExcavadora);
+		return;
+	}
+
+	//mientras haya lineas en el archivo, se lee el documento
+	while (std::getline(file, line) && FrameIndexExc < MAX_FRAMES) {
+		std::istringstream coord(line);
+		float movX, movY, cabina, brazo, anteb, garra;
+
+		// lee las 5 coordenadas
+		if (coord >> movX >> movY >> cabina >> brazo >> anteb >> garra) {
+
+			KeyFrameExc[FrameIndexExc].movBase_x = movX;
+			KeyFrameExc[FrameIndexExc].movBase_z = movY;
+			KeyFrameExc[FrameIndexExc].giroCabina = cabina;
+			KeyFrameExc[FrameIndexExc].giroBrazo = brazo;
+			KeyFrameExc[FrameIndexExc].giroAnteB = anteb;
+			KeyFrameExc[FrameIndexExc].giroGarra = garra;
+			FrameIndexExc++;
+		}
+		else {
+			std::cerr << "Error al leer la linea del archivo: " << line << "\n";
+		}
+	}
+
+	file.close();
+}
+
+//reinicia a posicion inicial
+void Animaciones::resetElementsExc() //Tecla 0
+{
+	movBase_x = KeyFrameExc[0].movBase_x;
+	movBase_z = KeyFrameExc[0].movBase_z;
+	giroCabina = KeyFrameExc[0].giroCabina;
+	giroBrazo = KeyFrameExc[0].giroBrazo;
+	giroAnteB = KeyFrameExc[0].giroAnteB;
+	giroGarra = KeyFrameExc[0].giroGarra;
+}
+
+//agrega frames entre keys
+void Animaciones::interpolationExc()
+{
+	KeyFrameExc[playIndexExc].movBase_xInc = (KeyFrameExc[playIndexExc + 1].movBase_x - KeyFrameExc[playIndexExc].movBase_x) / i_max_stepsExc;
+	KeyFrameExc[playIndexExc].movBase_zInc = (KeyFrameExc[playIndexExc + 1].movBase_z - KeyFrameExc[playIndexExc].movBase_z) / i_max_stepsExc;
+	KeyFrameExc[playIndexExc].giroCabinaInc = (KeyFrameExc[playIndexExc + 1].giroCabina - KeyFrameExc[playIndexExc].giroCabina) / i_max_stepsExc;
+	KeyFrameExc[playIndexExc].giroBrazoInc = (KeyFrameExc[playIndexExc + 1].giroBrazo - KeyFrameExc[playIndexExc].giroBrazo) / i_max_stepsExc;
+	KeyFrameExc[playIndexExc].giroAnteBInc = (KeyFrameExc[playIndexExc + 1].giroAnteB - KeyFrameExc[playIndexExc].giroAnteB) / i_max_stepsExc;
+	KeyFrameExc[playIndexExc].giroGarraInc = (KeyFrameExc[playIndexExc + 1].giroGarra - KeyFrameExc[playIndexExc].giroGarra) / i_max_stepsExc;
+}
+
+//ejecuta la animacion
+void Animaciones::animateExc(bool playExc) {
+	//Movimiento del objeto con barra espaciadora
+	if (playExc)
+	{
+		if (i_curr_stepsExc >= i_max_stepsExc) //fin de animación entre frames?
+		{
+			playIndexExc++;
+			//printf("playindexExc : %d\n", playIndexExc);
+			if (playIndexExc > FrameIndexExc - 2)	//Fin de toda la animación con último frame?
+			{
+				//printf("Frame index= %d\n", FrameIndexExc);
+				//printf("termino la animacion\n");
+				playIndexExc = 0;
+				playExc = false;
+			}
+			else //Interpolación del próximo cuadro
+			{
+
+				i_curr_stepsExc = 0; //Resetea contador
+				//Interpolar
+				interpolationExc();
+			}
+		}
+		else
+		{
+			//Dibujar Animación
+			movBase_x += KeyFrameExc[playIndexExc].movBase_xInc;
+			movBase_z += KeyFrameExc[playIndexExc].movBase_zInc;
+			giroCabina += KeyFrameExc[playIndexExc].giroCabinaInc;
+			giroBrazo += KeyFrameExc[playIndexExc].giroBrazoInc;
+			giroAnteB += KeyFrameExc[playIndexExc].giroAnteBInc;
+			giroGarra += KeyFrameExc[playIndexExc].giroGarraInc;
+			i_curr_stepsExc++;
+		}
+
+	}
+}
+
+void Animaciones::playAnimacionExcavadora(bool playExc) {
+	if (!playExc) {
+		resetElementsExc();
+		interpolationExc();
+		playIndexExc = 0;
+		i_curr_stepsExc = 0;
+	}
+	else
+		animateExc(playExc);
+}
+// Keyframes ARBOL
+typedef struct _Arbol
+{
+	//Variables para GUARDAR Key Frames
+	float rotTronco;
+	float movBase;
+	float movCopa;
+	float caidaBaya;
+
+	float rotTroncoInc;
+	float movBaseInc;
+	float movCopaInc;
+	float caidaBayaInc;
+
+}ARBOL;
+
+ARBOL KeyFramePoke[MAX_FRAMES]; //numero de frames a almacenar
+
+//carga las keyframes del archivo
+void Animaciones::loadKeyframesPoke() {
+
+	std::ifstream file(keyFramesArbol); // se abre el .txt para su lectura
+	std::string line; //guarda en un string cada linea
+
+	//Verifica si se puede abrir el archivo antes de intentar leerlo
+	if (!file.is_open()) {
+		printf("No se encontro el archivo %s\n", keyFramesArbol);
+		return;
+	}
+
+	//mientras haya lineas en el archivo, se lee el documento
+	while (std::getline(file, line) && FrameIndexPoke < MAX_FRAMES) {
+		std::istringstream coord(line);
+		float tronco, base, copa, baya;
+
+		// lee las 5 coordenadas
+		if (coord >> tronco >> base >> copa >> baya) {
+
+			KeyFramePoke[FrameIndexPoke].rotTronco = tronco;
+			KeyFramePoke[FrameIndexPoke].movBase = base;
+			KeyFramePoke[FrameIndexPoke].movCopa = copa;
+			KeyFramePoke[FrameIndexPoke].caidaBaya = baya;
+			FrameIndexPoke++;
+		}
+		else {
+			std::cerr << "Error al leer la linea del archivo: " << line << "\n";
+		}
+	}
+
+	file.close();
+}
+
+//reinicia a posicion inicial
+void Animaciones::resetElementsPoke() //Tecla 0
+{
+	rotTronco = KeyFramePoke[0].rotTronco;
+	movBase = KeyFramePoke[0].movBase;
+	movCopa = KeyFramePoke[0].movCopa;
+	caidaBaya = KeyFramePoke[0].caidaBaya;
+}
+
+//agrega frames entre keys
+void Animaciones::interpolationPoke()
+{
+	KeyFramePoke[playIndexPoke].rotTroncoInc = (KeyFramePoke[playIndexPoke + 1].rotTronco - KeyFramePoke[playIndexPoke].rotTronco) / i_max_stepsPoke;
+	KeyFramePoke[playIndexPoke].movBaseInc = (KeyFramePoke[playIndexPoke + 1].movBase - KeyFramePoke[playIndexPoke].movBase) / i_max_stepsPoke;
+	KeyFramePoke[playIndexPoke].movCopaInc = (KeyFramePoke[playIndexPoke + 1].movCopa - KeyFramePoke[playIndexPoke].movCopa) / i_max_stepsPoke;
+	KeyFramePoke[playIndexPoke].caidaBayaInc = (KeyFramePoke[playIndexPoke + 1].caidaBaya - KeyFramePoke[playIndexPoke].caidaBaya) / i_max_stepsPoke;
+}
+
+void Animaciones::animatePoke(bool playPoke) {
+	//Movimiento del objeto con barra espaciadora
+	if (playPoke)
+	{
+		if (i_curr_stepsPoke >= i_max_stepsPoke) //fin de animación entre frames?
+		{
+			playIndexPoke++;
+			//printf("playIndexPoke : %d\n", playIndexPoke);
+			if (playIndexPoke > FrameIndexPoke - 2)	//Fin de toda la animación con último frame?
+			{
+				//printf("Frame index= %d\n", FrameIndexPoke);
+				//printf("termino la animacion\n");
+				playIndexPoke = 0;
+				playedPoke = true;
+			}
+			else //Interpolación del próximo cuadro
+			{
+
+				i_curr_stepsPoke = 0; //Resetea contador
+				//Interpolar
+				interpolationPoke();
+			}
+		}
+		else
+		{
+			//Dibujar Animación
+			rotTronco += KeyFramePoke[playIndexPoke].rotTroncoInc;
+			movBase += KeyFramePoke[playIndexPoke].movBaseInc;
+			movCopa += KeyFramePoke[playIndexPoke].movCopaInc;
+			caidaBaya += KeyFramePoke[playIndexPoke].caidaBayaInc;
+			i_curr_stepsPoke++;
+		}
+
+	}
+}
+
+void Animaciones::playAnimacionPokearbol(bool playPoke) {
+	if (!playPoke) {
+		resetElementsPoke();
+		interpolationPoke();
+		playIndexPoke = 0;
+		i_curr_stepsPoke = 0;
+		playedPoke = false;
+	}
+	if (playPoke && !playedPoke) {
+		animatePoke(playPoke);
+	}
+		
+}
+
+// Keyframes EXPENDEDORA
+typedef struct _Expendedora
+{
+	//Variables para GUARDAR Key Frames
+	float rotMaquina;
+	float movBoton;
+	float movBandeja;
+	float posRefrescoY;
+	float posRefrescoZ;
+
+	float rotMaquinaInc;
+	float movBotonInc;
+	float movBandejaInc;
+	float posRefrescoYInc;
+	float posRefrescoZInc;
+
+}EXPEND;
+
+EXPEND KeyFrameCola[MAX_FRAMES]; //numero de frames a almacenar
+
+//carga las keyframes del archivo
+void Animaciones::loadKeyframesCola() {
+
+	std::ifstream file(keyFramesRefresco); // se abre el .txt para su lectura
+	std::string line; //guarda en un string cada linea
+
+	//Verifica si se puede abrir el archivo antes de intentar leerlo
+	if (!file.is_open()) {
+		printf("No se encontro el archivo %s\n", keyFramesRefresco);
+		return;
+	}
+
+	//mientras haya lineas en el archivo, se lee el documento
+	while (std::getline(file, line) && FrameIndexCola < MAX_FRAMES) {
+		std::istringstream coord(line);
+		float maq, boton, bandeja, refY, refZ;
+
+		// lee las 5 coordenadas
+		if (coord >> maq >> boton >> bandeja >> refY >> refZ) {
+
+			KeyFrameCola[FrameIndexCola].rotMaquina = maq;
+			KeyFrameCola[FrameIndexCola].movBoton = boton;
+			KeyFrameCola[FrameIndexCola].movBandeja = bandeja;
+			KeyFrameCola[FrameIndexCola].posRefrescoY = refY;
+			KeyFrameCola[FrameIndexCola].posRefrescoZ = refZ;
+			FrameIndexCola++;
+		}
+		else {
+			std::cerr << "Error al leer la linea del archivo: " << line << "\n";
+		}
+	}
+
+	file.close();
+}
+
+//reinicia a posicion inicial
+void Animaciones::resetElementsCola() //Tecla 0
+{
+	rotMaquina = KeyFrameCola[0].rotMaquina;
+	movBoton = KeyFrameCola[0].movBoton;
+	movBandeja = KeyFrameCola[0].movBandeja;
+	posRefrescoY = KeyFrameCola[0].posRefrescoY;
+	posRefrescoZ = KeyFrameCola[0].posRefrescoZ;
+}
+
+//agrega frames entre keys
+void Animaciones::interpolationCola()
+{
+	KeyFrameCola[playIndexCola].rotMaquinaInc = (KeyFrameCola[playIndexCola + 1].rotMaquina - KeyFrameCola[playIndexCola].rotMaquina) / i_max_stepsCola;
+	KeyFrameCola[playIndexCola].movBotonInc = (KeyFrameCola[playIndexCola + 1].movBoton - KeyFrameCola[playIndexCola].movBoton) / i_max_stepsCola;
+	KeyFrameCola[playIndexCola].movBandejaInc = (KeyFrameCola[playIndexCola + 1].movBandeja - KeyFrameCola[playIndexCola].movBandeja) / i_max_stepsCola;
+	KeyFrameCola[playIndexCola].posRefrescoYInc = (KeyFrameCola[playIndexCola + 1].posRefrescoY - KeyFrameCola[playIndexCola].posRefrescoY) / i_max_stepsCola;
+	KeyFrameCola[playIndexCola].posRefrescoZInc = (KeyFrameCola[playIndexCola + 1].posRefrescoZ - KeyFrameCola[playIndexCola].posRefrescoZ) / i_max_stepsCola;
+}
+
+void Animaciones::animateCola(bool playCola) {
+	//Movimiento del objeto con barra espaciadora
+	if (playCola)
+	{
+		if (i_curr_stepsCola >= i_max_stepsCola) //fin de animación entre frames?
+		{
+			playIndexCola++;
+			//printf("playIndexCola : %d\n", playIndexCola);
+			if (playIndexCola > FrameIndexCola - 2)	//Fin de toda la animación con último frame?
+			{
+				//printf("Frame index= %d\n", FrameIndexCola);
+				//printf("termino la animacion\n");
+				playIndexCola = 0;
+				playedCola = true;
+			}
+			else //Interpolación del próximo cuadro
+			{
+
+				i_curr_stepsCola = 0; //Resetea contador
+				//Interpolar
+				interpolationCola();
+			}
+		}
+		else
+		{
+			//Dibujar Animación
+			rotMaquina += KeyFrameCola[playIndexCola].rotMaquinaInc;
+			movBoton += KeyFrameCola[playIndexCola].movBotonInc;
+			movBandeja += KeyFrameCola[playIndexCola].movBandejaInc;
+			posRefrescoY += KeyFrameCola[playIndexCola].posRefrescoYInc;
+			posRefrescoZ += KeyFrameCola[playIndexCola].posRefrescoZInc;
+			i_curr_stepsCola++;
+		}
+
+	}
+}
+
+void Animaciones::playAnimacionRefresco(bool playCola){
+	if (!playCola) {
+		resetElementsCola();
+		interpolationCola();
+		playIndexCola = 0;
+		i_curr_stepsCola = 0;
+		if (!refrescoAleatorio) {
+			tipoRefresco = (rand() % 3);
+			refrescoAleatorio = true;
+		}
+		playedCola = false;
+	}
+	if (playCola && !playedCola) {
+		animateCola(playCola);
+		refrescoAleatorio = false;
+	}
+}
