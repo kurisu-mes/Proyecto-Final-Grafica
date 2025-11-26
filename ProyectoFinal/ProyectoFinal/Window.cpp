@@ -25,6 +25,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	estadoRefrescos = false;
 	muevex = 2.0f;
 	lightMode = 0;
+	spotLightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
 		keys[i] = 0;
@@ -152,6 +153,24 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 	{
 		theWindow->estadoRefrescos = !theWindow->estadoRefrescos;
 	}
+
+	// Modos de spotlight
+	// Modo 1 con letra B
+	if (key == GLFW_KEY_B && action == GLFW_PRESS)
+	{
+		theWindow->spotLightMode = 1;
+	}
+	// Modo 2 con letra N
+	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+	{
+		theWindow->spotLightMode = 2;
+	}
+	// Modo 3 con letra M
+	if (key == GLFW_KEY_M && action == GLFW_PRESS)
+	{
+		theWindow->spotLightMode = 3;
+	}
+
 
 	// Control audio
 	if (key == GLFW_KEY_U && action == GLFW_PRESS) {
