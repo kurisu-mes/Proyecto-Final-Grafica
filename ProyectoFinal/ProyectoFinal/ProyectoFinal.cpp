@@ -116,8 +116,7 @@ SpotLight spotLights2[1];
 SpotLight spotLights3[1];// (C) 4 Antorchas Ring
 
 int spotLightMode = 0;
-SpotLight lucesSpotParaShader[2];
-unsigned int spotCount = 0;
+
 
 //letreros
 Texture LetrasRingT;
@@ -186,6 +185,17 @@ bool sonidopausa = false;
 bool engineinit = false;
 bool ambientinit = false;
 bool spatialinit = false;
+
+
+// Centros de zonas de activación de luces
+glm::vec3 centroGaleriaInicio = glm::vec3(25.0f, -2.0f, 0.0f);
+glm::vec3 centroGaleriaFondo = glm::vec3(85.0f, -2.0f, 0.0f);
+glm::vec3 centroRing = glm::vec3(130.0f, -2.0f, 15.0f);
+
+// Radio de activacion de luces
+float radioActivacion = 25.0f;
+
+
 
 // Vertex Shader
 static const char* vShader = "shaders/shader_light.vert";
@@ -854,7 +864,8 @@ int main()
 		// luz ligada a la cámara de tipo flash
 		//sirve para que en tiempo de ejecución (dentro del while) se cambien propiedades de la luz
 		
-
+		SpotLight lucesSpotParaShader[2];
+		unsigned int spotCount = 0;
 	
 		if (lucesNocturnasEncendidas)
 		{
@@ -887,7 +898,7 @@ int main()
 		}
 		shaderList[0].SetSpotLights(lucesSpotParaShader, spotCount);
 
-
+		/* ANTERIOR LÓGICA DE LUCES PUNTUALES
 		int lightMode = mainWindow.getLightMode();
 		if (lucesNocturnasEncendidas)
 		{
@@ -909,6 +920,52 @@ int main()
 		}
 		else // Es de día
 			shaderList[0].SetPointLights(NULL, 0);
+		*/
+
+		if (lucesNocturnasEncendidas)
+		{
+			glm::vec3 camPos = camera.getCameraPosition();
+
+			
+			float distRing = glm::distance(camPos, centroRing);
+			float distFondo = glm::distance(camPos, centroGaleriaFondo);
+			float distInicio = glm::distance(camPos, centroGaleriaInicio);
+
+			// --- COMPROBACION DE EXCLUSIVIDAD ---
+			bool lucesAsignadas = false; // Bandera de control
+
+			// Prioridad 1: Ring
+			if (!lucesAsignadas && distRing < radioActivacion)
+			{
+				shaderList[0].SetPointLights(pointLights_Escenario3, 4);
+				lucesAsignadas = true; 
+			}
+
+			// Prioridad 2: Fondo Galería
+			if (!lucesAsignadas && distFondo < radioActivacion)
+			{
+				shaderList[0].SetPointLights(pointLights_Escenario2, 4);
+				lucesAsignadas = true; 
+			}
+
+			// Prioridad 3: Inicio Galería
+			if (!lucesAsignadas && distInicio < radioActivacion)
+			{
+				shaderList[0].SetPointLights(pointLights_Escenario1, 4);
+				lucesAsignadas = true; 
+			}
+
+			
+			if (!lucesAsignadas)
+			{
+				shaderList[0].SetPointLights(NULL, 0);
+			}
+		}
+		else // Es de día
+		{
+			shaderList[0].SetPointLights(NULL, 0);
+		}
+
 
 		// --- FIN DE LÓGICA DE LUCES ---
 
