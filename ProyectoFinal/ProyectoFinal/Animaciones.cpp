@@ -30,6 +30,25 @@ Animaciones::Animaciones() //inicializa variables
 	rotBrazoAng = 0.0f;
 	rotAnteBraAng = 0.0f;
 
+	// Animacion simple incineroar
+	estadoInci = 1;
+	rotBrazoInciX = 30.0f;
+	rotBrazoInciZ = -90.0f;
+	rotAntebInciX = 180.0f;
+	rotAntebInciZ = -120.0f;
+	rotPiernaInciX = 0.0f;
+	rotPiernaInciZ = 10.0f;
+	rotCabezaInciX = 0.0f;
+	rotCabezaInciY = 0.0f;
+	rotColaInci = 0.0f;
+	orientaInci = 0.0f;
+	minAlturaInci = 0.0f;
+	maxAlturaInci = 5.0f;
+	posInciX = 0.0f;
+	posInciY = 2.0f;
+	posInciZ = 0.0f;
+	tiempoLocalInci = 0.0f;
+
 	//variables vuelo pajaro
 	pos_ini_x_ave = 0.0f;
 	pos_ini_z_ave = 0.0f;
@@ -59,24 +78,20 @@ Animaciones::Animaciones() //inicializa variables
 	rotacionPiernaDer = 0.0f;
 	rotacionPiernaIzq = 0.0f;
 
-	// Animacion compleja incineroar
-	recorrido = 1;
-	orienta = 0.0f; //Orientacion del cuerpo
-	tiempolocal = 0.0f; //temporizador de los giros
-	rotacionBrazoDerInci = 0.0f;
-	rotacionBrazoIzqInci = 0.0f;
-	rotacionPiernaDerInci = 0.0f;
-	rotacionPiernaIzqInci = 0.0f;
-	//rotacioncabezaInci = 0.0f; //Rotaciones miembros del modelo
-
-	//PosInicial Incineroar
-	pos_ini_x_inci = -30.0f;
-	pos_ini_z_inci = -30.0f;
-	velocidadpiernas = 5.0f;
-	velocidadbrazos = 4.0f;
+	// Animacion compleja phantump
+	recorridoPhantump = 1;
+	orientaPhantump = 90.0f; //Orientacion del cuerpo
+	tiempolocalPhantump = 0.0f; //temporizador de los giros
+	velocidadMov = 0.0f;
 	minXZ = -15.0f;
 	maxXZ = 15.0f;
-	inciSpeed = 0.0f;
+	pos_ini_x_pha = -10.0f;
+	pos_ini_y_pha = 3.0f;
+	pos_ini_z_pha = -20.0f;
+	rotacion_brazos = 0.0f;
+	rotacion_cola = 0.0f;
+	elevacion_cuerpo = 0.0f;
+	 ladeo_cabeza = 0.0f;
 
 	// Keys Excavadora
 	movBase_x = 0.0f;
@@ -229,6 +244,96 @@ bool Animaciones::AnimacionAngela(bool condicion, GLfloat deltaTime) {
 	}
 }
 
+//ANIMACION SIMPLE INCINEROAR
+void Animaciones::AnimacionIncineroar(bool condicion, GLfloat deltaTime) {
+	if (condicion) {
+		if (estadoInci == 1) {
+			//mueve cabeza hacia arriba
+			if (rotCabezaInciX > -45) rotCabezaInciX -= 3.0f * deltaTime;
+			rotCabezaInciY = 0.0f;
+			//cruza los brazos para saltar
+			if (rotBrazoInciX < 90) {
+				rotBrazoInciX += 5.0f * deltaTime;
+				if (rotBrazoInciZ > -150) rotBrazoInciZ -= 10.0f * deltaTime;
+				if (rotAntebInciX > 160) rotAntebInciX -= 10.0f * deltaTime;
+				if (rotAntebInciZ < -35) rotAntebInciZ += 10.0f * deltaTime;
+			}
+			else estadoInci = 2;
+		}
+
+		if (estadoInci == 2) {
+			//salta
+			if (posInciY < maxAlturaInci) {
+				posInciY += 0.2f * deltaTime; //salta
+				//gira cola
+				if (rotColaInci > -50) rotColaInci -= 10.0f * deltaTime;
+			}
+			else estadoInci = 3;
+		}
+
+		if (estadoInci == 3) {
+			//gira cuerpo
+			if (orientaInci > -240) orientaInci -= 30.0f * deltaTime;
+			else estadoInci = 4;
+		}
+
+		if (estadoInci == 4) {
+			//desciende
+			if (posInciY > minAlturaInci) {
+				posInciY -= 0.2f * deltaTime;
+				posInciX += 0.2f * deltaTime;
+				posInciZ += 0.2f * deltaTime;
+			}
+			else estadoInci = 5;
+		}
+
+		if (estadoInci == 5) {
+			//posiciona piernas
+			if (rotPiernaInciZ > 0) rotPiernaInciZ -= 5.0f * deltaTime;
+			//mueve cabeza hacia frente
+			if (rotCabezaInciX < 0) rotCabezaInciX += 3.0f * deltaTime;
+			rotCabezaInciY = 0.0f;
+			//gira cuerpo
+			if (orientaInci < 0) orientaInci += 15.0f * deltaTime;
+			else estadoInci = 6;
+		}
+
+		if (estadoInci == 6) {
+			//se regresa a posicion inicial
+			if (posInciX > 0.0) posInciX -= 0.2f * deltaTime;
+			if (posInciZ > 0.0) posInciZ -= 0.2f * deltaTime;
+			else
+				if (posInciY < 2.0) posInciY += 0.2f * deltaTime;
+			//gira cola
+			if (rotColaInci < 0) rotColaInci += 10.0f * deltaTime;
+			else {
+				if (rotBrazoInciX < 120) {
+					rotBrazoInciX += 5.0f * deltaTime;
+					if (rotBrazoInciZ < -50) rotBrazoInciZ += 10.0f * deltaTime; //de -150 (anterior, -70)
+					if (rotAntebInciX > 180) rotAntebInciX -= 10.0f * deltaTime;
+					if (rotAntebInciZ > -60) rotAntebInciZ -= 10.0f * deltaTime;
+				}
+			}
+		}
+	}
+	else {
+		//posando sobre tubo de ring
+		tiempoLocalInci += 0.01 * deltaTime;
+		//posiciona piernas
+		if (rotPiernaInciZ < 10) rotPiernaInciZ += 5.0f * deltaTime;
+		//posicionar brazos
+		if (rotBrazoInciX > 30) {
+			rotBrazoInciX -= 5.0f * deltaTime;
+			if (rotBrazoInciZ < -90) rotBrazoInciZ += 10.0f * deltaTime;
+			if (rotAntebInciX < 180) rotAntebInciX += 10.0f * deltaTime;
+			if (rotAntebInciZ > -125) rotAntebInciZ -= 10.0f * deltaTime;
+		}
+		//gira la cabeza
+		rotCabezaInciY = 15.0f * sin(tiempoLocalInci * 5.5f);
+		estadoInci = 1;
+	}
+}
+
 //ANIMACION CAMINATA ROLAND
 void Animaciones::CaminataRoland(bool condicion, GLfloat deltaTime) {
 	if (condicion) {
@@ -244,92 +349,67 @@ void Animaciones::CaminataRoland(bool condicion, GLfloat deltaTime) {
 	}
 }
 
-//ANIMACION COMPLEJA INCINEROAR
-void Animaciones::AnimacionIncineroar(bool condicion, GLfloat deltaTime) {
-	if(condicion) {
-		tiempolocal += deltaTime * 0.01;
-		// Aumenté la velocidad para que coincida con el nuevo tamaño del recorrido
-		inciSpeed = 0.0035f * deltaTime * 60.0f;
+//ANIMACION COMPLEJA PHANTUMP
+void Animaciones::AnimacionPhantump(bool condicion, GLfloat deltaTime) {
+	//recorre en cuadrado, movimiento serpenteo horizontal.
+	if (condicion) {
+		tiempolocalPhantump += 0.01 * deltaTime;
+		velocidadMov = 0.0035f * deltaTime * 60.0f;
+
+		//derecha a izquierda
+		elevacion_cuerpo = sin(tiempolocalPhantump * 5.5f);
+		//ladea cabeza
+		ladeo_cabeza = 7.0f * cos(tiempolocalPhantump * 10.0f);
+		//mueve brazos
+		rotacion_brazos = 2.0f * cos(tiempolocalPhantump * 5.0f);
+		//mueve cola
+		rotacion_cola = sin(tiempolocalPhantump * 5.5f);
 
 		// Estado 1: avanza +x local
-		if (recorrido == 1) {
-			pos_ini_x_inci += inciSpeed;
-			orienta = 90.0f;
-
-			// Brazos subiendo (fase positiva)
-			rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-			rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-
-			// Piernas caminan alternadas
-			rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-			rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-			if (pos_ini_x_inci >= maxXZ) {
-				pos_ini_x_inci = maxXZ; // Ajustar a la esquina
-				recorrido = 2;
-				tiempolocal = 0.0f;
+		if (recorridoPhantump == 1) {
+			pos_ini_x_pha += velocidadMov;
+			orientaPhantump = 90.0f;
+			//orientaPhantump = 90.0f;
+			if (pos_ini_x_pha >= maxXZ) {
+				//pos_ini_x_pha = maxXZ; // Ajustar a la esquina
+				recorridoPhantump = 2;
 			}
 		}
-
 		//Estado 2: avanza +z local
-		else if (recorrido == 2) {
-			pos_ini_z_inci += inciSpeed;
-			orienta = 0.0f;
-
-			// Brazos bajando (fase invertida)
-			rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-			rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-
-			rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-			rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-			if (pos_ini_z_inci >= maxXZ) {
-				pos_ini_z_inci = maxXZ; // Ajustar a la esquina
-				recorrido = 3;
-				tiempolocal = 0.0f;
+		else if (recorridoPhantump == 2) {
+			pos_ini_z_pha += velocidadMov;
+			if (orientaPhantump >= 0)
+				orientaPhantump -= 10.0f * deltaTime;
+			if (pos_ini_z_pha >= maxXZ) {
+				//pos_ini_z_pha = maxXZ; // Ajustar a la esquina
+				recorridoPhantump = 3;
 			}
 		}
-
 		// Estado 3: avanza -x local
-		else if (recorrido == 3) {
-			pos_ini_x_inci -= inciSpeed;
-			orienta = -90.0f;
-
-			// Brazos subiendo de nuevo
-			rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-			rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f + sin(tiempolocal * velocidadbrazos));
-
-			rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-			rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-			if (pos_ini_x_inci <= minXZ) {
-				pos_ini_x_inci = minXZ; // Ajustar a la esquina
-				recorrido = 4;
-				tiempolocal = 0.0f;
+		else if (recorridoPhantump == 3) {
+			pos_ini_x_pha -= velocidadMov;
+			if (orientaPhantump >= -90)
+				orientaPhantump -= 10.0f * deltaTime;
+			if (pos_ini_x_pha <= minXZ) {
+				//pos_ini_x_pha = minXZ; // Ajustar a la esquina
+				recorridoPhantump = 4;
 			}
 		}
-
 		// Estado 4: avanza -z local
-		else if (recorrido == 4) {
-			pos_ini_z_inci -= inciSpeed;
-			orienta = 180.0f;
-
-			// Brazos bajando (fase invertida)
-			rotacionBrazoDerInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-			rotacionBrazoIzqInci = -165.0f * 0.5f * (1.0f - sin(tiempolocal * velocidadbrazos));
-
-			rotacionPiernaDerInci = 30.0f * sin(tiempolocal * velocidadpiernas);
-			rotacionPiernaIzqInci = -30.0f * sin(tiempolocal * velocidadpiernas);
-
-			if (pos_ini_z_inci <= minXZ) {
-				pos_ini_z_inci = minXZ; // Ajustar a la esquina
-				recorrido = 1;
-				tiempolocal = 0.0f;
+		else if (recorridoPhantump == 4) {
+			pos_ini_z_pha -= velocidadMov;
+			if (orientaPhantump >= -180)
+				orientaPhantump -= 10.0f * deltaTime;
+			if (pos_ini_z_pha <= minXZ) {
+				//pos_ini_z_pha = minXZ; // Ajustar a la esquina
+				recorridoPhantump = 1;
+				tiempolocalPhantump = 0.0f; // reinicia tiempo para evitar saltos en seno y coseno
 			}
 		}
-
 	}
 }
+
+
 
 //ANIMACION COMPLEJA PAJARO
 void Animaciones::AnimacionPajaro(bool condicion, float toRadians, GLfloat deltaTime) {
