@@ -27,11 +27,13 @@ public:
 		return  glfwWindowShouldClose(mainWindow);}
 	bool* getsKeys() { return keys; }
 	int getLightMode() { return lightMode; }
+	int getSpotLightMode() { return spotLightMode; }
 	void swapBuffers() { return glfwSwapBuffers(mainWindow); }
 	
 	~Window();
 private: 
 	int lightMode;
+	int spotLightMode;
 	GLFWwindow *mainWindow;
 	GLint width, height;
 	bool keys[1024];
