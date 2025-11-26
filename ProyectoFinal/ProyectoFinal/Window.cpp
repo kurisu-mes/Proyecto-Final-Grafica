@@ -173,7 +173,7 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 
 
 	// Control audio
-	if (key == GLFW_KEY_U && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
 		if (!sonidopausa) {
 			ma_sound_stop(&sonidoFondo);
 			sonidopausa = true;
