@@ -76,6 +76,17 @@ Model capoLampara, fuegoLampara;
 Model PuertaDerE, PuertaIzqE, PilaresE, LetreroM;
 Model ArcoRing, PuertaDerR, PuertaIzqR;
 
+//animaciones keyframes
+Model BaseDig, CabinaDig, BrazoDig;
+Model AntebrazoDig, GarraDig;
+
+Model TroncoPoke, BaseCopaPoke, BayaPoke, CopaPoke;
+
+Model MaquinaExpendedora, BotonExpend;
+Model BandejaExpend, LataRefresco;
+
+Texture refrescoCherry, refrescoRegular, refrescoGrape;
+
 Skybox skybox, skyboxNoche;
 
 //materiales
@@ -149,6 +160,7 @@ bool estadoActualAngela = false; // Estado actual de la animación de Angela
 bool animacionInci = true;
 bool animvuelo = true;
 bool animEddie = true;
+bool animExcavadora = true;
 
 
 // Posición y rotación guardadas de Roland
@@ -462,6 +474,44 @@ void CargarModelos() {
 	LetreroEntradaT = Texture("Textures/Letrero.png");
 	LetreroEntradaT.LoadTextureA();
 
+	//animaciones keyframes
+	BaseDig = Model();
+	BaseDig.LoadModel("Models/BaseDig.obj");
+	CabinaDig = Model();
+	CabinaDig.LoadModel("Models/CabinaDig.obj");
+	BrazoDig = Model();
+	BrazoDig.LoadModel("Models/BrazoDig.obj");
+	AntebrazoDig = Model();
+	AntebrazoDig.LoadModel("Models/AnteBrazoDig.obj");
+	GarraDig = Model();
+	GarraDig.LoadModel("Models/GarraDig.obj");
+
+	TroncoPoke = Model();
+	TroncoPoke.LoadModel("Models/TroncoPoke.obj");
+	BaseCopaPoke = Model();
+	BaseCopaPoke.LoadModel("Models/BaseCopaPoke.obj");
+	BayaPoke = Model();
+	BayaPoke.LoadModel("Models/BayaPoke.obj");
+	CopaPoke = Model();
+	CopaPoke.LoadModel("Models/CopaPoke.obj");
+
+	MaquinaExpendedora = Model();
+	MaquinaExpendedora.LoadModel("Models/expendedora.obj");
+	BotonExpend = Model();
+	BotonExpend.LoadModel("Models/botonExpend.obj");
+	BandejaExpend = Model();
+	BandejaExpend.LoadModel("Models/bandejaExpend.obj");
+	LataRefresco = Model();
+	LataRefresco.LoadModel("Models/lataWellcheers.obj");
+
+	refrescoCherry = Texture("Textures/LataCherryT.png");
+	refrescoCherry.LoadTextureA();
+	refrescoRegular = Texture("Textures/LataRegularT.png");
+	refrescoRegular.LoadTextureA();
+	refrescoGrape = Texture("Textures/LataGrapeT.png");
+	refrescoGrape.LoadTextureA();
+
+
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/right_dia.tga");
 	skyboxFaces.push_back("Textures/Skybox/left_dia.tga");
@@ -561,6 +611,11 @@ int main()
 	//Encender luces nocturnas
 	bool lucesNocturnasEncendidas = false;
 
+	//Se cargan keyframes
+	anim.loadKeyframesExc();
+	anim.loadKeyframesPoke();
+	anim.loadKeyframesCola();
+
 	printf("Controles:\n");
 	//modos de camara
 	printf("\nCAMARA:\nWASD - Mover camara\n");
@@ -569,12 +624,15 @@ int main()
 	//animaciones
 	printf("\nANIMACIONES:\nO - Entrada principal\n");
 	printf("I - Entrada al ring\nP - Protoman\n");
-	printf("L - Angela\n");
+	printf("L - Saludo de Angela\nK - Pokebayas\nJ - Maquina expendedora\n");
 	//luces
 	printf("\nILUMINACION:\nSolo de noche se prenden las luces\n");
 	printf("Z para luces entrada\n");
 	printf("X para luces altar\n");
 	printf("C para luces antorchas\n");
+	//audio
+	printf("\AUDIO:\n");
+	printf("U para pausar\n");
 	
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
@@ -735,6 +793,14 @@ int main()
 		anim.AnimacionIncineroar(animacionInci, deltaTime);
 		anim.AnimacionPajaro(animvuelo, toRadians, deltaTime);
 		anim.AnimacionEddie(animEddie, toRadians, deltaTime);
+
+		anim.playAnimacionExcavadora(animExcavadora);
+		anim.playAnimacionPokearbol(mainWindow.getEstadoPokeArbol());
+		
+		anim.playAnimacionRefresco(mainWindow.getEstadoRefrescos());
+		if (anim.playedCola && mainWindow.getEstadoRefrescos()) {
+			mainWindow.setEstadoRefrescos(false);
+		}
 		
 
 		// Clear the window
@@ -1529,6 +1595,120 @@ int main()
 		modelaux = glm::rotate(modelaux, anim.rotacionAspas, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		EddieAspas.RenderModel();
+
+		//---------- KEYFRAMES: EXCAVADORA --------------
+		//BASE DIG, nodo padre
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(anim.movBase_x + 150.0f, -2.0f, anim.movBase_z + (-30.0f)));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		BaseDig.RenderModel();
+
+		//CABINA DIG
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.0f, 2.5f, 0.0f));
+		model = glm::rotate(model, anim.giroCabina * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		CabinaDig.RenderModel();
+
+		//BRAZO DIG
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, 2.5f));
+		model = glm::rotate(model, anim.giroBrazo * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		BrazoDig.RenderModel();
+
+		//ANTEBRAZO DIG
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 5.5f));
+		model = glm::rotate(model, anim.giroAnteB * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		AntebrazoDig.RenderModel();
+
+		//GARRA DIG
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 4.3f));
+		model = glm::rotate(model, anim.giroGarra * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		GarraDig.RenderModel();
+
+		////---------- KEYFRAMES: ARBOL DE POKEBAYAS --------------
+
+		//TRONCO POKE, nodo padre
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(0.0f, -2.0f, -10.0f));
+		//model = glm::rotate(model, 10 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, anim.rotTronco * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		TroncoPoke.RenderModel();
+
+		//BASE COPA POKE
+		model = modelaux;
+		//model = glm::translate(model, glm::vec3(-1.0f, 3.5f, 0.0f));
+		model = glm::translate(model, glm::vec3(anim.movBase * 2, 3.5f, anim.movBase));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		BaseCopaPoke.RenderModel();
+
+		//COPA POKE
+		model = modelaux;
+		//model = glm::translate(model, glm::vec3(1.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(anim.movCopa * 2, 1.0f, anim.movCopa));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		CopaPoke.RenderModel();
+
+		//BAYA POKE
+		model = modelaux;
+		//model = glm::translate(model, glm::vec3(0.7f, 0.5f, 2.5f));
+		model = glm::translate(model, glm::vec3(0.7f, 0.5f + anim.caidaBaya, 2.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		BayaPoke.RenderModel();
+
+		////---------- KEYFRAMES: MAQUINA EXPENDEDORA --------------
+
+		//MAQUINA EXPENDEDORA, nodo padre
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-5.0f, -2.0f, 10.0f));
+		model = glm::rotate(model, anim.rotMaquina * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		MaquinaExpendedora.RenderModel();
+
+		//BOTON
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(1.0f, 2.9f, anim.movBoton + 1.2f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		BotonExpend.RenderModel();
+
+		//Bandeja
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.4f, 1.5f, anim.movBandeja + -0.1f));
+		//model = glm::translate(model, glm::vec3(movCopa * 2, 1.0f, movCopa));
+		modelaux = model;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		BandejaExpend.RenderModel();
+
+		//Lata Refresco
+		model = modelaux;
+		model = glm::translate(model, glm::vec3(0.0f, anim.posRefrescoY + 1.3f, anim.posRefrescoZ + 0.0f));
+		//model = glm::translate(model, glm::vec3(0.7f, 0.5f + caidaBaya, 2.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		switch (anim.tipoRefresco) {
+		case 0:
+			refrescoCherry.UseTexture();
+			break;
+		case 1:
+			refrescoRegular.UseTexture();
+			break;
+		case 2:
+			refrescoGrape.UseTexture();
+			break;
+		}
+		LataRefresco.RenderModel();
 
 		glDisable(GL_BLEND);
 

@@ -5,6 +5,10 @@
 #include <cmath>
 #include <vector>
 #include <math.h>
+//PARA GUARDAR KEYS EN .TXT
+#include <fstream>   
+#include <sstream>   
+#include <iostream>  
 
 class Animaciones
 {
@@ -24,6 +28,24 @@ public:
 	void AnimacionPajaro(bool condicion, float toRadians, GLfloat deltaTime);
 	void AnimacionEddie(bool condicion, float toRadians, GLfloat deltaTime);
 	void CaminataRoland(bool condicion, GLfloat deltaTime);
+	//animaciones keyframes excavadora
+	void loadKeyframesExc();
+	void resetElementsExc();
+	void interpolationExc();
+	void animateExc(bool playExc);
+	void playAnimacionExcavadora(bool playExc);
+	//animaciones keyframes arbol
+	void loadKeyframesPoke();
+	void resetElementsPoke();
+	void interpolationPoke();
+	void animatePoke(bool playPoke);
+	void playAnimacionPokearbol(bool playPoke);
+	//animaciones keyframes refresco
+	void loadKeyframesCola();
+	void resetElementsCola();
+	void interpolationCola();
+	void animateCola(bool playCola);
+	void playAnimacionRefresco(bool playCola);
 	
 
 	//GLfloat deltaTime;
@@ -55,6 +77,22 @@ public:
 	//Posicional Ave
 	float pos_ini_x_ave, pos_ini_z_ave, posAla;
 	float desplazamiento_vuelo, orienta_ave;
+
+	// Keys Excavadora
+	float movBase_x, movBase_z, giroCabina;
+	float giroBrazo, giroAnteB, giroGarra;
+
+	// Keys Arbol
+	float rotTronco, movBase, movCopa, caidaBaya;
+	bool playedPoke;
+
+	// Keys Refresco
+	float rotMaquina, movBoton, movBandeja;
+	float posRefrescoY, posRefrescoZ;
+	int tipoRefresco;
+	bool refrescoAleatorio;
+	bool playedCola;
+
 	
 private:
 	float AjusteP, velocidadPuerta;
@@ -73,5 +111,20 @@ private:
 	float radio = 5.0f; //Para la circunferencia de vuelo
 
 	int estadoEddie;
+
+	// Keyframes 
+	#define MAX_FRAMES 50
+	const char* keyFramesExcavadora = "keyframesExcava.txt";
+	const char* keyFramesArbol = "keyframesPokeArbol.txt";
+	const char* keyFramesRefresco = "keyframesExpendedora.txt";
+	// EXCAVADORA
+	int i_max_stepsExc = 50; //Número de pasos entre cuadros para interpolación, a mayor número , más lento será el movimiento
+	int FrameIndexExc, playIndexExc, i_curr_stepsExc;
+	// ARBOL
+	int i_max_stepsPoke = 10; //Número de pasos entre cuadros para interpolación, a mayor número , más lento será el movimiento
+	int FrameIndexPoke, playIndexPoke, i_curr_stepsPoke;
+	// EXPENDEDORA
+	int i_max_stepsCola = 20; //Número de pasos entre cuadros para interpolación, a mayor número , más lento será el movimiento
+	int FrameIndexCola, playIndexCola, i_curr_stepsCola;
 
 };
