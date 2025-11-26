@@ -24,7 +24,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	estadoPokeArbol = false;
 	estadoRefrescos = false;
 	muevex = 2.0f;
-	lightMode = 0;
+	lightMode = 1;
 	spotLightMode = 0;
 	for (size_t i = 0; i < 1024; i++)
 	{
