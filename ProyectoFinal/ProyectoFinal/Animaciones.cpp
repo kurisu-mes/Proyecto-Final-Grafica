@@ -42,8 +42,8 @@ Animaciones::Animaciones() //inicializa variables
 	rotCabezaInciY = 0.0f;
 	rotColaInci = 0.0f;
 	orientaInci = 0.0f;
-	minAlturaInci = 0.0f;
-	maxAlturaInci = 5.0f;
+	minAlturaInci = -2.5f;
+	maxAlturaInci = 6.0f;
 	posInciX = 0.0f;
 	posInciY = 2.0f;
 	posInciZ = 0.0f;
@@ -82,16 +82,16 @@ Animaciones::Animaciones() //inicializa variables
 	recorridoPhantump = 1;
 	orientaPhantump = 90.0f; //Orientacion del cuerpo
 	tiempolocalPhantump = 0.0f; //temporizador de los giros
-	velocidadMov = 0.0f;
-	minXZ = -15.0f;
-	maxXZ = 15.0f;
+	velocidadMov = 0.2f;
+	minXZ = -10.0f;
+	maxXZ = 10.0f;
 	pos_ini_x_pha = -10.0f;
 	pos_ini_y_pha = 3.0f;
-	pos_ini_z_pha = -20.0f;
+	pos_ini_z_pha = -19.0f;
 	rotacion_brazos = 0.0f;
 	rotacion_cola = 0.0f;
 	elevacion_cuerpo = 0.0f;
-	 ladeo_cabeza = 0.0f;
+	ladeo_cabeza = 0.0f;
 
 	// Keys Excavadora
 	movBase_x = 0.0f;
@@ -280,8 +280,8 @@ void Animaciones::AnimacionIncineroar(bool condicion, GLfloat deltaTime) {
 		if (estadoInci == 4) {
 			//desciende
 			if (posInciY > minAlturaInci) {
-				posInciY -= 0.2f * deltaTime;
-				posInciX += 0.2f * deltaTime;
+				posInciY -= 0.4f * deltaTime;
+				posInciX += 0.25f * deltaTime;
 				posInciZ += 0.2f * deltaTime;
 			}
 			else estadoInci = 5;
@@ -354,7 +354,6 @@ void Animaciones::AnimacionPhantump(bool condicion, GLfloat deltaTime) {
 	//recorre en cuadrado, movimiento serpenteo horizontal.
 	if (condicion) {
 		tiempolocalPhantump += 0.01 * deltaTime;
-		velocidadMov = 0.0035f * deltaTime * 60.0f;
 
 		//derecha a izquierda
 		elevacion_cuerpo = sin(tiempolocalPhantump * 5.5f);
@@ -408,8 +407,6 @@ void Animaciones::AnimacionPhantump(bool condicion, GLfloat deltaTime) {
 		}
 	}
 }
-
-
 
 //ANIMACION COMPLEJA PAJARO
 void Animaciones::AnimacionPajaro(bool condicion, float toRadians, GLfloat deltaTime) {

@@ -28,7 +28,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	staticFront5 = glm::vec3(0.8f, -0.2f, 0.6f); // Direcci�n
 	
 	// camara a�rea
-	alturaAerea = 50.0f;
+	alturaAerea = 120.0f;
 	positionAerea = glm::vec3(startPosition.x, alturaAerea, startPosition.z);
 	HPrimeraPersona = startPosition.y;
 

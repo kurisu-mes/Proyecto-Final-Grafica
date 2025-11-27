@@ -54,6 +54,7 @@ Camera camera;
 Texture plainTexture;
 
 Model Piso_M;
+Model Arboles1;
 
 Model Angela_Desk, Angela_Chair;
 Model Ofrenda;
@@ -95,9 +96,6 @@ Model RolandPiernaDer, RolandPiernaIzq;
 Model PhantumpCabeza, PhantumpCuerpo;
 Model PhantumpBrazos, PhantumpCola;
 
-Material RolandMaterial;
-
-Animaciones anim;
 //Incineroar
 Model InciCabeza, InciTorso, InciCola;
 Model InciBrazoD, InciAnteD, InciBrazoL, InciAnteL;
@@ -159,6 +157,7 @@ Skybox skybox, skyboxNoche;
 //materiales
 Material Material_brillante;
 Material Material_opaco;
+Material RolandMaterial;
 
 
 
@@ -347,6 +346,10 @@ void CargarModelos() {
 
 	Piso_M = Model();
 	Piso_M.LoadModel("Models/pisoProyecto.obj");
+
+	//arboles
+	Arboles1 = Model();
+	Arboles1.LoadModel("Models/ArbolesParque1.obj");
 
 	//recepcion
 	Angela_Desk = Model();
@@ -1006,7 +1009,6 @@ int main()
 
 		glm::vec3 posGaleria = glm::vec3(70.0f, -2.0f, 0.0f); // Heredamos posicion de la galeria
 
-
 		glm::vec3 posJugador = camera.getCameraPosition();
 
 		// Distancia al ring
@@ -1042,6 +1044,13 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiso));
 		Piso_M.RenderModel();
 
+		//arboles
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(80.0f, -2.0f, 35.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		Arboles1.RenderModel();
+
+		/*
 		//Recepcion
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(43.0f, -2.0f, -15.0f));
@@ -1090,11 +1099,11 @@ int main()
 
 		//Modelo Phantump posicionado alrededor de la ofrenda
 		//Cuerpo, torso como base
-		//basePhant = elementos;
-		basePhant = glm::mat4(1.0);
+		basePhant = elementos;
+		//basePhant = glm::mat4(1.0);
 		basePhant = glm::translate(basePhant, glm::vec3(anim.pos_ini_x_pha + anim.elevacion_cuerpo, 2.0f + anim.elevacion_cuerpo, anim.pos_ini_z_pha));
 		basePhant = glm::rotate(basePhant, anim.orientaPhantump * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-		basePhant = glm::scale(basePhant, glm::vec3(0.1f, 0.1f, 0.1f));
+		basePhant = glm::scale(basePhant, glm::vec3(0.05f, 0.05f, 0.05f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(basePhant));
 		PhantumpCuerpo.RenderModel();
 
@@ -1139,7 +1148,7 @@ int main()
 		// INCINEROAR
 		// 1. Empezar desde la matriz del ring (que ya está girada y en -2.0f Y)
 		baseInc = elementoLocal;
-		baseInc = glm::translate(baseInc, glm::vec3(anim.posInciX + 0.0f, anim.posInciY + 3.5f, anim.posInciZ + 0.0f));
+		baseInc = glm::translate(baseInc, glm::vec3(anim.posInciX - 5.9f, anim.posInciY + 8.2f, anim.posInciZ -6.1f));
 		baseInc = glm::rotate(baseInc, anim.orientaInci * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		baseInc = glm::scale(baseInc, glm::vec3(0.025f, 0.025f, 0.025f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseInc));
@@ -1605,7 +1614,7 @@ int main()
 		toffset = glm::vec2(0.0f, 0.0f);
 		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 		//------------------------------------------
-
+		*/
 		// === HUMANOIDE ROLAND ===
 
 		if (currentCameraMode == 1)
@@ -1682,8 +1691,9 @@ int main()
 		// = PROTOMAN =
 		//Posicionar torso
 		baseProto = glm::mat4(1.0f);
-		baseProto = glm::translate(baseProto, glm::vec3(65.0f, 0.6f, 16.0f - anim.posicionProto));
-		baseProto = glm::rotate(baseProto, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseProto = glm::translate(baseProto, glm::vec3(90.0f - anim.posicionProto, 1.0f, 39.0f));
+		baseProto = glm::rotate(baseProto, -90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseProto = glm::scale(baseProto, glm::vec3(1.5f, 1.5f, 1.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseProto));
 		ProtoTorso.RenderModel();
 
@@ -1732,7 +1742,7 @@ int main()
 
 		//AVE CASTIGADORA
 		baseAve = glm::mat4(1.0f);
-		baseAve = glm::translate(baseAve, glm::vec3(20.0f + anim.pos_ini_x_ave, 8.5f + anim.desplazamiento_vuelo, 20.0f + anim.pos_ini_z_ave));
+		baseAve = glm::translate(baseAve, glm::vec3(50.0f + anim.pos_ini_x_ave, 8.5f + anim.desplazamiento_vuelo, 45.0f + anim.pos_ini_z_ave));
 		baseAve = glm::rotate(baseAve, anim.orienta_ave * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		baseAve = glm::scale(baseAve, glm::vec3(10.0f, 10.0f, 10.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseAve));
@@ -1754,9 +1764,10 @@ int main()
 
 		//EDDIE
 		baseEddie = glm::mat4(1.0f);
-		baseEddie = glm::translate(baseEddie, glm::vec3(15.0f + anim.posEddieX, -2.0f + anim.posEddieY, -10.0f));
-		baseEddie = glm::rotate(baseEddie, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseEddie = glm::translate(baseEddie, glm::vec3(150.0f, -2.0f + anim.posEddieY, -25.0f + anim.posEddieX));
+		//baseEddie = glm::rotate(baseEddie, 90 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		baseEddie = glm::rotate(baseEddie, anim.anguloEddieY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		baseAve = glm::scale(baseAve, glm::vec3(3.0f, 3.0f, 3.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseEddie));
 		Eddie.RenderModel();
 
@@ -1777,7 +1788,7 @@ int main()
 		//---------- KEYFRAMES: EXCAVADORA --------------
 		//BASE DIG, nodo padre
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(anim.movBase_x + 150.0f, -2.0f, anim.movBase_z + (-30.0f)));
+		model = glm::translate(model, glm::vec3(anim.movBase_x + 160.0f, -2.0f, anim.movBase_z + (-35.0f)));
 		modelaux = model;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		BaseDig.RenderModel();
@@ -1817,7 +1828,7 @@ int main()
 
 		//TRONCO POKE, nodo padre
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(0.0f, -2.0f, -10.0f));
+		model = glm::translate(model, glm::vec3(85.0f, -2.0f, -35.0f));
 		//model = glm::rotate(model, 10 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, anim.rotTronco * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		modelaux = model;
@@ -1850,8 +1861,10 @@ int main()
 
 		//MAQUINA EXPENDEDORA, nodo padre
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-5.0f, -2.0f, 10.0f));
+		model = glm::translate(model, glm::vec3(70.0f, -2.0f, 16.0f));
+		model = glm::rotate(model, 180 * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, anim.rotMaquina * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		baseAve = glm::scale(baseAve, glm::vec3(3.0f, 3.0f, 3.0f));
 		modelaux = model;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		MaquinaExpendedora.RenderModel();
