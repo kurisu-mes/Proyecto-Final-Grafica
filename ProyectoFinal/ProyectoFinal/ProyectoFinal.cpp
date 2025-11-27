@@ -117,7 +117,7 @@ Model Angela, AngelaBrazo, AngelaAntebrazo;
 //Eddie
 Model Eddie, EddieTapa, EddieAspas;
 
-Animaciones anim;
+//Animaciones anim;
 
 
 
@@ -680,9 +680,11 @@ int main()
 	printf("L - Saludo de Angela\nK - Pokebayas\nJ - Maquina expendedora\n");
 	//luces
 	printf("\nILUMINACION:\nSolo de noche se prenden las luces\n");
+	/*
 	printf("Z para luces entrada\n");
 	printf("X para luces altar\n");
 	printf("C para luces antorchas\n");
+	*/
 	//luces tipo spotlight
 	printf("V para luz ofrenda\n");
 	printf("B para luz megaHawlucha\n");
