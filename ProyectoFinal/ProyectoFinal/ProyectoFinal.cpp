@@ -116,7 +116,7 @@ Model Angela, AngelaBrazo, AngelaAntebrazo;
 Model Eddie, EddieTapa, EddieAspas;
 
 //Animaciones anim;
-
+Animaciones anim;
 
 
 //letreros
@@ -1052,7 +1052,6 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		Arboles1.RenderModel();
 
-		/*
 		//Recepcion
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(43.0f, -2.0f, -15.0f));
@@ -1616,7 +1615,7 @@ int main()
 		toffset = glm::vec2(0.0f, 0.0f);
 		glUniform2fv(uniformTextureOffset, 1, glm::value_ptr(toffset));
 		//------------------------------------------
-		*/
+
 		// === HUMANOIDE ROLAND ===
 
 		if (currentCameraMode == 1)
