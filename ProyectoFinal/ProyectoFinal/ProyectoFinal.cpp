@@ -1743,7 +1743,7 @@ int main()
 
 		//AVE CASTIGADORA
 		baseAve = glm::mat4(1.0f);
-		baseAve = glm::translate(baseAve, glm::vec3(55.0f + anim.pos_ini_x_ave, 8.5f + anim.desplazamiento_vuelo, 45.0f + anim.pos_ini_z_ave));
+		baseAve = glm::translate(baseAve, glm::vec3(58.0f + anim.pos_ini_x_ave, 8.5f + anim.desplazamiento_vuelo, 40.0f + anim.pos_ini_z_ave));
 		baseAve = glm::rotate(baseAve, anim.orienta_ave * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 		baseAve = glm::scale(baseAve, glm::vec3(10.0f, 10.0f, 10.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseAve));
