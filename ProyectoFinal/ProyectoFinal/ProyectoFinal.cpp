@@ -93,6 +93,8 @@ Skybox skybox, skyboxNoche;
 Material Material_brillante;
 Material Material_opaco;
 
+Material RolandMaterial;
+
 Animaciones anim;
 
 
@@ -553,6 +555,7 @@ void CargarModelos() {
 	Material_brillante = Material(4.0f, 256);
 	Material_opaco = Material(0.3f, 4);
 
+	RolandMaterial = Material(0.5f, 32);
 }
 
 int main()
@@ -1565,6 +1568,8 @@ int main()
 		baseRol = glm::scale(baseRol, glm::vec3(3.0f, 3.0f, 3.0f)); // Aplicar escala
 
 		// 7. Dibujar el Torso (baseRol)
+		RolandMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseRol));
 		RolandTorso.RenderModel();
 
@@ -1597,7 +1602,7 @@ int main()
 		RolandPiernaIzq.RenderModel();
 
 		//------------------------------------------
-
+		Material_brillante.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		// = PROTOMAN =
 		//Posicionar torso
 		baseProto = glm::mat4(1.0f);
