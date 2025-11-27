@@ -84,8 +84,75 @@ Model TroncoPoke, BaseCopaPoke, BayaPoke, CopaPoke;
 
 Model MaquinaExpendedora, BotonExpend;
 Model BandejaExpend, LataRefresco;
-
 Texture refrescoCherry, refrescoRegular, refrescoGrape;
+
+//PERSONAJES
+//Roland
+Model RolandTorso, RolandBrazoDer, RolandBrazoIzq;
+Model RolandPiernaDer, RolandPiernaIzq;
+
+//Phantump
+Model PhantumpCabeza, PhantumpCuerpo;
+Model PhantumpBrazos, PhantumpCola;
+
+Material RolandMaterial;
+
+Animaciones anim;
+//Incineroar
+Model InciCabeza, InciTorso, InciCola;
+Model InciBrazoD, InciAnteD, InciBrazoL, InciAnteL;
+Model InciPiernaD, InciPiernaL;
+
+//Protoman
+Model ProtoCabeza, ProtoTorso, ProtoEscudo;
+Model ProtoIzqBrazo, ProtoDerBrazo;
+Model ProtoIzqPierna, ProtoDerPierna;
+
+//Ave Castigadora
+Model AveCuerpo, AveLW, AveRW;
+
+//Angela
+Model Angela, AngelaBrazo, AngelaAntebrazo;
+
+//Eddie
+Model Eddie, EddieTapa, EddieAspas;
+
+Animaciones anim;
+
+
+
+//letreros
+Texture LetrasRingT;
+Texture LetreroEntradaT;
+//coordenadas letreros
+//		P	 R		O	Y		E	C		T	O      ESP	C		G	 E		I	  H		C	ESP	
+float posicionesLetrasX[] = { 0.6f, 0.0f, 0.4f, 0.2f, 0.8f, 0.4f, 0.4f, 0.4f, 0.6f, 0.4f, 0.2f, 0.8f, 0.6f, 0.4f, 0.4f, 0.6f };
+float posicionesLetrasY[] = { 0.4f, 0.2f, 0.4f, 0.0f, 0.8f, 0.8f, 0.2f, 0.4f, 0.0f, 0.8f, 0.6f, 0.8f, 0.6f, 0.6f, 0.8f, 0.0f };
+int cuentaCambioLetra = 0; //contador para cambio
+//letras
+int velCambioLetra = 60; //cada cuando se cambia
+int pos1 = 0, pos2 = 1, pos3 = 2, pos4 = 3, pos5 = 4; //en que numero vamos
+//Para el letrero------------------------------------------------------
+float toffsetLetrero = 0.0f;
+float velocidadLetrero = 0.01f;
+
+
+//Prueba caminata
+float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
+float velocidadPaso = 0.1f;     // velocidad del ciclo de paso
+
+int currentCameraMode = 1; // Rastreador de modo de cámara
+
+bool estadoActualAngela = false; // Estado actual de la animación de Angela
+bool animvuelo = true;
+bool animEddie = true;
+bool animPhantump = true;
+bool animExcavadora = true;
+
+// Posición y rotación guardadas de Roland
+glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
+float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
+bool caminarRoland = false;
 
 Skybox skybox, skyboxNoche;
 
@@ -93,11 +160,9 @@ Skybox skybox, skyboxNoche;
 Material Material_brillante;
 Material Material_opaco;
 
-Material RolandMaterial;
-
-Animaciones anim;
 
 
+//-----------ILUMINACION----------------
 //Sphere cabeza = Sphere(0.5, 20, 20);
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
@@ -119,61 +184,13 @@ SpotLight spotLights3[1];// (C) 4 Antorchas Ring
 
 int spotLightMode = 0;
 
+// Centros de zonas de activación de luces
+glm::vec3 centroGaleriaInicio = glm::vec3(25.0f, -2.0f, 0.0f);
+glm::vec3 centroGaleriaFondo = glm::vec3(85.0f, -2.0f, 0.0f);
+glm::vec3 centroRing = glm::vec3(130.0f, -2.0f, 15.0f);
 
-//letreros
-Texture LetrasRingT;
-Texture LetreroEntradaT;
-//coordenadas letreros
-//		P	 R		O	Y		E	C		T	O      ESP	C		G	 E		I	  H		C	ESP	
-float posicionesLetrasX[] = { 0.6f, 0.0f, 0.4f, 0.2f, 0.8f, 0.4f, 0.4f, 0.4f, 0.6f, 0.4f, 0.2f, 0.8f, 0.6f, 0.4f, 0.4f, 0.6f };
-float posicionesLetrasY[] = { 0.4f, 0.2f, 0.4f, 0.0f, 0.8f, 0.8f, 0.2f, 0.4f, 0.0f, 0.8f, 0.6f, 0.8f, 0.6f, 0.6f, 0.8f, 0.0f };
-int cuentaCambioLetra = 0; //contador para cambio
-//letras
-int velCambioLetra = 60; //cada cuando se cambia
-int pos1 = 0, pos2 = 1, pos3 = 2, pos4 = 3, pos5 = 4; //en que numero vamos
-//Para el letrero------------------------------------------------------
-float toffsetLetrero = 0.0f;
-float velocidadLetrero = 0.01f;
-
-//Roland
-Model RolandTorso, RolandBrazoDer, RolandBrazoIzq;
-Model RolandPiernaDer, RolandPiernaIzq;
-
-//Incineroar
-Model InciCabeza, InciTorso, InciCola;
-Model InciBD, InciBI, InciPD, InciPI;
-
-//Protoman
-Model ProtoCabeza, ProtoTorso, ProtoEscudo;
-Model ProtoIzqBrazo, ProtoDerBrazo;
-Model ProtoIzqPierna, ProtoDerPierna;
-
-//Ave Castigadora
-Model AveCuerpo, AveLW, AveRW;
-
-//Angela
-Model Angela, AngelaBrazo, AngelaAntebrazo;
-
-//Eddie
-Model Eddie, EddieTapa, EddieAspas;
-
-//Prueba caminata
-float anguloMovimiento = 0.0f;  // controla el ciclo de movimiento (sinusoidal)
-float velocidadPaso = 0.1f;     // velocidad del ciclo de paso
-
-int currentCameraMode = 1; // Rastreador de modo de cámara
-
-bool estadoActualAngela = false; // Estado actual de la animación de Angela
-bool animacionInci = true;
-bool animvuelo = true;
-bool animEddie = true;
-bool animExcavadora = true;
-
-
-// Posición y rotación guardadas de Roland
-glm::vec3 rolandAvatarPos = glm::vec3(0.0f, 1.5f, 2.0f); // Posición inicial (ajusta si es necesario)
-float rolandAvatarYaw = M_PI; // Rotación inicial (mirando a -Z)
-bool caminarRoland = false;
+// Radio de activacion de luces
+float radioActivacion = 25.0f;
 
 //Variables miniaudio
 
@@ -187,16 +204,6 @@ bool sonidopausa = false;
 bool engineinit = false;
 bool ambientinit = false;
 bool spatialinit = false;
-
-
-// Centros de zonas de activación de luces
-glm::vec3 centroGaleriaInicio = glm::vec3(25.0f, -2.0f, 0.0f);
-glm::vec3 centroGaleriaFondo = glm::vec3(85.0f, -2.0f, 0.0f);
-glm::vec3 centroRing = glm::vec3(130.0f, -2.0f, 15.0f);
-
-// Radio de activacion de luces
-float radioActivacion = 25.0f;
-
 
 
 // Vertex Shader
@@ -431,21 +438,36 @@ void CargarModelos() {
 	RolandPiernaIzq = Model();
 	RolandPiernaIzq.LoadModel("Models/RolandPiernaIzqArt.obj");
 
+
+	// Phantump
+	PhantumpCabeza = Model();
+	PhantumpCabeza.LoadModel("Models/PhantumpCabeza.obj");
+	PhantumpCuerpo = Model();
+	PhantumpCuerpo.LoadModel("Models/PhantumpCuerpo.obj");
+	PhantumpBrazos = Model();
+	PhantumpBrazos.LoadModel("Models/PhantumpBrazos.obj");
+	PhantumpCola = Model();
+	PhantumpCola.LoadModel("Models/PhantumpCola.obj");
+
 	//Incineroar
 	InciCabeza = Model();
-	InciCabeza.LoadModel("Models/InciHead.obj");
+	InciCabeza.LoadModel("Models/InciCabeza.obj");
 	InciTorso = Model();
 	InciTorso.LoadModel("Models/InciTorso.obj");
-	InciBD = Model();
-	InciBD.LoadModel("Models/InciBD.obj");
-	InciPD = Model();
-	InciPD.LoadModel("Models/InciPD.obj");
-	InciBI = Model();
-	InciBI.LoadModel("Models/InciBI.obj");
-	InciPI = Model();
-	InciPI.LoadModel("Models/InciPI.obj");
 	InciCola = Model();
 	InciCola.LoadModel("Models/InciCola.obj");
+	InciBrazoD = Model();
+	InciBrazoD.LoadModel("Models/InciRBrazo.obj");
+	InciAnteD = Model();
+	InciAnteD.LoadModel("Models/InciRAnte.obj");
+	InciBrazoL = Model();
+	InciBrazoL.LoadModel("Models/InciLBrazo.obj");
+	InciAnteL = Model();
+	InciAnteL.LoadModel("Models/InciLAnte.obj");
+	InciPiernaD = Model();
+	InciPiernaD.LoadModel("Models/InciRPierna.obj");
+	InciPiernaL = Model();
+	InciPiernaL.LoadModel("Models/InciLPierna.obj");
 
 	//Protoman
 	ProtoCabeza = Model();
@@ -654,7 +676,7 @@ int main()
 	printf("3 - Vista al Ring\n4 - Vista a la Ofrenda\n3 - Vista a la Galeria\n");
 	//animaciones
 	printf("\nANIMACIONES:\nO - Entrada principal\n");
-	printf("I - Entrada al ring\nP - Protoman\n");
+	printf("I - Entrada al ring\nP - Protoman\nU - Incineroar\n");
 	printf("L - Saludo de Angela\nK - Pokebayas\nJ - Maquina expendedora\n");
 	//luces
 	printf("\nILUMINACION:\nSolo de noche se prenden las luces\n");
@@ -667,7 +689,7 @@ int main()
 	printf("M para luz de la piramide\n");
 	//audio
 	printf("\AUDIO:\n");
-	printf("U para pausar\n");
+	printf("Q para pausar\n");
 	
 	glm::mat4 model(1.0);
 	glm::mat4 modelaux(1.0);
@@ -676,6 +698,8 @@ int main()
 	glm::mat4 elementoLocal(1.0);
 	glm::mat4 baseRol(1.0);
 	glm::mat4 baseInc(1.0);
+	glm::mat4 modelBrazo(1.0);
+	glm::mat4 basePhant(1.0);
 	glm::mat4 baseProto(1.0);
 	glm::mat4 brazoProto(1.0);
 	glm::mat4 baseAve(1.0);
@@ -684,6 +708,7 @@ int main()
 	glm::mat4 antebrazoAngela(1.0);
 	glm::mat4 baseEddie(1.0);
 	glm::mat4 tapaEddie(1.0);
+	
 
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 lowerLight(1.0f);
@@ -824,8 +849,9 @@ int main()
 		anim.AnimacionProtoman(mainWindow.getEstadoProto(), deltaTime);
 		estadoActualAngela = anim.AnimacionAngela(mainWindow.getEstadoAngela(), deltaTime);
 		mainWindow.setEstadoAngela(estadoActualAngela);
+		anim.AnimacionIncineroar(mainWindow.getEstadoIncineroar(), deltaTime);
 
-		anim.AnimacionIncineroar(animacionInci, deltaTime);
+		anim.AnimacionPhantump(animPhantump, deltaTime);
 		anim.AnimacionPajaro(animvuelo, toRadians, deltaTime);
 		anim.AnimacionEddie(animEddie, toRadians, deltaTime);
 
@@ -1062,6 +1088,37 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Ofrenda.RenderModel();
 
+		//Modelo Phantump posicionado alrededor de la ofrenda
+		//Cuerpo, torso como base
+		//basePhant = elementos;
+		basePhant = glm::mat4(1.0);
+		basePhant = glm::translate(basePhant, glm::vec3(anim.pos_ini_x_pha + anim.elevacion_cuerpo, 2.0f + anim.elevacion_cuerpo, anim.pos_ini_z_pha));
+		basePhant = glm::rotate(basePhant, anim.orientaPhantump * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		basePhant = glm::scale(basePhant, glm::vec3(0.1f, 0.1f, 0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(basePhant));
+		PhantumpCuerpo.RenderModel();
+
+		//Brazos
+		modelaux = basePhant;
+		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 1.0f, 2.0f));
+		modelaux = glm::rotate(modelaux, anim.rotacion_brazos, glm::vec3(1.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		PhantumpBrazos.RenderModel();
+
+		//Cabeza
+		modelaux = basePhant;
+		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 23.3f, 2.0f));
+		modelaux = glm::rotate(modelaux, anim.ladeo_cabeza * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		PhantumpCabeza.RenderModel();
+
+		//Cola
+		modelaux = basePhant;
+		modelaux = glm::translate(modelaux, glm::vec3(-2.5f, -1.5f, -10.0f));
+		modelaux = glm::rotate(modelaux, anim.rotacion_cola, glm::vec3(1.0f, 0.0f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
+		PhantumpCola.RenderModel();
+
 		//Ubicacion central de la piramide
 		elementos = glm::mat4(1.0);
 		elementos = glm::translate(elementos, glm::vec3(158.5f, -2.0f, 39.0f));
@@ -1078,57 +1135,76 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(elementos));
 		Ring.RenderModel();
 
+
 		// INCINEROAR
 		// 1. Empezar desde la matriz del ring (que ya está girada y en -2.0f Y)
 		baseInc = elementoLocal;
-		// 2. Aplicar el movimiento local (X, Z) y ajustar Y para ponerlo en el suelo (-2.5f)
-		//    (El ring está en -2.0, así que bajamos -0.5 más)
-		baseInc = glm::translate(baseInc, glm::vec3(anim.pos_ini_x_inci, 3.5f, anim.pos_ini_z_inci));
-		// 3. Aplicar la orientación local del modelo
-		baseInc = glm::rotate(baseInc, glm::radians(anim.orienta), glm::vec3(0.0f, 1.0f, 0.0f));
-		// 4. Aplicar la escala del modelo
+		baseInc = glm::translate(baseInc, glm::vec3(anim.posInciX + 0.0f, anim.posInciY + 3.5f, anim.posInciZ + 0.0f));
+		baseInc = glm::rotate(baseInc, anim.orientaInci * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		baseInc = glm::scale(baseInc, glm::vec3(0.025f, 0.025f, 0.025f));
-
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(baseInc));
 		InciTorso.RenderModel();
 
 		//Cabeza
 		modelaux = baseInc;
-		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 19.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotCabezaInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotCabezaInciY * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelaux = glm::translate(modelaux, glm::vec3(0.0f, 7.5f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		InciCabeza.RenderModel();
 
 		//BD
-		modelaux = baseInc;
-		modelaux = glm::translate(modelaux, glm::vec3(-42.9f, -14.0f, 2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionBrazoDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelBrazo = baseInc;
+		modelBrazo = glm::translate(modelBrazo, glm::vec3(-35.0f, -2.0f, -10.0f));
+		modelBrazo = glm::rotate(modelBrazo, anim.rotBrazoInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelBrazo = glm::rotate(modelBrazo, anim.rotBrazoInciZ * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		//modelBrazo = modelaux;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelBrazo));
+		InciBrazoD.RenderModel();
+
+		modelaux = modelBrazo;
+		modelaux = glm::translate(modelaux, glm::vec3(-23.0f, -46.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotAntebInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotAntebInciZ * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		InciBD.RenderModel();
+		InciAnteD.RenderModel();
 
 		//BI
-		modelaux = baseInc;
-		modelaux = glm::translate(modelaux, glm::vec3(42.9f, -14.0f, 2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionBrazoIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelBrazo = baseInc;
+		modelBrazo = glm::translate(modelBrazo, glm::vec3(35.0f, -2.0f, -10.0f));
+		modelBrazo = glm::rotate(modelBrazo, anim.rotBrazoInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelBrazo = glm::rotate(modelBrazo, -anim.rotBrazoInciZ * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+		//modelBrazo = modelaux;
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelBrazo));
+		InciBrazoL.RenderModel();
+
+		modelaux = modelBrazo;
+		modelaux = glm::translate(modelaux, glm::vec3(23.0f, -46.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotAntebInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, -anim.rotAntebInciZ * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		InciBI.RenderModel();
+		InciAnteL.RenderModel();
 
 		//pD
 		modelaux = baseInc;
-		modelaux = glm::translate(modelaux, glm::vec3(-12.0f, -73.0f, -2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionPiernaDerInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::translate(modelaux, glm::vec3(-5.0f, -62.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotPiernaInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotPiernaInciZ * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		InciPD.RenderModel();
+		InciPiernaD.RenderModel();
 
 		//pI
 		modelaux = baseInc;
-		modelaux = glm::translate(modelaux, glm::vec3(12.0f, -73.0f, -2.0f));
-		modelaux = glm::rotate(modelaux, glm::radians(anim.rotacionPiernaIzqInci), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::translate(modelaux, glm::vec3(5.0f, -62.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, anim.rotPiernaInciX * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelaux = glm::rotate(modelaux, -anim.rotPiernaInciZ * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
-		InciPI.RenderModel();
+		InciPiernaL.RenderModel();
 
 		//COLA
 		modelaux = baseInc;
-		modelaux = glm::translate(modelaux, glm::vec3(0.0f, -93.0f, -78.0f));
+		modelaux = glm::translate(modelaux, glm::vec3(0.0f, -60.0f, -20.0f));
+		modelaux = glm::rotate(modelaux, anim.rotColaInci * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelaux));
 		InciCola.RenderModel();
 

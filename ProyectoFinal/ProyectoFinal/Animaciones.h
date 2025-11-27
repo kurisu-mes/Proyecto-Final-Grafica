@@ -23,8 +23,9 @@ public:
 	//animaciones simples
 	void AnimacionProtoman(bool condicion, GLfloat deltaTime);
 	bool AnimacionAngela(bool condicion, GLfloat deltaTime);
-	//animaciones complejas
 	void AnimacionIncineroar(bool condicion, GLfloat deltaTime);
+	//animaciones complejas
+	void AnimacionPhantump(bool condicion, GLfloat deltaTime);
 	void AnimacionPajaro(bool condicion, float toRadians, GLfloat deltaTime);
 	void AnimacionEddie(bool condicion, float toRadians, GLfloat deltaTime);
 	void CaminataRoland(bool condicion, GLfloat deltaTime);
@@ -57,18 +58,22 @@ public:
 	float rotacionBrazoDer, rotacionBrazoIzq;
 	float rotacionPiernaDer, rotacionPiernaIzq;
 
-	// Animacion compleja incineroar
-	float orienta, tiempolocal;
-	float rotacionBrazoDerInci, rotacionBrazoIzqInci;
-	float rotacionPiernaDerInci, rotacionPiernaIzqInci;
-	//float rotacioncabezaInci;
-	float pos_ini_x_inci, pos_ini_z_inci;
+	// Animacion simple incineroar
+	float rotBrazoInciX, rotBrazoInciZ, rotAntebInciX, rotAntebInciZ;
+	float rotPiernaInciX, rotPiernaInciZ, rotCabezaInciX, rotCabezaInciY;
+	float rotColaInci, orientaInci;
+	float posInciX, posInciY, posInciZ;
 	
 	//Variables Movimiento Protoman
 	float brazoProtoR, escudoProto1, escudoProto2;
 	float posicionProto, piernaProto;
 	//Animacion Angela
 	float rotBrazoAng, rotAnteBraAng;
+
+	// Animacion compleja phantump
+	float pos_ini_x_pha, pos_ini_y_pha, pos_ini_z_pha;
+	float orientaPhantump, rotacion_brazos, rotacion_cola;
+	float elevacion_cuerpo, ladeo_cabeza;
 
 	//Animacion Eddie
 	float posEddieY, posEddieX, rotacionAspas;
@@ -102,15 +107,19 @@ private:
 	float velocidadbrazos = 4.0f;
 	int faseAnimAngela;
 
-	//PosInicial Incineroar
-	float minXZ, maxXZ;
-	float inciSpeed;
-
 	float tiempovuelo, velocidadvuelo, rotacionAla;
 	float desplazamiento_x, desplazamiento_z;
 	float radio = 5.0f; //Para la circunferencia de vuelo
 
 	int estadoEddie;
+	int estadoInci;
+	int recorridoPhantump;
+	float tiempolocalPhantump, velocidadMov;
+	float minXZ, maxXZ;
+
+	float tiempoLocalInci;
+	float minAlturaInci, maxAlturaInci;
+	
 
 	// Keyframes 
 	#define MAX_FRAMES 50

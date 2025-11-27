@@ -19,6 +19,7 @@ public:
 	bool getEstadoProto() { return estadoProto; }
 	bool getEstadoAngela() { return estadoAngela; }
 	void setEstadoAngela(bool nuevoEstado) { estadoAngela = nuevoEstado; }
+	bool getEstadoIncineroar() { return estadoIncineroar; }
 	bool getEstadoPokeArbol() { return estadoPokeArbol; }
 	bool getEstadoRefrescos() { return estadoRefrescos; }
 	void setEstadoRefrescos(bool nuevoEstado) { estadoRefrescos = nuevoEstado; }
@@ -45,7 +46,7 @@ private:
 	GLfloat yChange;
 	GLfloat muevex;
 	bool mouseFirstMoved, estadoEntrada, estadoRing, estadoProto, estadoAngela;
-	bool estadoPokeArbol, estadoRefrescos;
+	bool estadoIncineroar, estadoPokeArbol, estadoRefrescos;
 	static void ManejaTeclado(GLFWwindow* window, int key, int code, int action, int mode);
 	static void ManejaMouse(GLFWwindow* window, double xPos, double yPos);
 

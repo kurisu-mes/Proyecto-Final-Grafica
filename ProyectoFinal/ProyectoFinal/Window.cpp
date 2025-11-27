@@ -21,6 +21,7 @@ Window::Window(GLint windowWidth, GLint windowHeight)
 	estadoRing = false;
 	estadoProto = false;
 	estadoAngela = false;
+	estadoIncineroar = false;
 	estadoPokeArbol = false;
 	estadoRefrescos = false;
 	muevex = 2.0f;
@@ -141,6 +142,11 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		theWindow->estadoAngela = !theWindow->estadoAngela;
 	}
 
+	//Animacion Incineroar
+	if (key == GLFW_KEY_U && GLFW_PRESS == action)
+	{
+		theWindow->estadoIncineroar = !theWindow->estadoIncineroar;
+	}
 
 	//Animacion Arbol
 	if (key == GLFW_KEY_K && GLFW_PRESS == action)
@@ -173,7 +179,7 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 
 
 	// Control audio
-	if (key == GLFW_KEY_U && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
 		if (!sonidopausa) {
 			ma_sound_stop(&sonidoFondo);
 			sonidopausa = true;
