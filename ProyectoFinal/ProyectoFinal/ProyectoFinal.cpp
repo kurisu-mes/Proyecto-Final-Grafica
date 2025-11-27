@@ -676,7 +676,7 @@ int main()
 	//modos de camara
 	printf("\nCAMARA:\nWASD - Mover camara\n");
 	printf("1 - Modo Principal (Tercera Persona)\n2 - Modo Aereo\n");
-	printf("3 - Vista al Ring\n4 - Vista a la Ofrenda\n3 - Vista a la Galeria\n");
+	printf("3 - Vista al Ring\n4 - Vista a la Ofrenda\n5 - Vista a la Galeria\n");
 	//animaciones
 	printf("\nANIMACIONES:\nO - Entrada principal\n");
 	printf("I - Entrada al ring\nP - Protoman\nU - Incineroar\n");
